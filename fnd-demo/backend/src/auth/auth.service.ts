@@ -20,7 +20,7 @@ export class AuthService {
     return null;
   }
 
-  async signIn(_user: User) {
+  async signIn(_user: User): Promise<{ access_token: string }> {
     const paylod = {
       id: _user.id,
       email: _user.email,
