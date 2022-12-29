@@ -28,57 +28,60 @@ const ButtonWrap = styled.div`
   margin: 0 auto;
 `;
 
-export default function SignUp() {
-  const [signUpObject, setSignUpObject] = useState({ email: '', password: '' });
+export default function SignIn() {
+  const [signInObject, setSignInObject] = useState({ email: '', password: '' });
 
-  const changeSignUpObject = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const changeSignInObject = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
     if (name === 'email') {
-      setSignUpObject({ ...signUpObject, email: value });
+      setSignInObject({ ...signInObject, email: value });
     } else {
-      setSignUpObject({ ...signUpObject, password: value });
+      setSignInObject({ ...signInObject, password: value });
     }
   };
 
-  const onSignUp = async () => {
-    if (!signUpObject.email) {
+  const onSignIn = async () => {
+    if (!signInObject.email) {
       alert('Email is required');
       return;
     }
-    if (!signUpObject.password) {
+    if (!signInObject.password) {
       alert('Password is required');
       return;
     }
-    axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, signUpObject)
+    await axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject)
       .then((_res: AxiosResponse) => {
-        if (_res.status === 201) {
-          alert('Successfully signed up');
+        if (_res.status && _res.status === 201) {
+          alert('Successfully signed in');
         }
       })
       .catch((_error: AxiosError) => {
-        alert('Failed to sign up');
+        const data: any = _error.response?.data;
+        if (data.statusCode && data.statusCode === 404) {
+          alert(data.message);
+        }
       });
   };
 
   return (
     <Container>
-      <h1>Sign Up</h1>
+      <h1>Sign In</h1>
       <SignUpDiv>
         <InputDiv>
           <label htmlFor="email">email</label>
-          <input type="text" name="email" value={signUpObject.email} onChange={changeSignUpObject} />
+          <input type="text" name="email" value={signInObject.email} onChange={changeSignInObject} />
         </InputDiv>
         <br />
         <InputDiv>
           <label htmlFor="password">password</label>
-          <input type="password" name="password" value={signUpObject.password} onChange={changeSignUpObject} />
+          <input type="password" name="password" value={signInObject.password} onChange={changeSignInObject} />
         </InputDiv>
         <br />
         <br />
         <ButtonWrap>
-          <button onClick={onSignUp}>sign up</button>
+          <button onClick={onSignIn}>sign in</button>
         </ButtonWrap>
       </SignUpDiv>
     </Container>
