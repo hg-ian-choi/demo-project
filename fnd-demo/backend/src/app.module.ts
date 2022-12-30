@@ -7,6 +7,7 @@ import * as Joi from 'joi';
 import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    CommonModule,
   ],
 })
 export class AppModule {}

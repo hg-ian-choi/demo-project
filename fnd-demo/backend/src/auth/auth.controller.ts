@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { User } from 'src/users/user.entity';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -15,12 +17,11 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('/signin')
   async signIn(
-    @Req() _req: any,
+    @GetUser() _user: User,
     @Res({ passthrough: true }) _res: Response,
   ): Promise<string> {
-    const accessToken = await this.authService.signIn(_req.user);
-    console.log('accessToken', accessToken);
-    await _res
+    const accessToken = await this.authService.signIn(_user);
+    _res
       .cookie('at_auth', accessToken, {
         domain: this.configService.get<string>('domain'),
         path: '/',
@@ -29,7 +30,7 @@ export class AuthController {
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: true,
       })
-      .cookie('loginId', _req.user.id, {
+      .cookie('loginId', _user.id, {
         domain: this.configService.get<string>('domain'),
         path: '/',
         maxAge: 1800000,
@@ -37,7 +38,7 @@ export class AuthController {
         secure: false,
         httpOnly: false,
       })
-      .cookie('username', _req.user.username, {
+      .cookie('username', _user.username, {
         domain: this.configService.get<string>('domain'),
         path: '/',
         maxAge: 1800000,
@@ -50,7 +51,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  getProfile(@Req() _req: any) {
-    return _req.user;
+  getProfile(@GetUser() _user: User) {
+    return _user;
   }
 }
