@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
@@ -11,6 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (_request: Request) => {
+          console.log('at_auth', _request.signedCookies.at_auth);
           return _request.signedCookies.at_auth;
         },
       ]),
@@ -20,7 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(_paylod: User) {
-    return { id: _paylod.id, email: _paylod.email, username: _paylod.username };
+  async validate(_req: Request, _payload: User): Promise<User> {
+    const userId = _req.params.user_id;
+
+    if (userId && userId !== _payload.id) {
+      throw new UnauthorizedException(`Only user in person is allowed.`);
+    }
+
+    return _payload;
   }
 }

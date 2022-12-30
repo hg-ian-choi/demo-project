@@ -12,7 +12,7 @@ export class AuthService {
   ) {}
 
   async validateUser(_user: SigninDto): Promise<User> {
-    const user = await this.usersService.getUser({ email: _user.email });
+    const user = await this.usersService.getUser(_user.email);
     if (user && _user.password === user.password) {
       const { password, ...result } = user;
       return result;
@@ -20,13 +20,13 @@ export class AuthService {
     return null;
   }
 
-  async signIn(_user: User): Promise<{ access_token: string }> {
-    const paylod = {
+  async signIn(_user: User): Promise<string> {
+    const paylod: User = {
       id: _user.id,
       email: _user.email,
       username: _user.username,
     };
 
-    return { access_token: this.jwtService.sign(paylod) };
+    return this.jwtService.sign(paylod);
   }
 }

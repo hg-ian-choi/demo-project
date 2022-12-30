@@ -2,8 +2,9 @@
 
 export default () => ({
   mode: process.env.MODE,
-  port: parseInt(process.env.PORT, 10),
+  ssl: process.env.SSL,
   domain: process.env.DOMAIN,
+  port: parseInt(process.env.PORT, 10),
   database: {
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT, 10),

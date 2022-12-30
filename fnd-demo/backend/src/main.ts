@@ -11,7 +11,10 @@ async function main() {
   const config = configuration();
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: `${config.ssl}://${config.domain}`,
+    credentials: true,
+  });
   app.use(cookieParser(config.cookieSecret));
   app.useGlobalPipes(
     new ValidationPipe({
@@ -23,7 +26,7 @@ async function main() {
 
   await app.listen(config.port).then(() => {
     mainLogger.verbose(
-      `FND-Demo server listening on ${config.domain}:${config.port}`,
+      `FND-Demo server listening on [${config.ssl}://${config.domain}:${config.port}]`,
     );
   });
 }

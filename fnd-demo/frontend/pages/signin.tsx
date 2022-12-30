@@ -54,7 +54,7 @@ export default function SignIn() {
       .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject)
       .then((_res: AxiosResponse) => {
         if (_res.status && _res.status === 201) {
-          alert('Successfully signed in');
+          console.log('_res', _res);
         }
       })
       .catch((_error: AxiosError) => {

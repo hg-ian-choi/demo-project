@@ -2,7 +2,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 
@@ -36,8 +36,25 @@ export class UsersService {
    * @param _userId
    * @returns User
    */
-  async getUser(_match: FindOptionsWhere<User>): Promise<User> {
-    console.log('!!!!!');
-    return await this.usersRepository.findOne({ where: _match });
+  async getUsers(
+    _match?: FindOptionsWhere<User>,
+    _sort?: FindOptionsOrder<User>,
+  ): Promise<User[]> {
+    return await this.usersRepository.find({ where: _match, order: _sort });
+  }
+
+  /**
+   *@description select one User
+   * @param _userId
+   * @returns User
+   */
+  async getUser(_match: string): Promise<User> {
+    let user = await this.usersRepository.findOne({ where: { email: _match } });
+    if (!user) {
+      user = await this.usersRepository
+        .findOne({ where: { id: _match } })
+        .catch(() => null);
+    }
+    return user;
   }
 }

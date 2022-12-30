@@ -1,7 +1,7 @@
 // user/user.controller.ts
 
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { FindOptionsWhere } from 'typeorm';
+import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -27,12 +27,25 @@ export class UsersController {
    ************************************ READ ************************************
    ******************************************************************************/
   /**
+   * @description select Users
+   * @param _userId
+   * @returns User[]
+   */
+  @Get('/')
+  getUsers(
+    @Body('match') _match: FindOptionsWhere<User>,
+    @Body('sort') _sort: FindOptionsOrder<User>,
+  ): Promise<User[]> {
+    return this.usersService.getUsers(_match, _sort);
+  }
+
+  /**
    * @description select one User
    * @param _userId
    * @returns User
    */
-  @Get('/:userId')
-  getUser(@Param('match') _match: FindOptionsWhere<User>): Promise<User> {
+  @Get('/:match')
+  getUser(@Param('match') _match: string): Promise<User> {
     return this.usersService.getUser(_match);
   }
 }
