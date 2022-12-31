@@ -12,7 +12,7 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const SignUpDiv = styled.div`
+const SignInDiv = styled.div`
   min-width: 300px;
   max-width: 500px;
   display: flex;
@@ -68,7 +68,7 @@ export default function SignIn() {
   return (
     <Container>
       <h1>Sign In</h1>
-      <SignUpDiv>
+      <SignInDiv>
         <InputDiv>
           <label htmlFor="email">email</label>
           <input type="text" name="email" value={signInObject.email} onChange={changeSignInObject} />
@@ -83,7 +83,9 @@ export default function SignIn() {
         <ButtonWrap>
           <button onClick={onSignIn}>sign in</button>
         </ButtonWrap>
-      </SignUpDiv>
+      </SignInDiv>
+      <div style={{ borderTop: '1px solid black', width: '50%', margin: '30px 0' }} />
+      <button>Signin with Metamask</button>
     </Container>
   );
 }

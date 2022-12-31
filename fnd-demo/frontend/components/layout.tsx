@@ -1,11 +1,12 @@
 // components/layout.js
 
+import { ReactNode } from 'react';
 import Navbar from './navbar';
 
-export default function Layout({ children, loginUser }: { children: any; loginUser: string }) {
+export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Navbar loginUser={loginUser} />
+      <Navbar />
       <main>{children}</main>
     </>
   );

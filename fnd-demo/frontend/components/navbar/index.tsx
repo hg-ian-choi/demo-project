@@ -23,7 +23,7 @@ const ImageWrap = styled.div`
 const ProfileContainer = styled.div``;
 const ButtonWrap = styled.div``;
 
-export default function Navbar({ loginUser }: { loginUser: string }) {
+export default function Navbar() {
   const router = useRouter();
 
   const turnToSignIn = () => {
@@ -49,8 +49,8 @@ export default function Navbar({ loginUser }: { loginUser: string }) {
           />
         </ImageWrap>
         <ProfileContainer>
-          {loginUser ? (
-            <div>Hi, {loginUser}</div>
+          {false ? (
+            <div>Hi, </div>
           ) : (
             <ButtonWrap>
               <button onClick={turnToSignIn}>Sign In</button>
