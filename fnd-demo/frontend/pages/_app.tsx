@@ -1,19 +1,21 @@
 // pages/_app.tsx
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { AppProps } from 'next/app';
 import Layout from '../components/layout';
 
 App.getInitialProps = async ({ ctx }: { ctx: any }) => {
   let loginId = '';
-  let username = '';
+  let loginUser = '';
   if (ctx.req) {
-    loginId = await ctx.req.cookies['loginUser'];
+    loginId = await ctx.req.cookies['loginId'];
     if (loginId) {
-      username = await axios.get(`${process.env.server_url}`);
+      loginUser = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/${loginId}`).then((_res: AxiosResponse) => {
+        return _res.data.username;
+      });
     }
   }
-  return { loginId: loginId };
+  return { loginUser: loginUser };
 };
 
 export default function App({ Component, pageProps, loginUser }: any) {

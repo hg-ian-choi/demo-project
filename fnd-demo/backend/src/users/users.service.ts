@@ -40,7 +40,15 @@ export class UsersService {
     _match?: FindOptionsWhere<User>,
     _sort?: FindOptionsOrder<User>,
   ): Promise<User[]> {
-    return await this.usersRepository.find({ where: _match, order: _sort });
+    const users = await this.usersRepository.find({
+      where: _match,
+      order: _sort,
+    });
+    const result = users.map((_v: User) => {
+      const { password, ...rest } = _v;
+      return rest;
+    });
+    return result;
   }
 
   /**

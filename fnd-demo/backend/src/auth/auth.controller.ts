@@ -35,7 +35,7 @@ export class AuthController {
         path: '/',
         maxAge: 1800000,
         signed: false,
-        secure: false,
+        secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
       })
       .cookie('username', _user.username, {
@@ -43,7 +43,7 @@ export class AuthController {
         path: '/',
         maxAge: 1800000,
         signed: false,
-        secure: false,
+        secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
       });
     return accessToken;

@@ -51,7 +51,7 @@ export default function SignIn() {
       return;
     }
     await axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject)
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject, { withCredentials: true })
       .then((_res: AxiosResponse) => {
         if (_res.status && _res.status === 201) {
           console.log('_res', _res);
