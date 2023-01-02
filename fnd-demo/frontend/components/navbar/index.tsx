@@ -3,8 +3,6 @@
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import styled from '@emotion/styled';
-import { useSelector } from 'react-redux';
-import { RootState, userSelector } from '../../store/store';
 
 const Container = styled.div`
   position: fixed;
@@ -26,9 +24,6 @@ const ButtonWrap = styled.div``;
 
 export default function Navbar() {
   const router = useRouter();
-
-  const user = useSelector(userSelector);
-  console.log('user', user);
 
   const turnToSignIn = () => {
     router.push('/signin');
@@ -53,8 +48,8 @@ export default function Navbar() {
           />
         </ImageWrap>
         <ProfileContainer>
-          {user.userId ? (
-            <div>Hi, {user.username}</div>
+          {false ? (
+            <div>Hi, </div>
           ) : (
             <ButtonWrap>
               <button onClick={turnToSignIn}>Sign In</button>
