@@ -50,6 +50,7 @@ export default function SignIn() {
       alert('Password is required');
       return;
     }
+    // signIn();
     await axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject, { withCredentials: true })
       .then((_res: AxiosResponse) => {

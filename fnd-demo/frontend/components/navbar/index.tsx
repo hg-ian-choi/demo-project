@@ -3,7 +3,6 @@
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import styled from '@emotion/styled';
-import { useState } from 'react';
 
 const Container = styled.div`
   position: fixed;
