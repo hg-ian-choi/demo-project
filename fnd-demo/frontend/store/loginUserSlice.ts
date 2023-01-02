@@ -36,6 +36,6 @@ export const loginUserSlice = createSlice({
 export const { setLoginUserId, setLoginUsername, setLoginUser } = loginUserSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
-export const selectCount = (state: RootState) => state.loginUser;
+export const loginUserSelector = (state: RootState) => state.loginUser;
 
 export default loginUserSlice.reducer;
