@@ -3,6 +3,8 @@
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import styled from '@emotion/styled';
+import { useSelector } from 'react-redux';
+import { loginUserSelector } from '../../store/loginUserSlice';
 
 const Container = styled.div`
   position: fixed;
@@ -23,6 +25,7 @@ const ProfileContainer = styled.div``;
 const ButtonWrap = styled.div``;
 
 export default function Navbar() {
+  const user = useSelector(loginUserSelector);
   const router = useRouter();
 
   const turnToSignIn = () => {
@@ -48,8 +51,8 @@ export default function Navbar() {
           />
         </ImageWrap>
         <ProfileContainer>
-          {false ? (
-            <div>Hi, </div>
+          {user.username ? (
+            <div>Hi, {user.username}</div>
           ) : (
             <ButtonWrap>
               <button onClick={turnToSignIn}>Sign In</button>

@@ -1,8 +1,8 @@
 // pages/_app.tsx
 
-import { AppProps } from 'next/app';
-import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 import Layout from '../components/layout';
+import store from '../store/store';
 
 App.getInitialProps = async (ctx: any) => {
   let username = '';
@@ -14,13 +14,12 @@ App.getInitialProps = async (ctx: any) => {
 
 export default function App({ Component, ...pageProps }: any) {
   const { username } = pageProps;
-  useEffect(() => {
-    console.log('username', username);
-  }, [username]);
 
   return (
-    <Layout {...pageProps}>
-      <Component {...pageProps} />
-    </Layout>
+    <Provider store={store}>
+      <Layout username={username}>
+        <Component {...pageProps} />
+      </Layout>
+    </Provider>
   );
 }
