@@ -1,6 +1,7 @@
 // components/layout.js
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Navbar from './navbar';
 
 export default function Layout({ children }: { children: ReactNode }) {
