@@ -3,6 +3,8 @@
 import styled from '@emotion/styled';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useState } from 'react';
+import { useAppDispatch } from '../store/hooks';
+import { setLoginUser } from '../store/loginUserSlice';
 
 const Container = styled.div`
   height: 100vh;
@@ -29,6 +31,7 @@ const ButtonWrap = styled.div`
 `;
 
 export default function SignIn() {
+  const dispatch = useAppDispatch();
   const [signInObject, setSignInObject] = useState({ email: '', password: '' });
 
   const changeSignInObject = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +53,11 @@ export default function SignIn() {
       alert('Password is required');
       return;
     }
-    // signIn();
     await axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject, { withCredentials: true })
       .then((_res: AxiosResponse) => {
         if (_res.status && _res.status === 201) {
-          console.log('_res', _res);
+          dispatch(setLoginUser({ username: _res.data.username }));
         }
       })
       .catch((_error: AxiosError) => {

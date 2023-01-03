@@ -19,7 +19,7 @@ export class AuthController {
   async signIn(
     @GetUser() _user: User,
     @Res({ passthrough: true }) _res: Response,
-  ): Promise<string> {
+  ): Promise<object> {
     const accessToken = await this.authService.signIn(_user);
     _res
       .cookie('at_auth', accessToken, {
@@ -46,7 +46,44 @@ export class AuthController {
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
       });
-    return accessToken;
+    return { userId: _user.id, username: _user.username, _token: accessToken };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/signout')
+  signOut(
+    @GetUser() _user: User,
+    @Res({ passthrough: true }) _res: Response,
+  ): boolean {
+    if (_user) {
+      _res
+        .cookie('at_auth', '', {
+          domain: this.configService.get<string>('domain'),
+          path: '/',
+          maxAge: 0,
+          signed: true,
+          secure: this.configService.get<string>('mode') === 'PROD',
+          httpOnly: true,
+        })
+        .cookie('loginId', '', {
+          domain: this.configService.get<string>('domain'),
+          path: '/',
+          maxAge: 0,
+          signed: false,
+          secure: this.configService.get<string>('mode') === 'PROD',
+          httpOnly: false,
+        })
+        .cookie('username', '', {
+          domain: this.configService.get<string>('domain'),
+          path: '/',
+          maxAge: 0,
+          signed: false,
+          secure: this.configService.get<string>('mode') === 'PROD',
+          httpOnly: false,
+        });
+      return true;
+    }
+    return false;
   }
 
   @UseGuards(JwtAuthGuard)
