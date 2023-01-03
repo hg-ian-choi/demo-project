@@ -3,7 +3,11 @@ import { User } from 'src/users/user.entity';
 
 export class SigninDto extends User {
   @IsEmail()
-  email: string;
+  email?: string;
+
   @IsString()
-  password: string;
+  password?: string;
+
+  @IsString()
+  wallet_address?: string;
 }

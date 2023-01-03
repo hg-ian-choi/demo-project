@@ -1,6 +1,16 @@
 // user/user.controller.ts
 
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
@@ -19,7 +29,7 @@ export class UsersController {
    * @returns User
    */
   @Post('/')
-  createUser(@Body() _user: CreateUserDto): Promise<User> {
+  private createUser(@Body() _user: CreateUserDto): Promise<User> {
     return this.usersService.createUser(_user);
   }
 
@@ -32,7 +42,7 @@ export class UsersController {
    * @returns User[]
    */
   @Get('/')
-  getUsers(
+  private getUsers(
     @Body('match') _match: FindOptionsWhere<User>,
     @Body('sort') _sort: FindOptionsOrder<User>,
   ): Promise<User[]> {
@@ -45,7 +55,21 @@ export class UsersController {
    * @returns User
    */
   @Get('/:match')
-  getUser(@Param('match') _match: string): Promise<User> {
-    return this.usersService.getUser(_match);
+  private getUser(
+    @Param('match') _match: FindOptionsWhere<User>,
+  ): Promise<User> {
+    return this.usersService.getUserWithoutPassword(_match);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/connectWallet')
+  public async connectWallet(
+    @GetUser() _user: User,
+    @Body('wallet') _wallet: string,
+  ) {
+    if (_wallet) {
+      _user.wallet_address = _wallet;
+    }
+    return this.usersService.connectWallet(_user);
   }
 }

@@ -11,6 +11,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (_request: Request) => {
+          console.log('_request.signedCookies', _request.signedCookies.at_auth);
           return _request.signedCookies.at_auth;
         },
       ]),
@@ -21,6 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(_req: Request, _payload: User): Promise<User> {
+    console.log('!!!');
     const userId = _req.params.user_id;
 
     if (userId && userId !== _payload.id) {

@@ -6,6 +6,7 @@ import { User } from '../user.entity';
 export class CreateUserDto extends User {
   @IsEmail()
   email: string;
+
   @IsString()
   password: string;
 }

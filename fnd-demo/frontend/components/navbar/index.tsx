@@ -42,6 +42,10 @@ export default function Navbar({ signOut }: { signOut: any }) {
     signOut();
   };
 
+  const turnToProfile = () => {
+    router.push('/mypage');
+  };
+
   return (
     <Container>
       <SubContainer>
@@ -62,7 +66,7 @@ export default function Navbar({ signOut }: { signOut: any }) {
               Hi, {loginUser.username}
               <span>
                 {' '}
-                <button onClick={turnToSignOut}>Sign Out</button>
+                <button onClick={turnToProfile}>My Page</button> <button onClick={turnToSignOut}>Sign Out</button>
               </span>
             </div>
           ) : (

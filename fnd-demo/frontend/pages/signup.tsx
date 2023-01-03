@@ -2,6 +2,7 @@
 
 import styled from '@emotion/styled';
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 const Container = styled.div`
@@ -29,6 +30,7 @@ const ButtonWrap = styled.div`
 `;
 
 export default function SignUp() {
+  const router = useRouter();
   const [signUpObject, setSignUpObject] = useState({ email: '', password: '' });
 
   const changeSignUpObject = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +57,7 @@ export default function SignUp() {
       .then((_res: AxiosResponse) => {
         if (_res.status === 201) {
           alert('Successfully signed up');
+          router.push('/');
         }
       })
       .catch((_error: AxiosError) => {

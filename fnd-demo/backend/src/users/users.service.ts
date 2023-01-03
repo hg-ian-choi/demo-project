@@ -21,7 +21,7 @@ export class UsersService {
    * @param _user
    * @returns User
    */
-  async createUser(_user: CreateUserDto): Promise<User> {
+  public async createUser(_user: CreateUserDto): Promise<User> {
     const username = _user.email.split('@')[0];
     const user = this.usersRepository.create({ ..._user, username: username });
     await this.usersRepository.save(user);
@@ -32,11 +32,11 @@ export class UsersService {
    ************************************ READ ************************************
    ******************************************************************************/
   /**
-   *@description select one User
+   *@description get Users without password
    * @param _userId
    * @returns User
    */
-  async getUsers(
+  public async getUsers(
     _match?: FindOptionsWhere<User>,
     _sort?: FindOptionsOrder<User>,
   ): Promise<User[]> {
@@ -44,25 +44,46 @@ export class UsersService {
       where: _match,
       order: _sort,
     });
-    const result = users.map((_v: User) => {
-      const { password, ...rest } = _v;
+    const result = users.map((_value: User) => {
+      const { password, ...rest } = _value;
       return rest;
     });
     return result;
   }
 
   /**
-   *@description select one User
+   *@description get one User (for sign in)
    * @param _userId
    * @returns User
    */
-  async getUser(_match: string): Promise<User> {
-    let user = await this.usersRepository.findOne({ where: { email: _match } });
+  public async getUser(_match: FindOptionsWhere<User>): Promise<User> {
+    let user = await this.usersRepository.findOne({ where: _match });
     if (!user) {
       user = await this.usersRepository
-        .findOne({ where: { id: _match } })
+        .findOne({ where: _match })
         .catch(() => null);
     }
     return user;
+  }
+
+  /**
+   * @description get User without password (for HTTP.GET)
+   * @param _match
+   * @returns User
+   */
+  public async getUserWithoutPassword(
+    _match: FindOptionsWhere<User>,
+  ): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: _match });
+    if (user) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return user;
+  }
+
+  public async connectWallet(_user: User) {
+    const user = this.usersRepository.create(_user);
+    return await this.usersRepository.save(user);
   }
 }

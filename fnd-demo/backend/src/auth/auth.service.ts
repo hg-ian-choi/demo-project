@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -12,10 +12,18 @@ export class AuthService {
   ) {}
 
   async validateUser(_user: SigninDto): Promise<User> {
-    const user = await this.usersService.getUser(_user.email);
-    if (user && _user.password === user.password) {
-      const { password, ...result } = user;
-      return result;
+    let user: User;
+    if (typeof _user.wallet_address === 'string') {
+      user = await this.usersService.getUserWithoutPassword({
+        wallet_address: _user.wallet_address.toLowerCase(),
+      });
+      return user;
+    } else {
+      user = await this.usersService.getUser({ email: _user.email });
+      if (user && _user.password === user.password) {
+        const { password, ...result } = user;
+        return result;
+      }
     }
     return null;
   }
