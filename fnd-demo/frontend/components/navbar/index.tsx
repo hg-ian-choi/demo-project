@@ -26,7 +26,7 @@ const ImageWrap = styled.div`
 const ProfileContainer = styled.div``;
 const ButtonWrap = styled.div``;
 
-export default function Navbar({ signOut }: { signOut: any }) {
+export default function Navbar({ signOut, loadCookie }: { signOut: any; loadCookie: any }) {
   const loginUser = useSelector(loginUserSelector);
   const router = useRouter();
 
@@ -44,6 +44,9 @@ export default function Navbar({ signOut }: { signOut: any }) {
 
   const turnToProfile = () => {
     router.push('/mypage');
+    if (!loadCookie()) {
+      router.push('/');
+    }
   };
 
   return (
@@ -56,6 +59,7 @@ export default function Navbar({ signOut }: { signOut: any }) {
             height={50}
             alt={'favicon'}
             onClick={() => {
+              loadCookie();
               router.push('/');
             }}
           />

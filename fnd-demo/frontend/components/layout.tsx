@@ -2,7 +2,7 @@
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store/hooks';
 import { loginUserSelector, setLoginUser } from '../store/loginUserSlice';
@@ -10,16 +10,23 @@ import Navbar from './navbar';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const user = useSelector(loginUserSelector);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
+  const loadCookie = useCallback((): boolean => {
     const cookiesArray = document.cookie.split(';');
     const cookies: any = cookiesArray.reduce((a, v) => ({ ...a, [v.trim().split('=')[0]]: v.trim().split('=')[1] }), {});
     if (cookies?.userId && cookies?.username) {
-      dispatch(setLoginUser({ ...user, userId: cookies.userId, username: cookies.username, wallet: cookies.wallet }));
+      dispatch(setLoginUser({ userId: cookies.userId, username: cookies.username, wallet: cookies.wallet }));
+      return true;
+    } else {
+      dispatch(setLoginUser({ userId: '', username: '', wallet: '' }));
+      return false;
     }
-  }, []);
+  }, [dispatch, router]);
+
+  useEffect(() => {
+    loadCookie();
+  }, [loadCookie]);
 
   const signOut = async () => {
     await axios
@@ -35,9 +42,10 @@ export default function Layout({ children }: { children: ReactNode }) {
         console.log('_error', _error);
       });
   };
+
   return (
     <>
-      <Navbar signOut={signOut} />
+      <Navbar signOut={signOut} loadCookie={loadCookie} />
       <main>{children}</main>
     </>
   );
