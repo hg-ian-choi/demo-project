@@ -21,7 +21,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(_req: Request, _payload: User): Promise<User> {
-    console.log('!!!');
     const userId = _req.params.user_id;
 
     if (userId && userId !== _payload.id) {

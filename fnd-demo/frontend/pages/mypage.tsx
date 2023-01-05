@@ -1,7 +1,7 @@
 // pages/mypage.tsx
 
 import styled from '@emotion/styled';
-import axios, { Axios, AxiosResponse } from 'axios';
+import axios, { Axios, AxiosError, AxiosResponse } from 'axios';
 import { use, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store/hooks';
@@ -53,16 +53,6 @@ export default function MyPage() {
   };
 
   const confirmConnect = async () => {
-    await axios
-      .patch(`${process.env.NEXT_PUBLIC_API_URL}/users/connectWallet`, { wallet: wallet }, { withCredentials: true })
-      .then((_res: AxiosResponse) => {
-        if (_res.status === 200 && _res.data) {
-          dispatch(setLoginUser({ ...user, wallet: _res.data.wallet_address }));
-        }
-      });
-  };
-
-  const signMessage = async () => {
     const customWindow: any = window;
     if (typeof customWindow?.ethereum === 'undefined') {
       if (confirm('Open new tab for installing metamask?')) {
@@ -83,26 +73,37 @@ export default function MyPage() {
       }
     }
 
+    if (!confirm(`Connect account(${from}) to fnd-demo`)) return;
+
     let signed = '';
     try {
-      signed = await web3.eth.personal.sign('Hello, World!', from, '');
+      signed = await web3.eth.personal.sign(
+        '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!',
+        from,
+        `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
+      );
     } catch (_error: any) {
       if (_error.code === 4001) {
         alert('User denied message signature');
       }
     }
 
+    let result = false;
     if (!signed) return;
-    const result = await axios.patch(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/connectWallet`,
-      { wallet: from[0], sign: signed },
-      { withCredentials: true }
-    );
+    result = await axios
+      .patch(`${process.env.NEXT_PUBLIC_API_URL}/users/connectWallet`, { wallet: from, sign: signed }, { withCredentials: true })
+      .then((_res: AxiosResponse) => {
+        dispatch(setLoginUser({ ...user, wallet: from }));
+        return _res.data;
+      })
+      .catch((_err: AxiosError) => {
+        const data: any = _err.response?.data;
+        alert(data.message);
+        return false;
+      });
 
     if (result) {
       alert('Successfully connected Metamask');
-    } else {
-      alert('Failed to connect Metamask');
     }
   };
 
@@ -115,8 +116,6 @@ export default function MyPage() {
         {user.wallet ? (
           <div>
             <div>Wallet: {user.wallet || wallet}</div>
-            <br />
-            <button onClick={signMessage}>Sign</button>
           </div>
         ) : wallet ? (
           <div>
