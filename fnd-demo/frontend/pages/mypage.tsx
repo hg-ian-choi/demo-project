@@ -78,7 +78,7 @@ export default function MyPage() {
     let signed = '';
     try {
       signed = await web3.eth.personal.sign(
-        '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!',
+        '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!!!',
         from,
         `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
       );

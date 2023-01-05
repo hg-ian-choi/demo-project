@@ -22,9 +22,20 @@ contract CloneFactory {
         origin = _origin;
     }
 
-    function cloneMain() external returns (string memory _name, string memory _symbol, address identicalChild) {
+    function cloneMain()
+        external
+        returns (
+            string memory _name,
+            string memory _symbol,
+            address identicalChild
+        )
+    {
         identicalChild = origin.clone();
-        IMain(identicalChild).initialize(_name, _symbol, payable(msg.sender));
+        ICloneable(identicalChild).initialize(
+            _name,
+            _symbol,
+            payable(msg.sender)
+        );
         emit NewClone(identicalChild, msg.sender);
     }
 
