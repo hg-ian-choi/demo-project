@@ -11,7 +11,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (_request: Request) => {
-          console.log('_request.signedCookies', _request.signedCookies.at_auth);
           return _request.signedCookies.at_auth;
         },
       ]),

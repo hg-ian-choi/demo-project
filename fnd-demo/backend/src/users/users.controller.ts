@@ -15,6 +15,7 @@ import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import Web3 from 'web3';
 
 @Controller('/api/users')
 export class UsersController {
@@ -66,10 +67,23 @@ export class UsersController {
   public async connectWallet(
     @GetUser() _user: User,
     @Body('wallet') _wallet: string,
+    @Body('sign') _sign: string,
   ) {
-    if (_wallet) {
+    let user: User = null;
+    const web3 = new Web3(
+      'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
+    );
+    const signer = web3.eth.accounts.recover('Hello, World!', _sign);
+
+    if (_wallet && _wallet === signer) {
       _user.wallet_address = _wallet;
+      user = await this.usersService.connectWallet(_user);
     }
-    return this.usersService.connectWallet(_user);
+
+    if (user) {
+      return true;
+    }
+
+    return false;
   }
 }

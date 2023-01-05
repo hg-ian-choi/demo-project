@@ -41,7 +41,8 @@
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
     "save-dev": "^0.0.1-security",
-    "typeorm": "^0.3.11"
+    "typeorm": "^0.3.11",
+    "web3": "1.7.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",

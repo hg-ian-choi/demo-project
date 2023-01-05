@@ -2,10 +2,11 @@
 
 import styled from '@emotion/styled';
 import axios, { Axios, AxiosResponse } from 'axios';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store/hooks';
 import { loginUserSelector, setLoginUser } from '../store/loginUserSlice';
+import Web3 from 'web3';
 
 const Container = styled.div`
   height: 100vh;
@@ -34,7 +35,7 @@ const ButtonWrap = styled.div`
 export default function MyPage() {
   const user = useSelector(loginUserSelector);
   const dispatch = useAppDispatch();
-  const [wallet, setWallet] = useState('');
+  const [wallet, setWallet] = useState(user.wallet);
 
   const connectMetamask = async () => {
     const customWindow: any = window;
@@ -61,6 +62,50 @@ export default function MyPage() {
       });
   };
 
+  const signMessage = async () => {
+    const customWindow: any = window;
+    if (typeof customWindow?.ethereum === 'undefined') {
+      if (confirm('Open new tab for installing metamask?')) {
+        window.open('https://metamask.io/');
+      }
+      return;
+    }
+
+    const web3 = new Web3(Web3.givenProvider);
+
+    if (!web3) return;
+    let from = '';
+    try {
+      from = (await web3.eth.requestAccounts())[0];
+    } catch (_error: any) {
+      if (_error?.code === -32002) {
+        alert('Already processing: Please check your Metamask');
+      }
+    }
+
+    let signed = '';
+    try {
+      signed = await web3.eth.personal.sign('Hello, World!', from, '');
+    } catch (_error: any) {
+      if (_error.code === 4001) {
+        alert('User denied message signature');
+      }
+    }
+
+    if (!signed) return;
+    const result = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/connectWallet`,
+      { wallet: from[0], sign: signed },
+      { withCredentials: true }
+    );
+
+    if (result) {
+      alert('Successfully connected Metamask');
+    } else {
+      alert('Failed to connect Metamask');
+    }
+  };
+
   return (
     <Container>
       <h1>My Page</h1>
@@ -68,7 +113,11 @@ export default function MyPage() {
         <div>Username: {user.username}</div>
         <br />
         {user.wallet ? (
-          <div>Wallet: {user.wallet || wallet}</div>
+          <div>
+            <div>Wallet: {user.wallet || wallet}</div>
+            <br />
+            <button onClick={signMessage}>Sign</button>
+          </div>
         ) : wallet ? (
           <div>
             <div>Wallet: {wallet}</div>
