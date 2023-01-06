@@ -50,7 +50,7 @@ contract Ownable is Initializable {
      * @dev Throws if the sender is not the owner.
      */
     function _checkOwner() internal view virtual {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        require(owner() == _Sender(), "Ownable: caller is not the owner");
     }
 
     /**
@@ -60,7 +60,7 @@ contract Ownable is Initializable {
         return _owner;
     }
 
-    function _msgSender() internal view virtual returns (address) {
+    function _Sender() internal view virtual returns (address) {
         return msg.sender;
     }
 }
