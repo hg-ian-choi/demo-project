@@ -22,8 +22,6 @@ contract Cloneable is
     string public symbol;
     string private _prefix;
     string private _suffix;
-    bytes private _verifyCode;
-    address payable private _kaisha;
 
     mapping(uint256 => string) tokenURI;
 
