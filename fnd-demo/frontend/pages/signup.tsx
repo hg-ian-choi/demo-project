@@ -39,7 +39,6 @@ const SignUpTitle = styled.h2`
 const InputDiv = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 0 20px;
 `;
 
 const InputSubDiv = styled.div`
@@ -53,10 +52,10 @@ const ButtonWrap = styled.div`
 
 export default function SignUp() {
   const router = useRouter();
-  const [signUpObject1, setSignUpObject1] = useState({ email: '', password: '' });
-  const [signUpObject2, setSignUpObject2] = useState({ email: '', address: '', connected: false });
-  const [warning1, setWarning1] = useState({ email: '', password: '' });
-  const [warning2, setWarning2] = useState({ email: '', password: '' });
+  const [signUpObject1, setSignUpObject1] = useState({ username: '', email: '', password: '' });
+  const [signUpObject2, setSignUpObject2] = useState({ username: '', email: '', address: '', connected: false });
+  const [warning1, setWarning1] = useState({ username: '', email: '', password: '' });
+  const [warning2, setWarning2] = useState({ username: '', email: '', password: '' });
 
   const user = useSelector(loginUserSelector);
   const dispatch = useAppDispatch();
@@ -65,7 +64,10 @@ export default function SignUp() {
     const name = event.target.name;
     const value = event.target.value;
     console.log('name', name, value);
-    if (name === 'email1') {
+    if (name === 'username1') {
+      setSignUpObject1({ ...signUpObject1, username: value.trim() });
+      setWarning1({ ...warning1, username: '' });
+    } else if (name === 'email1') {
       setSignUpObject1({ ...signUpObject1, email: value.trim() });
       setWarning1({ ...warning1, email: '' });
     } else {
@@ -77,7 +79,10 @@ export default function SignUp() {
   const changeMetamaskSignUpObject = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    if (name === 'email2') {
+    if (name === 'username2') {
+      setSignUpObject2({ ...signUpObject2, username: value.trim() });
+      setWarning1({ ...warning2, username: '' });
+    } else if (name === 'email2') {
       setSignUpObject2({ ...signUpObject2, email: value.trim() });
       setWarning2({ ...warning2, email: '' });
     }
@@ -90,6 +95,10 @@ export default function SignUp() {
     }
     if (!signUpObject1.password) {
       setWarning1({ ...warning1, password: 'Password is required' });
+      return;
+    }
+    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject1.username)) {
+      setWarning1({ ...warning1, username: 'English or number only' });
       return;
     }
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(signUpObject2.email)) {
@@ -112,6 +121,10 @@ export default function SignUp() {
   const onMetamaskSignUp = async () => {
     if (!signUpObject2.email) {
       setWarning2({ ...warning2, email: 'Email is required' });
+      return;
+    }
+    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject2.username)) {
+      setWarning2({ ...warning2, username: 'English or number only' });
       return;
     }
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(signUpObject2.email)) {
@@ -193,7 +206,17 @@ export default function SignUp() {
         <SignUpDiv>
           <SignUpTitle>Sign Up with Email</SignUpTitle>
           <InputDiv>
-            <label htmlFor="email1">email</label>
+            <label htmlFor="username1">username (Optional)</label>
+            <InputSubDiv>
+              <input type="text" name="username1" value={signUpObject1.username} onChange={changePasswordSignUpObject} />
+              <div style={{ color: 'red' }}>{warning1.username}</div>
+            </InputSubDiv>
+          </InputDiv>
+          <br />
+          <InputDiv>
+            <label htmlFor="email1">
+              email<span style={{ color: 'red' }}>*</span>
+            </label>
             <InputSubDiv>
               <input type="text" name="email1" value={signUpObject1.email} onChange={changePasswordSignUpObject} />
               <div style={{ color: 'red' }}>{warning1.email}</div>
@@ -201,7 +224,9 @@ export default function SignUp() {
           </InputDiv>
           <br />
           <InputDiv>
-            <label htmlFor="password">password</label>
+            <label htmlFor="password">
+              password<span style={{ color: 'red' }}>*</span>
+            </label>
             <InputSubDiv>
               <input type="password" name="password" value={signUpObject1.password} onChange={changePasswordSignUpObject} />
               <div style={{ color: 'red' }}>{warning1.password}</div>
@@ -217,7 +242,17 @@ export default function SignUp() {
         <SignUpDiv>
           <SignUpTitle>Sign Up with Metamask</SignUpTitle>
           <InputDiv>
-            <label htmlFor="email2">email</label>
+            <label htmlFor="username2">username (Optional)</label>
+            <InputSubDiv>
+              <input type="text" name="username2" value={signUpObject2.username} onChange={changeMetamaskSignUpObject} />
+              <div style={{ color: 'red' }}>{warning2.username}</div>
+            </InputSubDiv>
+          </InputDiv>
+          <br />
+          <InputDiv>
+            <label htmlFor="email2">
+              email<span style={{ color: 'red' }}>*</span>
+            </label>
             <InputSubDiv>
               <input type="text" name="email2" value={signUpObject2.email} onChange={changeMetamaskSignUpObject} />
               <div style={{ color: 'red' }}>{warning2.email}</div>
@@ -225,7 +260,9 @@ export default function SignUp() {
           </InputDiv>
           <br />
           <InputDiv>
-            <label htmlFor="address">address</label>
+            <label htmlFor="address">
+              address<span style={{ color: 'red' }}>*</span>
+            </label>
             <InputSubDiv>
               <input type="text" name="address" disabled={signUpObject2.address ? false : true} readOnly />
               <div style={{ color: 'red' }}>{warning2.password}</div>
