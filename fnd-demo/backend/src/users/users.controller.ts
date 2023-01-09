@@ -77,23 +77,7 @@ export class UsersController {
     @Body('sign') _sign: string,
     @Res({ passthrough: true }) _res: Response,
   ) {
-    let user: User = null;
-    const web3 = new Web3(
-      'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
-    );
-    const signer = web3.eth.accounts.recover(
-      '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!',
-      _sign,
-    );
-
-    if (_wallet && _wallet === signer) {
-      console.log('!!!');
-      _user.wallet_address = _wallet;
-      user = await this.usersService.connectWallet(_user);
-    } else {
-      throw new ConflictException(`Signer Not Match!`);
-    }
-
+    const user = this.usersService.connectWallet(_user, _wallet, _sign);
     if (user) {
       _res.cookie('wallet', _user.wallet_address, {
         domain: this.configService.get<string>('domain'),

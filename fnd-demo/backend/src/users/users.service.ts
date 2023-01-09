@@ -1,8 +1,9 @@
 // user/user.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
+import Web3 from 'web3';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 
@@ -12,6 +13,10 @@ export class UsersService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
+
+  web3 = new Web3(
+    'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
+  );
 
   /********************************************************************************
    ************************************ CREATE ************************************
@@ -24,6 +29,7 @@ export class UsersService {
   public async createUser(_user: CreateUserDto): Promise<User> {
     const username = _user.email.split('@')[0];
     const user = this.usersRepository.create({ ..._user, username: username });
+    user.wallet_address = this.web3.eth.accounts.create().address;
     await this.usersRepository.save(user);
     return user;
   }
@@ -82,8 +88,23 @@ export class UsersService {
     return user;
   }
 
-  public async connectWallet(_user: User) {
+  public async connectWallet(
+    _user: User,
+    _wallet: string,
+    _sign: string,
+  ): Promise<User> {
     const user = this.usersRepository.create(_user);
-    return await this.usersRepository.save(user);
+    const signer = this.web3.eth.accounts.recover(
+      '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!',
+      _sign,
+    );
+    if (_wallet && _wallet === signer) {
+      _user.wallet_address = _wallet;
+      await this.usersRepository.save(user);
+    } else {
+      throw new ConflictException(`Signer Not Match!`);
+    }
+
+    return;
   }
 }
