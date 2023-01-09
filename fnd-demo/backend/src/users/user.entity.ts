@@ -17,8 +17,8 @@ export class User {
   username?: string;
 
   @Column({ type: 'varchar', nullable: true, unique: true })
-  wallet_address?: string;
+  address?: string;
 
   @Column({ type: 'varchar', nullable: true, unique: true })
-  wallet_private_key?: string;
+  pk?: string;
 }

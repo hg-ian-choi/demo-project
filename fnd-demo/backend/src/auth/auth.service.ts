@@ -13,9 +13,9 @@ export class AuthService {
 
   async validateUser(_user: SigninDto): Promise<User> {
     let user: User;
-    if (typeof _user.wallet_address === 'string') {
+    if (typeof _user.address === 'string') {
       user = await this.usersService.getUserWithoutPassword({
-        wallet_address: _user.wallet_address.toLowerCase(),
+        address: _user.address.toLowerCase(),
       });
       return user;
     } else {

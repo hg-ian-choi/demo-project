@@ -12,7 +12,7 @@ export class WalletStrategy extends PassportStrategy(Strategy, 'wallet') {
   }
 
   async validate(wallet: string): Promise<User> {
-    const _user: SigninDto = { wallet_address: wallet };
+    const _user: SigninDto = { address: wallet };
     const user = await this.authService.validateUser(_user);
     if (user) {
       return user;

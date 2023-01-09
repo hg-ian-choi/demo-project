@@ -17,4 +17,5 @@ export default () => ({
     jwtExpiresIn: process.env.JWT_EXPIRESIN,
   },
   cookieSecret: process.env.COOKIE_SECRET,
+  signUpMessage: process.env.SIGNUP_MESSAGE,
 });

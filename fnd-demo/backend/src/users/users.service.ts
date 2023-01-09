@@ -1,6 +1,7 @@
 // user/user.service.ts
 
 import { ConflictException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import Web3 from 'web3';
@@ -10,6 +11,7 @@ import { User } from './user.entity';
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
@@ -29,7 +31,7 @@ export class UsersService {
   public async createUser(_user: CreateUserDto): Promise<User> {
     const username = _user.email.split('@')[0];
     const user = this.usersRepository.create({ ..._user, username: username });
-    user.wallet_address = this.web3.eth.accounts.create().address;
+    user.address = this.web3.eth.accounts.create().address;
     await this.usersRepository.save(user);
     return user;
   }
@@ -95,11 +97,11 @@ export class UsersService {
   ): Promise<User> {
     const user = this.usersRepository.create(_user);
     const signer = this.web3.eth.accounts.recover(
-      '\nYou are now signing to connect Metamask.\n\n & \n\n Connect Metamask account to your fnd-demo account!',
+      this.configService.get<string>('signUpMessage'),
       _sign,
     );
     if (_wallet && _wallet === signer) {
-      _user.wallet_address = _wallet;
+      _user.address = _wallet;
       await this.usersRepository.save(user);
     } else {
       throw new ConflictException(`Signer Not Match!`);

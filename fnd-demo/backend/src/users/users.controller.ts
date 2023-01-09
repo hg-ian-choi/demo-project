@@ -41,6 +41,11 @@ export class UsersController {
     return this.usersService.createUser(_user);
   }
 
+  @Post('/metamask/signup')
+  private createUserWithMetamask(@Body() _user: CreateUserDto): Promise<User> {
+    return this.usersService.createUser(_user);
+  }
+
   /******************************************************************************
    ************************************ READ ************************************
    ******************************************************************************/
@@ -79,10 +84,10 @@ export class UsersController {
   ) {
     const user = this.usersService.connectWallet(_user, _wallet, _sign);
     if (user) {
-      _res.cookie('wallet', _user.wallet_address, {
+      _res.cookie('wallet', _user.address, {
         domain: this.configService.get<string>('domain'),
         path: '/',
-        maxAge: _user.wallet_address ? 1800000 : 0,
+        maxAge: _user.address ? 1800000 : 0,
         signed: false,
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,

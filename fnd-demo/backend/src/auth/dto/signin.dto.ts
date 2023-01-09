@@ -9,5 +9,5 @@ export class SigninDto extends User {
   password?: string;
 
   @IsString()
-  wallet_address?: string;
+  address?: string;
 }

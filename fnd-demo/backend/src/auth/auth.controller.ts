@@ -47,10 +47,10 @@ export class AuthController {
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
       })
-      .cookie('wallet', _user.wallet_address, {
+      .cookie('wallet', _user.address, {
         domain: this.configService.get<string>('domain'),
         path: '/',
-        maxAge: _user.wallet_address ? 1800000 : 0,
+        maxAge: _user.address ? 1800000 : 0,
         signed: false,
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
@@ -58,7 +58,7 @@ export class AuthController {
     return {
       userId: _user.id,
       username: _user.username,
-      wallet: _user.wallet_address,
+      wallet: _user.address,
       _token: accessToken,
     };
   }
@@ -95,7 +95,7 @@ export class AuthController {
         secure: this.configService.get<string>('mode') === 'PROD',
         httpOnly: false,
       })
-      .cookie('wallet', _user.wallet_address, {
+      .cookie('wallet', _user.address, {
         domain: this.configService.get<string>('domain'),
         path: '/',
         maxAge: 1800000,
@@ -106,7 +106,7 @@ export class AuthController {
     return {
       userId: _user.id,
       username: _user.username,
-      wallet: _user.wallet_address,
+      wallet: _user.address,
       _token: accessToken,
     };
   }

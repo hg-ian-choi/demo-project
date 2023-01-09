@@ -8,6 +8,7 @@ import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { EwalletModule } from './ewallet/ewallet.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CommonModule } from './common/common.module';
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRESIN: Joi.string().required(),
         COOKIE_SECRET: Joi.string().required(),
+        SIGNUP_MESSAGE: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,
@@ -50,6 +52,7 @@ import { CommonModule } from './common/common.module';
     UsersModule,
     AuthModule,
     CommonModule,
+    EwalletModule,
   ],
 })
 export class AppModule {}
