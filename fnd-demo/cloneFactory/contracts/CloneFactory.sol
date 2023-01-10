@@ -26,23 +26,19 @@ contract CloneFactory {
         _owner = _msgSender();
     }
 
-    function _clone(string memory _name, string memory _symbol)
+    function _clone(string memory name_, string memory symbol_)
         external
-        returns (address identicalChild)
+        returns (address identicalChild_)
     {
-        identicalChild = _origin.clone();
+        identicalChild_ = _origin.clone();
 
-        ICloneableInitializer(identicalChild).initialize(
-            _name,
-            _symbol,
-            payable(msg.sender)
+        ICloneableInitializer(identicalChild_).initialize(
+            name_,
+            symbol_,
+            payable(_msgSender())
         );
 
-        emit newClone(identicalChild, msg.sender, _name, _symbol);
-    }
-
-    function _msgSender() private view returns (address) {
-        return msg.sender;
+        emit newClone(identicalChild_, _msgSender(), name_, symbol_);
     }
 
     function getOrigin() external view onlyOwner returns (address) {
@@ -53,11 +49,15 @@ contract CloneFactory {
         return _owner;
     }
 
-    function transferOwner(address _newOwner) external onlyOwner {
-        _owner = _newOwner;
+    function transferOwner(address newOwner_) external onlyOwner {
+        _owner = newOwner_;
     }
 
-    function upgradeOrigin(address _newOrigin) external onlyOwner {
-        _origin = _newOrigin;
+    function upgradeOrigin(address newOrigin_) external onlyOwner {
+        _origin = newOrigin_;
+    }
+
+    function _msgSender() private view returns (address) {
+        return msg.sender;
     }
 }

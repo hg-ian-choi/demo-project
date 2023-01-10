@@ -16,24 +16,24 @@ contract Ownable is Initializable {
         _;
     }
 
-    function __Ownable_init(address payable _newOwner)
+    function __Ownable_init(address payable newOwner_)
         internal
         onlyInitializing
     {
-        __Ownable_init_unchained(_newOwner);
+        __Ownable_init_unchained(newOwner_);
     }
 
-    function __Ownable_init_unchained(address payable _newOwner)
+    function __Ownable_init_unchained(address payable newOwner_)
         internal
         onlyInitializing
     {
-        _transferOwnership(_newOwner);
+        _transferOwnership(newOwner_);
     }
 
-    function _transferOwnership(address payable _newOwner) internal virtual {
+    function _transferOwnership(address payable newOwner_) internal virtual {
         address payable oldOwner = _owner;
-        _owner = _newOwner;
-        emit OwnershipTransferred(oldOwner, _newOwner);
+        _owner = newOwner_;
+        emit OwnershipTransferred(oldOwner, newOwner_);
     }
 
     function _checkOwner() internal view virtual {

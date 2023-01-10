@@ -1,6 +1,7 @@
 // user/user.entity.ts
 
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Ewallet } from 'src/ewallet/ewallet.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -21,4 +22,7 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true, unique: true })
   pk?: string;
+
+  @OneToMany(() => Ewallet, (ewallet) => ewallet.user)
+  ewallets?: Ewallet[];
 }

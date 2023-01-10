@@ -63,7 +63,6 @@ export default function SignUp() {
   const changePasswordSignUpObject = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    console.log('name', name, value);
     if (name === 'username1') {
       setSignUpObject1({ ...signUpObject1, username: value.trim() });
       setWarning1({ ...warning1, username: '' });
@@ -97,7 +96,7 @@ export default function SignUp() {
       setWarning1({ ...warning1, password: 'Password is required' });
       return;
     }
-    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject1.username)) {
+    if (signUpObject1.username && !/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject1.username)) {
       setWarning1({ ...warning1, username: 'English or number only' });
       return;
     }
@@ -123,7 +122,7 @@ export default function SignUp() {
       setWarning2({ ...warning2, email: 'Email is required' });
       return;
     }
-    if (!/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject2.username)) {
+    if (signUpObject2.username && !/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject2.username)) {
       setWarning2({ ...warning2, username: 'English or number only' });
       return;
     }
