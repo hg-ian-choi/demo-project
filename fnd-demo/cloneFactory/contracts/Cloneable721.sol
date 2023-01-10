@@ -22,6 +22,8 @@ contract Cloneable721 is
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     CountersUpgradeable.Counter private _tokenIdCounter;
+    string private _prefix;
+    string private _suffix;
 
     constructor() {
         _disableInitializers();
@@ -76,10 +78,18 @@ contract Cloneable721 is
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (string memory)
     {
-        return super.tokenURI(tokenId_);
+        return string.concat(_prefix, super.tokenURI(tokenId_), _suffix);
     }
 
     function getCurrentTokenId() public view returns (uint256) {
         return _tokenIdCounter.current();
+    }
+
+    function setURI(string memory prefix_, string memory suffix_)
+        external
+        onlyOwner
+    {
+        _prefix = prefix_;
+        _suffix = suffix_;
     }
 }
