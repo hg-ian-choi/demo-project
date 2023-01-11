@@ -19,12 +19,13 @@ contract Cloneable1155 is
     ERC1155SupplyUpgradeable
 {
     using Counters for Counters.Counter;
+    Counters.Counter private tokenId;
+
     string public name;
     string public symbol;
-    string private prefix;
-    string private suffix;
-    address payable private operator;
-    Counters.Counter private tokenId;
+    string private _prefix;
+    string private _suffix;
+    address payable private _core;
 
     mapping(uint256 => string) tokenURI;
 
@@ -35,12 +36,12 @@ contract Cloneable1155 is
     function initialize(
         string memory name_,
         string memory symbol_,
-        address payable operator_,
+        address payable core_,
         address payable sender_
     ) public initializer {
         name = name_;
         symbol = symbol_;
-        operator = operator_;
+        _core = core_;
         __ERC1155_init("");
         __Ownable_init(sender_);
         __Pausable_init();
@@ -70,15 +71,14 @@ contract Cloneable1155 is
         _mint(account_, id_, amount_, data_);
     }
 
-    function mintAndApprove(uint256 amount_, bytes memory data_)
-        external
-        onlyOwner
-        returns (uint256 tokenId_)
-    {
+    function mintAndApprove(
+        uint256 amount_,
+        bytes memory data_
+    ) external onlyOwner returns (uint256 tokenId_) {
         tokenId.increment();
         tokenId_ = tokenId.current();
         _mint(_Sender(), tokenId_, amount_, data_);
-        setApprovalForAll(operator, true);
+        setApprovalForAll(_core, true);
     }
 
     function mintBatch(
@@ -113,15 +113,15 @@ contract Cloneable1155 is
     }
 
     function uri(uint256 id_) public view override returns (string memory) {
-        return string.concat(prefix, tokenURI[id_], suffix);
+        return string.concat(_prefix, tokenURI[id_], _suffix);
     }
 
-    function setPrefixAndSuffix(string memory prefix_, string memory suffix_)
-        external
-        onlyOwner
-    {
-        prefix = prefix_;
-        suffix = suffix_;
+    function setPrefixAndSuffix(
+        string memory prefix_,
+        string memory suffix_
+    ) external onlyOwner {
+        _prefix = prefix_;
+        _suffix = suffix_;
     }
 
     function getCurrentTokenId() public view returns (uint256) {

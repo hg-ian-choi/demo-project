@@ -65,14 +65,15 @@ contract Cloneable721 is
         super._beforeTokenTransfer(from_, to_, tokenId_, batchSize_);
     }
 
-    function _burn(uint256 tokenId_)
-        internal
-        override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
-    {
+    function _burn(
+        uint256 tokenId_
+    ) internal override(ERC721Upgradeable, ERC721URIStorageUpgradeable) {
         super._burn(tokenId_);
     }
 
-    function tokenURI(uint256 tokenId_)
+    function tokenURI(
+        uint256 tokenId_
+    )
         public
         view
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
@@ -85,10 +86,10 @@ contract Cloneable721 is
         return _tokenIdCounter.current();
     }
 
-    function setURI(string memory prefix_, string memory suffix_)
-        external
-        onlyOwner
-    {
+    function setURI(
+        string memory prefix_,
+        string memory suffix_
+    ) external onlyOwner {
         _prefix = prefix_;
         _suffix = suffix_;
     }
