@@ -184,7 +184,9 @@ export default function SignUp() {
       })
       .catch((_err: AxiosError) => {
         const data: any = _err.response?.data;
-        alert(data.message);
+        if (data?.message) {
+          alert(data.message);
+        }
         return false;
       });
 

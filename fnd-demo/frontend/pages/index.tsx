@@ -2,6 +2,8 @@
 
 import Head from 'next/head';
 import styled from '@emotion/styled';
+import { useSelector } from 'react-redux';
+import { loginUserSelector } from '../store/loginUserSlice';
 
 const Container = styled.div`
   height: 100vh;
@@ -11,6 +13,8 @@ const Container = styled.div`
 `;
 
 export default function Home() {
+  const user = useSelector(loginUserSelector);
+
   return (
     <>
       <Head>
@@ -21,7 +25,7 @@ export default function Home() {
       </Head>
       <main>
         <Container>
-          <h1>Hello, World!</h1>
+          <h1>{user.username ? `Welcome, ${user.username}!` : 'Hello, World!'}</h1>
         </Container>
       </main>
     </>

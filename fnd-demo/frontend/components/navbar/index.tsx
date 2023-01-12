@@ -49,6 +49,13 @@ export default function Navbar({ signOut, loadCookie }: { signOut: any; loadCook
     }
   };
 
+  const turnToCreate = () => {
+    if (!loadCookie()) {
+      router.push('/');
+    }
+    router.push('/create');
+  };
+
   return (
     <Container>
       <SubContainer>
@@ -75,6 +82,8 @@ export default function Navbar({ signOut, loadCookie }: { signOut: any; loadCook
             </div>
           ) : (
             <ButtonWrap>
+              <button onClick={turnToCreate}>Create</button>
+              <span> </span>
               <button onClick={turnToSignIn}>Sign In</button>
               <span> </span>
               <button onClick={turnToSignUp}>Sign Up</button>
