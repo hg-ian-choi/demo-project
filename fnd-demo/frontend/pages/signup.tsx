@@ -1,6 +1,7 @@
 // pages/signup.tsx
 
 import styled from '@emotion/styled';
+import { Button, TextField } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -39,6 +40,7 @@ const SignUpTitle = styled.h2`
 const InputDiv = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `;
 
 const InputSubDiv = styled.div`
@@ -51,11 +53,12 @@ const ButtonWrap = styled.div`
 `;
 
 export default function SignUp() {
+  const web3 = new Web3(Web3.givenProvider);
   const router = useRouter();
   const [signUpObject1, setSignUpObject1] = useState({ username: '', email: '', password: '' });
-  const [signUpObject2, setSignUpObject2] = useState({ username: '', email: '', address: '', connected: false });
+  const [signUpObject2, setSignUpObject2] = useState({ email: '', password: '', address: '' });
   const [warning1, setWarning1] = useState({ username: '', email: '', password: '' });
-  const [warning2, setWarning2] = useState({ username: '', email: '', password: '' });
+  const [warning2, setWarning2] = useState({ username: '', email: '', password: '', address: '' });
 
   const user = useSelector(loginUserSelector);
   const dispatch = useAppDispatch();
@@ -78,12 +81,12 @@ export default function SignUp() {
   const changeMetamaskSignUpObject = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
     const value = event.target.value;
-    if (name === 'username2') {
-      setSignUpObject2({ ...signUpObject2, username: value.trim() });
-      setWarning1({ ...warning2, username: '' });
-    } else if (name === 'email2') {
+    if (name === 'email') {
       setSignUpObject2({ ...signUpObject2, email: value.trim() });
-      setWarning2({ ...warning2, email: '' });
+      setWarning1({ ...warning2, email: '' });
+    } else if (name === 'password') {
+      setSignUpObject2({ ...signUpObject2, password: value.trim() });
+      setWarning2({ ...warning2, password: '' });
     }
   };
 
@@ -122,69 +125,69 @@ export default function SignUp() {
       setWarning2({ ...warning2, email: 'Email is required' });
       return;
     }
-    if (signUpObject2.username && !/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject2.username)) {
-      setWarning2({ ...warning2, username: 'English or number only' });
+    if (!signUpObject2.password) {
+      setWarning2({ ...warning2, password: 'Password is required' });
       return;
     }
+    // if (signUpObject2.username && !/^[A-Za-z][A-Za-z0-9]*$/.test(signUpObject2.username)) {
+    //   setWarning2({ ...warning2, username: 'English or number only' });
+    //   return;
+    // }
     if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g.test(signUpObject2.email)) {
       setWarning2({ ...warning2, email: 'Email is incorrect' });
       return;
     }
-    if (signUpObject2.connected) {
-    } else {
-      const customWindow: any = window;
-      if (typeof customWindow?.ethereum === 'undefined') {
-        if (confirm('Open new tab for installing metamask?')) {
-          window.open('https://metamask.io/');
-        }
-        return;
+    const customWindow: any = window;
+    if (typeof customWindow?.ethereum === 'undefined') {
+      if (confirm('Open new tab for installing metamask?')) {
+        window.open('https://metamask.io/');
       }
+      return;
+    }
 
-      const web3 = new Web3(Web3.givenProvider);
+    if (!web3) return;
+    let from = '';
+    try {
+      from = (await web3.eth.requestAccounts())[0];
+      setSignUpObject2({ ...signUpObject2, address: from });
 
-      if (!web3) return;
-      let from = '';
-      try {
-        from = (await web3.eth.requestAccounts())[0];
-      } catch (_error: any) {
-        if (_error?.code === -32002) {
-          alert('Already processing: Please check your Metamask');
-        }
-      }
-
-      if (!confirm(`Connect account(${from}) to fnd-demo`)) return;
-
-      let signed = '';
-      try {
-        signed = await web3.eth.personal.sign(
-          `${process.env.NEXT_PUBLIC_SIGNUP_MESSAGE}`.toString(),
-          from,
-          `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
-        );
-      } catch (_error: any) {
-        if (_error.code === 4001) {
-          alert('User denied message signature');
-        }
-      }
-
-      let result = false;
-      if (!signed) return;
-      result = await axios
-        .patch(`${process.env.NEXT_PUBLIC_API_URL}/users/connectWallet`, { wallet: from, sign: signed }, { withCredentials: true })
-        .then((_res: AxiosResponse) => {
-          dispatch(setLoginUser({ ...user, wallet: from }));
-          return _res.data;
-        })
-        .catch((_err: AxiosError) => {
-          const data: any = _err.response?.data;
-          alert(data.message);
-          return false;
-        });
-
-      if (result) {
-        alert('Successfully connected Metamask');
+      customWindow.ethereum.on('accountsChanged', (accounts: string[]) => {
+        setSignUpObject2({ ...signUpObject2, address: accounts[0] });
+      });
+    } catch (_error: any) {
+      if (_error?.code === -32002) {
+        alert('Already processing: Please check your Metamask');
       }
     }
+
+    let signed = '';
+    try {
+      signed = await web3.eth.personal.sign(
+        `${process.env.NEXT_PUBLIC_SIGNUP_MESSAGE}`.toString(),
+        signUpObject2.address,
+        `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
+      );
+    } catch (_error: any) {
+      if (_error.code === 4001) {
+        alert('User denied message signature');
+      }
+    }
+    if (!signed) return;
+
+    await axios
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { ...signUpObject2, address: signed }, { withCredentials: true })
+      .then((_res: AxiosResponse) => {
+        const data: any = _res.data;
+        dispatch(setLoginUser({ ...user, wallet: signUpObject2.address }));
+        alert(`Welcome to join us ${data.username}`);
+        router.push('/');
+      })
+      .catch((_err: AxiosError) => {
+        const data: any = _err.response?.data;
+        alert(data.message);
+        return false;
+      });
+
     // axios
     //   .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, signUpObject)
     //   .then((_res: AxiosResponse) => {
@@ -202,7 +205,7 @@ export default function SignUp() {
     <Container>
       <h1>Sign Up</h1>
       <SignUpContainer>
-        <SignUpDiv>
+        {/* signUpDiv>
           <SignUpTitle>Sign Up with Email</SignUpTitle>
           <InputDiv>
             <label htmlFor="username1">username (Optional)</label>
@@ -237,9 +240,9 @@ export default function SignUp() {
             <button onClick={onPasswordSignUp}>sign Up</button>
           </ButtonWrap>
         </SignUpDiv>
-        <Divider />
+        <Divider /> */}
         <SignUpDiv>
-          <SignUpTitle>Sign Up with Metamask</SignUpTitle>
+          {/* <SignUpTitle>Sign Up with Metamask</SignUpTitle>
           <InputDiv>
             <label htmlFor="username2">username (Optional)</label>
             <InputSubDiv>
@@ -247,14 +250,33 @@ export default function SignUp() {
               <div style={{ color: 'red' }}>{warning2.username}</div>
             </InputSubDiv>
           </InputDiv>
-          <br />
+          <br /> */}
           <InputDiv>
             <label htmlFor="email2">
               email<span style={{ color: 'red' }}>*</span>
             </label>
             <InputSubDiv>
-              <input type="text" name="email2" value={signUpObject2.email} onChange={changeMetamaskSignUpObject} />
+              <TextField label="email" name="email" variant="outlined" value={signUpObject2.email} onChange={changeMetamaskSignUpObject} />
+              {/* <input type="text" name="email2" value={signUpObject2.email} onChange={changeMetamaskSignUpObject} /> */}
               <div style={{ color: 'red' }}>{warning2.email}</div>
+            </InputSubDiv>
+          </InputDiv>
+          <br />
+          <InputDiv>
+            <label htmlFor="password2">
+              password<span style={{ color: 'red' }}>*</span>
+            </label>
+            <InputSubDiv>
+              <TextField
+                label="password"
+                name="password"
+                type="password"
+                variant="outlined"
+                value={signUpObject2.password}
+                onChange={changeMetamaskSignUpObject}
+              />
+              {/* <input type="password" name="password2" value={signUpObject2.password} onChange={changeMetamaskSignUpObject} /> */}
+              <div style={{ color: 'red' }}>{warning2.password}</div>
             </InputSubDiv>
           </InputDiv>
           <br />
@@ -263,15 +285,32 @@ export default function SignUp() {
               address<span style={{ color: 'red' }}>*</span>
             </label>
             <InputSubDiv>
-              <input type="text" name="address" disabled={signUpObject2.address ? false : true} readOnly />
-              <div style={{ color: 'red' }}>{warning2.password}</div>
+              <TextField
+                label="address"
+                name="address"
+                variant="outlined"
+                disabled
+                value={
+                  signUpObject2.address ? signUpObject2.address.substring(0, 7).concat('...').concat(signUpObject2.address.substring(37, 42)) : ''
+                }
+              />
+              {/* <input
+                type="text"
+                name="address"
+                disabled
+                readOnly
+                value={
+                  signUpObject2.address ? signUpObject2.address.substring(0, 7).concat('...').concat(signUpObject2.address.substring(37, 42)) : ''
+                }
+              /> */}
+              <div style={{ color: 'red' }}>{warning2.address}</div>
             </InputSubDiv>
           </InputDiv>
           <br />
           <br />
-          <ButtonWrap>
-            <button onClick={onMetamaskSignUp}>{signUpObject2.address ? 'Sign Up' : 'Connect Metamask'}</button>
-          </ButtonWrap>
+          <Button variant="contained" onClick={onMetamaskSignUp}>
+            {signUpObject2.address ? 'Sign Up' : 'Connect Metamask'}
+          </Button>
         </SignUpDiv>
       </SignUpContainer>
     </Container>

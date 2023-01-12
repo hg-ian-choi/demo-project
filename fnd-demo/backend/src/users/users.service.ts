@@ -3,6 +3,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Web3Service } from 'src/web3/web3.service';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
 import Web3 from 'web3';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,14 +13,10 @@ import { User } from './user.entity';
 export class UsersService {
   constructor(
     private readonly configService: ConfigService,
+    private readonly web3Service: Web3Service,
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
-
-  web3 = new Web3(
-    'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
-  );
-
   /********************************************************************************
    ************************************ CREATE ************************************
    ********************************************************************************/
@@ -30,8 +27,12 @@ export class UsersService {
    */
   public async createUser(_user: CreateUserDto): Promise<User> {
     const username = _user.email.split('@')[0];
-    const user = this.usersRepository.create({ ..._user, username: username });
-    user.address = this.web3.eth.accounts.create().address;
+    const signer = await this.web3Service.getSignerFromSign(_user.address);
+    const user = this.usersRepository.create({
+      ..._user,
+      username: username,
+      address: signer.toLowerCase(),
+    });
     await this.usersRepository.save(user);
     return user;
   }
@@ -96,10 +97,7 @@ export class UsersService {
     _sign: string,
   ): Promise<User> {
     const user = this.usersRepository.create(_user);
-    const signer = this.web3.eth.accounts.recover(
-      this.configService.get<string>('signUpMessage'),
-      _sign,
-    );
+    const signer = await this.web3Service.getSignerFromSign(_sign);
     if (_wallet && _wallet === signer) {
       _user.address = _wallet;
       await this.usersRepository.save(user);

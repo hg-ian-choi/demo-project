@@ -65,7 +65,6 @@ export class AuthController {
     };
   }
 
-  @UseGuards(WalletAuthGuard)
   @Post('/signin/wallet')
   async signInWithWallet(
     @GetUser() _user: User,

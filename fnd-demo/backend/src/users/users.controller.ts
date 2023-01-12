@@ -74,7 +74,7 @@ export class UsersController {
     return this.usersService.getUserWithoutPassword(_match);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch('/connectWallet')
   public async connectWallet(
     @GetUser() _user: User,

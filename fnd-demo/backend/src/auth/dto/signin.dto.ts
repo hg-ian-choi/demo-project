@@ -9,7 +9,4 @@ export class SigninDto extends User {
 
   @IsString()
   password?: string;
-
-  @IsString()
-  address?: string;
 }

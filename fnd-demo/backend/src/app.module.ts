@@ -8,6 +8,8 @@ import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { CollectionsModule } from './collections/collections.module';
+import { Web3Module } from './web3/web3.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { CommonModule } from './common/common.module';
     UsersModule,
     AuthModule,
     CommonModule,
+    CollectionsModule,
+    Web3Module,
   ],
 })
 export class AppModule {}
