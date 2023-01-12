@@ -1,3 +1,5 @@
+// auth/auth.service.ts
+
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/users/user.entity';

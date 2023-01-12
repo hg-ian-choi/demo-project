@@ -1,3 +1,5 @@
+// auth/strategies/local.strategy.ts
+
 import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';

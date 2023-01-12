@@ -1,4 +1,4 @@
-// user/user.service.ts
+// users/users.service.ts
 
 import { ConflictException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

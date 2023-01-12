@@ -1,3 +1,5 @@
+// auth/auth.controller.ts
+
 import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';

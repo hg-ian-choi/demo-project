@@ -1,4 +1,4 @@
-// user/dto/create-user.dto.ts
+// users/dto/create-user.dto.ts
 
 import { IsEmail, IsString, Matches } from 'class-validator';
 import { User } from '../user.entity';

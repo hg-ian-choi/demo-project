@@ -14,6 +14,19 @@ contract Core {
 
     mapping(address => mapping(address => mapping(uint256 => Product))) contractToTokenToAddressToProduct;
 
+    event receiveExtraEvent(address sender, uint value);
+    event buyProductEvent(
+        address seller,
+        address buyer,
+        address tokenAddress,
+        uint tokenId,
+        uint amount,
+        uint price,
+        uint totalPrice,
+        uint buyerPay,
+        uint extraValue
+    );
+
     constructor() {
         _owner = _msgSender();
     }
@@ -73,18 +86,53 @@ contract Core {
     function buyProduct(
         address payable contract_,
         uint256 id_,
-        uint256 amount_,
-        uint256 price_
+        uint256 amount_
     ) external payable {
         Product memory sell = contractToTokenToAddressToProduct[contract_][
             _msgSender()
         ][id_];
 
-        require(price_ >= sell.price, "Not sufficient funds");
+        require(msg.value >= sell.price, "Not sufficient funds");
         require(amount_ <= sell.amount, "Not sufficient amount");
 
-        (bool sent, bytes memory data) = sell.seller.call{value: price_}("");
+        uint totalPrice = sell.price * amount_;
 
-        require(sent, "Failed to sent ether!");
+        uint sellerValue = (totalPrice * 95) / 100;
+        uint ownerValue = (totalPrice * 5) / 100;
+
+        (bool sentToSeller, ) = sell.seller.call{value: sellerValue}("");
+        (bool sentToOwner, ) = _owner.call{value: ownerValue}("");
+
+        require(sentToSeller, "Failed to sent ether!");
+        require(sentToOwner, "Failed to sent ether!");
+
+        if (msg.value > totalPrice) {
+            emit receiveExtraEvent(msg.sender, msg.value - totalPrice);
+        }
+
+        if (amount_ == sell.amount) {
+            delete contractToTokenToAddressToProduct[contract_][_msgSender()][
+                id_
+            ];
+        } else {
+            sell.amount = sell.amount - amount_;
+            contractToTokenToAddressToProduct[contract_][_msgSender()][
+                id_
+            ] = sell;
+        }
+
+        emit buyProductEvent(
+            sell.seller,
+            msg.sender,
+            contract_,
+            id_,
+            amount_,
+            sell.price,
+            totalPrice,
+            msg.value,
+            msg.value - totalPrice
+        );
     }
+
+    receive() external payable {}
 }

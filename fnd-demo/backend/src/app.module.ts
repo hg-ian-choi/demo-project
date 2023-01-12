@@ -8,7 +8,6 @@ import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { EwalletModule } from './ewallet/ewallet.module';
 
 @Module({
   imports: [
@@ -52,7 +51,6 @@ import { EwalletModule } from './ewallet/ewallet.module';
     UsersModule,
     AuthModule,
     CommonModule,
-    EwalletModule,
   ],
 })
 export class AppModule {}
