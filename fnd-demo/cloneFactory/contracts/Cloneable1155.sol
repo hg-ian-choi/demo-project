@@ -19,13 +19,14 @@ contract Cloneable1155 is
     ERC1155SupplyUpgradeable
 {
     using Counters for Counters.Counter;
-    Counters.Counter private tokenId;
+    Counters.Counter private _tokenId;
 
     string public name;
     string public symbol;
     string private _prefix;
     string private _suffix;
     address payable private _core;
+    bytes private _data;
 
     mapping(uint256 => string) tokenURI;
 
@@ -37,20 +38,18 @@ contract Cloneable1155 is
         string memory name_,
         string memory symbol_,
         address payable core_,
-        address payable sender_
+        address payable sender_,
+        bytes memory data_
     ) public initializer {
         name = name_;
         symbol = symbol_;
         _core = core_;
+        _data = data_;
         __ERC1155_init("");
         __Ownable_init(sender_);
         __Pausable_init();
         __ERC1155Burnable_init();
         __ERC1155Supply_init();
-    }
-
-    function setURI(string memory newuri_) public onlyOwner {
-        _setURI(newuri_);
     }
 
     function pause() public onlyOwner {
@@ -61,33 +60,39 @@ contract Cloneable1155 is
         _unpause();
     }
 
-    function mint(
-        address account_,
-        uint256 id_,
+    function mintAndApproval(
         uint256 amount_,
+        string memory uri_,
         bytes memory data_
     ) public onlyOwner {
-        tokenURI[id_] = Strings.toString(id_);
-        _mint(account_, id_, amount_, data_);
-    }
-
-    function mintAndApprove(
-        uint256 amount_,
-        bytes memory data_
-    ) external onlyOwner returns (uint256 tokenId_) {
-        tokenId.increment();
-        tokenId_ = tokenId.current();
-        _mint(_Sender(), tokenId_, amount_, data_);
+        _tokenId.increment();
+        uint tokenId = _tokenId.current();
+        tokenURI[tokenId] = uri_;
+        _mint(_sender(), tokenId, amount_, data_);
         setApprovalForAll(_core, true);
     }
 
-    function mintBatch(
-        address to_,
-        uint256[] memory ids_,
-        uint256[] memory amounts_,
-        bytes memory data_
-    ) public onlyOwner {
-        _mintBatch(to_, ids_, amounts_, data_);
+    function setApprovalForAll(
+        address operator,
+        bool approved
+    ) public virtual override {
+        require(operator == _core, "Can not Approval");
+        _setApprovalForAll(_msgSender(), operator, approved);
+    }
+
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 id,
+        uint256 amount,
+        bytes memory data
+    ) public virtual override {
+        require(keccak256(data) == keccak256(_data), "Can not Transfer");
+        require(
+            from == _msgSender() || isApprovedForAll(from, _msgSender()),
+            "ERC1155: caller is not token owner or approved"
+        );
+        _safeTransferFrom(from, to, id, amount, data);
     }
 
     function _beforeTokenTransfer(
@@ -125,6 +130,6 @@ contract Cloneable1155 is
     }
 
     function getCurrentTokenId() public view returns (uint256) {
-        return tokenId.current();
+        return _tokenId.current();
     }
 }

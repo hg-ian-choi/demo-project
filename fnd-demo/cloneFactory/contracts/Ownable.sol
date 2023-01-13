@@ -16,17 +16,15 @@ contract Ownable is Initializable {
         _;
     }
 
-    function __Ownable_init(address payable newOwner_)
-        internal
-        onlyInitializing
-    {
+    function __Ownable_init(
+        address payable newOwner_
+    ) internal onlyInitializing {
         __Ownable_init_unchained(newOwner_);
     }
 
-    function __Ownable_init_unchained(address payable newOwner_)
-        internal
-        onlyInitializing
-    {
+    function __Ownable_init_unchained(
+        address payable newOwner_
+    ) internal onlyInitializing {
         _transferOwnership(newOwner_);
     }
 
@@ -37,14 +35,14 @@ contract Ownable is Initializable {
     }
 
     function _checkOwner() internal view virtual {
-        require(owner() == _Sender(), "Ownable: caller is not the owner");
+        require(owner() == _sender(), "Ownable: caller is not the owner");
     }
 
     function owner() public view virtual returns (address) {
         return _owner;
     }
 
-    function _Sender() internal view virtual returns (address) {
+    function _sender() internal view virtual returns (address) {
         return msg.sender;
     }
 }

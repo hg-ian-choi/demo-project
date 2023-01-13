@@ -1,5 +1,6 @@
 // users/user.entity.ts
 
+import { Collection } from 'src/collections/collection.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
@@ -18,4 +19,7 @@ export class User {
 
   @Column({ type: 'varchar', nullable: true, unique: true })
   address?: string;
+
+  @OneToMany(() => Collection, (collection) => collection.user)
+  collections?: Collection[];
 }

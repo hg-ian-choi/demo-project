@@ -9,7 +9,6 @@ contract CloneFactory {
 
     address private _owner;
     address private _origin;
-    address private _core;
 
     event newClone(
         address indexed newClone,
@@ -23,25 +22,19 @@ contract CloneFactory {
         _;
     }
 
-    constructor(address core_) {
+    constructor() {
         _owner = _msgSender();
-        _core = core_;
     }
 
     function _clone(
         string memory name_,
         string memory symbol_
-    ) external returns (address identicalChild_) {
-        identicalChild_ = _origin.cloneDeterministic(_genSalt(_msgSender()));
+    ) external returns (address newClone_) {
+        newClone_ = _origin.cloneDeterministic(_genSalt(_msgSender()));
 
-        ICloneable(identicalChild_).initialize(
-            name_,
-            symbol_,
-            payable(_core),
-            payable(_msgSender())
-        );
+        ICloneable(newClone_).initialize(name_, symbol_, payable(_msgSender()));
 
-        emit newClone(identicalChild_, _msgSender(), name_, symbol_);
+        emit newClone(newClone_, _msgSender(), name_, symbol_);
     }
 
     function getOrigin() external view onlyOwner returns (address) {

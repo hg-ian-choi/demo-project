@@ -18,7 +18,6 @@ export class AuthService {
   async validateUser(_user: SigninDto): Promise<User> {
     let user: User;
     if (_user.password.startsWith('0x')) {
-      console.log('_user.password', _user.password);
       const signer = await this.web3Service.getSignerFromSign(_user.password);
       user = await this.usersService.getUserWithoutPassword({
         address: signer.toLowerCase(),

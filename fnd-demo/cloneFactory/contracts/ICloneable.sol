@@ -5,7 +5,6 @@ interface ICloneable {
     function initialize(
         string memory name_,
         string memory symbol_,
-        address payable core_,
         address payable sender_
     ) external;
 
