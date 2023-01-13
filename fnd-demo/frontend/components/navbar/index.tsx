@@ -74,16 +74,14 @@ export default function Navbar({ signOut, loadCookie }: { signOut: any; loadCook
         <ProfileContainer>
           {loginUser.username ? (
             <div>
-              Hi, {loginUser.username}
+              Hi, {loginUser.username}{' '}
               <span>
-                {' '}
-                <button onClick={turnToProfile}>My Page</button> <button onClick={turnToSignOut}>Sign Out</button>
+                <button onClick={turnToCreate}>Create</button> <button onClick={turnToProfile}>My Page</button>{' '}
+                <button onClick={turnToSignOut}>Sign Out</button>{' '}
               </span>
             </div>
           ) : (
             <ButtonWrap>
-              <button onClick={turnToCreate}>Create</button>
-              <span> </span>
               <button onClick={turnToSignIn}>Sign In</button>
               <span> </span>
               <button onClick={turnToSignUp}>Sign Up</button>

@@ -8,7 +8,6 @@ import { User } from 'src/users/user.entity';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { WalletAuthGuard } from './guards/wallet-auth.guard';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -65,52 +64,52 @@ export class AuthController {
     };
   }
 
-  @Post('/signin/wallet')
-  async signInWithWallet(
-    @GetUser() _user: User,
-    @Res({ passthrough: true }) _res: Response,
-  ): Promise<object> {
-    const accessToken = await this.authService.signIn(_user);
-    _res
-      .cookie('at_auth', accessToken, {
-        domain: this.configService.get<string>('domain'),
-        path: '/',
-        maxAge: 1800000,
-        signed: true,
-        secure: this.configService.get<string>('mode') === 'PROD',
-        httpOnly: true,
-      })
-      .cookie('userId', _user.id, {
-        domain: this.configService.get<string>('domain'),
-        path: '/',
-        maxAge: 1800000,
-        signed: false,
-        secure: this.configService.get<string>('mode') === 'PROD',
-        httpOnly: false,
-      })
-      .cookie('username', _user.username, {
-        domain: this.configService.get<string>('domain'),
-        path: '/',
-        maxAge: 1800000,
-        signed: false,
-        secure: this.configService.get<string>('mode') === 'PROD',
-        httpOnly: false,
-      })
-      .cookie('wallet', _user.address, {
-        domain: this.configService.get<string>('domain'),
-        path: '/',
-        maxAge: 1800000,
-        signed: false,
-        secure: this.configService.get<string>('mode') === 'PROD',
-        httpOnly: false,
-      });
-    return {
-      userId: _user.id,
-      username: _user.username,
-      wallet: _user.address,
-      _token: accessToken,
-    };
-  }
+  // @Post('/signin/wallet')
+  // async signInWithWallet(
+  //   @GetUser() _user: User,
+  //   @Res({ passthrough: true }) _res: Response,
+  // ): Promise<object> {
+  //   const accessToken = await this.authService.signIn(_user);
+  //   _res
+  //     .cookie('at_auth', accessToken, {
+  //       domain: this.configService.get<string>('domain'),
+  //       path: '/',
+  //       maxAge: 1800000,
+  //       signed: true,
+  //       secure: this.configService.get<string>('mode') === 'PROD',
+  //       httpOnly: true,
+  //     })
+  //     .cookie('userId', _user.id, {
+  //       domain: this.configService.get<string>('domain'),
+  //       path: '/',
+  //       maxAge: 1800000,
+  //       signed: false,
+  //       secure: this.configService.get<string>('mode') === 'PROD',
+  //       httpOnly: false,
+  //     })
+  //     .cookie('username', _user.username, {
+  //       domain: this.configService.get<string>('domain'),
+  //       path: '/',
+  //       maxAge: 1800000,
+  //       signed: false,
+  //       secure: this.configService.get<string>('mode') === 'PROD',
+  //       httpOnly: false,
+  //     })
+  //     .cookie('wallet', _user.address, {
+  //       domain: this.configService.get<string>('domain'),
+  //       path: '/',
+  //       maxAge: 1800000,
+  //       signed: false,
+  //       secure: this.configService.get<string>('mode') === 'PROD',
+  //       httpOnly: false,
+  //     });
+  //   return {
+  //     userId: _user.id,
+  //     username: _user.username,
+  //     wallet: _user.address,
+  //     _token: accessToken,
+  //   };
+  // }
 
   @Post('/signout')
   signOut(@Res({ passthrough: true }) _res: Response): boolean {

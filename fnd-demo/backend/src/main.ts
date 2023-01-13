@@ -11,11 +11,11 @@ async function main() {
   const config = configuration();
   const app = await NestFactory.create(AppModule);
 
+  app.use(cookieParser(config.cookieSecret));
   app.enableCors({
     origin: `${config.ssl}://${config.domain}`,
     credentials: true,
   });
-  app.use(cookieParser(config.cookieSecret));
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

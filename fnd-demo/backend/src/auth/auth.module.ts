@@ -10,7 +10,6 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
-import { WalletStrategy } from './strategies/wallet.strategy';
 
 @Module({
   imports: [
@@ -29,6 +28,6 @@ import { WalletStrategy } from './strategies/wallet.strategy';
     Web3Module,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, WalletStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
