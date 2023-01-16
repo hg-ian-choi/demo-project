@@ -33,6 +33,7 @@ import { HistoriesModule } from './histories/histories.module';
         JWT_EXPIRESIN: Joi.string().required(),
         COOKIE_SECRET: Joi.string().required(),
         SIGNUP_MESSAGE: Joi.string().required(),
+        SIGNIN_MESSAGE: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,

@@ -12,7 +12,7 @@ export class Web3Service {
 
   async getSignerFromSign(sign_: string): Promise<string> {
     const signer = this.web3.eth.accounts.recover(
-      this.configService.get<string>('signUpMessage'),
+      this.configService.get<string>('signInMessage'),
       sign_,
     );
     return signer;

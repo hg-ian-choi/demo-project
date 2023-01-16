@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { Button, TextField } from '@mui/material';
 import axios, { AxiosResponse } from 'axios';
 import React, { useState } from 'react';
+import { getAccount } from '../api/web3/web3';
 
 const instance = axios.create({
   withCredentials: true,
@@ -30,9 +31,12 @@ const InputDiv = styled.div`
 `;
 
 export async function getServerSideProps(context: any) {
-  const collections = await instance.get('/collections/user', { headers: { Cookie: context.req.headers.cookie } }).then((res_: AxiosResponse) => {
-    return res_.data;
-  });
+  let collections: any = [];
+  if (context.req.headers.cookie) {
+    collections = await instance.get('/collections/user', { headers: { Cookie: context.req.headers.cookie } }).then((res_: AxiosResponse) => {
+      return res_.data;
+    });
+  }
   return {
     props: { collections },
   };
@@ -69,14 +73,7 @@ export default function Create(props: any) {
       return;
     }
 
-    const customWindow: any = window;
-    if (typeof customWindow?.ethereum === 'undefined') {
-      if (confirm('Open new tab for installing metamask?')) {
-        window.open('https://metamask.io/');
-      }
-      return;
-    }
-    const account = (await customWindow.ethereum.request({ method: 'eth_requestAccounts' }))[0];
+    const account = await getAccount();
   };
 
   return (

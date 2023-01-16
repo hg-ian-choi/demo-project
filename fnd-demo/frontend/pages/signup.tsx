@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import Web3 from 'web3';
 import { useAppDispatch } from '../store/hooks';
 import { loginUserSelector, setLoginUser } from '../store/loginUserSlice';
+import { getAccount, personalSign } from './api/web3/web3';
 
 const SignUpContainer = styled.div`
   display: flex;
@@ -137,58 +138,39 @@ export default function SignUp() {
       setWarning2({ ...warning2, email: 'Email is incorrect' });
       return;
     }
-    const customWindow: any = window;
-    if (typeof customWindow?.ethereum === 'undefined') {
-      if (confirm('Open new tab for installing metamask?')) {
-        window.open('https://metamask.io/');
-      }
-      return;
-    }
 
-    if (!web3) return;
-    let from = '';
-    try {
-      from = (await web3.eth.requestAccounts())[0];
-      setSignUpObject2({ ...signUpObject2, address: from });
+    if (signUpObject2.address) {
+      const signed = await personalSign(`${process.env.NEXT_PUBLIC_SIGNUP_MESSAGE}`.toString(), `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`);
 
-      customWindow.ethereum.on('accountsChanged', (accounts: string[]) => {
-        setSignUpObject2({ ...signUpObject2, address: accounts[0] });
-      });
-    } catch (_error: any) {
-      if (_error?.code === -32002) {
-        alert('Already processing: Please check your Metamask');
-      }
-    }
+      if (!signed) return;
 
-    let signed = '';
-    try {
-      signed = await web3.eth.personal.sign(
-        `${process.env.NEXT_PUBLIC_SIGNUP_MESSAGE}`.toString(),
-        signUpObject2.address,
-        `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
-      );
-    } catch (_error: any) {
-      if (_error.code === 4001) {
-        alert('User denied message signature');
-      }
-    }
-    if (!signed) return;
+      await axios
+        .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { ...signUpObject2, address: signed }, { withCredentials: true })
+        .then((_res: AxiosResponse) => {
+          const data: any = _res.data;
+          dispatch(setLoginUser({ ...user, wallet: signUpObject2.address }));
+          alert(`Welcome to join us ${data.username}`);
+          router.push('/');
+        })
+        .catch((_err: AxiosError) => {
+          const data: any = _err.response?.data;
+          if (data?.message) {
+            alert(data.message);
+          }
+          return false;
+        });
+    } else {
+      let account = await getAccount();
+      if (!account) return;
+      setSignUpObject2({ ...signUpObject2, address: account || '' });
 
-    await axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { ...signUpObject2, address: signed }, { withCredentials: true })
-      .then((_res: AxiosResponse) => {
-        const data: any = _res.data;
-        dispatch(setLoginUser({ ...user, wallet: signUpObject2.address }));
-        alert(`Welcome to join us ${data.username}`);
-        router.push('/');
-      })
-      .catch((_err: AxiosError) => {
-        const data: any = _err.response?.data;
-        if (data?.message) {
-          alert(data.message);
+      const customWindow: any = window;
+      customWindow.ethereum.on('accountsChanged', (accounts_: string[]) => {
+        if (accounts_[0]) {
+          setSignUpObject2({ ...signUpObject2, address: accounts_[0] });
         }
-        return false;
       });
+    }
 
     // axios
     //   .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, signUpObject)

@@ -53,7 +53,8 @@ export default function Navbar({ signOut, loadCookie }: { signOut: any; loadCook
     if (!loadCookie()) {
       router.push('/');
     }
-    router.push('/create');
+    if (router.pathname === '/collection') router.reload();
+    router.push('/collection');
   };
 
   return (

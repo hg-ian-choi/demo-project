@@ -8,6 +8,7 @@ import { useState } from 'react';
 import Web3 from 'web3';
 import { useAppDispatch } from '../store/hooks';
 import { setLoginUser } from '../store/loginUserSlice';
+import { getAccount, personalSign } from './api/web3/web3';
 
 const Container = styled.div`
   height: 100vh;
@@ -68,6 +69,7 @@ export default function SignIn() {
       setWarning({ ...warning, email: 'Email is incorrect' });
       return;
     }
+
     await axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, signInObject, { withCredentials: true })
       .then((_res: AxiosResponse) => {
@@ -86,22 +88,13 @@ export default function SignIn() {
   };
 
   const signInWithMetamask = async () => {
-    const customWindow: any = window;
-    if (typeof customWindow?.ethereum === 'undefined') {
-      if (confirm('Open new tab for installing metamask?')) {
-        window.open('https://metamask.io/');
-      }
-      return;
-    }
-    const account = (await customWindow.ethereum.request({ method: 'eth_requestAccounts' }))[0];
+    const account = await getAccount();
 
-    const password = await web3.eth.personal.sign(
-      `${process.env.NEXT_PUBLIC_SIGNUP_MESSAGE}`.toString(),
-      account,
-      `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`
-    );
+    if (!account) return;
 
-    console.log('password', password);
+    const password = await personalSign(`${process.env.NEXT_PUBLIC_SIGNIN_MESSAGE}`.toString(), `${process.env.NEXT_PUBLIC_SIGNATURE_PASSWORD}`);
+
+    if (!password) return;
 
     await axios
       .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/signin`, { email: 'email', password: password }, { withCredentials: true })
