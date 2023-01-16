@@ -1,3 +1,5 @@
+// collections/collections.controller.ts
+
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { GetUser } from 'src/common/decorators/get-user.decorator';

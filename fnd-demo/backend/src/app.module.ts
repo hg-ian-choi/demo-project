@@ -10,6 +10,9 @@ import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { CollectionsModule } from './collections/collections.module';
 import { Web3Module } from './web3/web3.module';
+import { NftsModule } from './nfts/nfts.module';
+import { EditionsModule } from './editions/editions.module';
+import { HistoriesModule } from './histories/histories.module';
 
 @Module({
   imports: [
@@ -55,6 +58,9 @@ import { Web3Module } from './web3/web3.module';
     CommonModule,
     CollectionsModule,
     Web3Module,
+    NftsModule,
+    EditionsModule,
+    HistoriesModule,
   ],
 })
 export class AppModule {}

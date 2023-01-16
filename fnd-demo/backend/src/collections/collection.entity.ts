@@ -1,3 +1,5 @@
+// collections/collection.entity.ts
+
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -15,6 +17,6 @@ export class Collection {
   @Column()
   address: string;
 
-  @ManyToOne(() => User, (user) => user.collections)
+  @ManyToOne(() => User, { cascade: true })
   user: User;
 }

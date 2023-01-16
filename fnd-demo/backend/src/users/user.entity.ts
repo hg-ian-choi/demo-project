@@ -1,25 +1,33 @@
 // users/user.entity.ts
 
-import { Collection } from 'src/collections/collection.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  public id?: string;
 
   @Column({ type: 'varchar', unique: true })
-  email?: string;
+  public email?: string;
 
   @Column({ type: 'varchar' })
-  password?: string;
+  public password?: string;
 
   @Column({ type: 'varchar', unique: true })
-  username?: string;
+  public username?: string;
 
   @Column({ type: 'varchar', nullable: true, unique: true })
-  address?: string;
+  public address?: string;
 
-  @OneToMany(() => Collection, (collection) => collection.user)
-  collections?: Collection[];
+  // @OneToMany(() => Collection, (collection) => collection.user)
+  // public collections?: Collection[];
+
+  // @OneToMany(() => NFT, (nft) => nft.creator)
+  // public nfts: NFT[];
+
+  // @OneToMany(() => Edition, (edition) => edition.owner)
+  // public editions: Edition[];
+
+  // @OneToMany(() => History, (history) => history.buyer)
+  // histories: History[];
 }
