@@ -11,9 +11,7 @@ export const checkProvider = () => {
 };
 
 export const getAccount = async () => {
-  if (!checkProvider()) {
-    return null;
-  }
+  if (!checkProvider()) return null;
 
   const web3 = new Web3(Web3.givenProvider);
 
@@ -31,20 +29,17 @@ export const getAccount = async () => {
 };
 
 export const personalSign = async (message_: string, password_: string) => {
-  if (!checkProvider()) {
-    return null;
-  }
+  if (!checkProvider()) return null;
 
   const web3 = new Web3(Web3.givenProvider);
 
   const account = await getAccount();
 
-  if (!account) return;
+  if (!account) return null;
 
   return web3.eth.personal
     .sign(message_, account, password_)
     .then((result_: string) => {
-      console.log('result_', result_);
       return result_;
     })
     .catch((error_: any) => {
@@ -53,4 +48,15 @@ export const personalSign = async (message_: string, password_: string) => {
         return null;
       }
     });
+};
+
+export const getContractInstance = async (abi_: any, address_: string) => {
+  if (!abi_ || !address_) return;
+
+  if (!checkProvider()) return null;
+
+  const web3 = new Web3(Web3.givenProvider);
+  const contractInstance = new web3.eth.Contract(abi_, address_);
+
+  return contractInstance;
 };

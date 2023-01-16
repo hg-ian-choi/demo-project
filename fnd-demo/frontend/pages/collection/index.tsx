@@ -1,8 +1,12 @@
 import styled from '@emotion/styled';
 import { Button, TextField } from '@mui/material';
 import axios, { AxiosResponse } from 'axios';
-import React, { useState } from 'react';
-import { getAccount } from '../api/web3/web3';
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useRouter } from 'next/router';
+import { getAccount, getContractInstance } from '../api/web3/web3';
+import { loginUserSelector } from '../../store/loginUserSlice';
+import abi from '../../abis/NftAbi.json';
 
 const instance = axios.create({
   withCredentials: true,
@@ -45,9 +49,18 @@ export async function getServerSideProps(context: any) {
 export default function Create(props: any) {
   const { collections } = props;
 
+  const router = useRouter();
+  const loginUser = useSelector(loginUserSelector);
+
   const [step, setStep] = useState(0);
   const [createCollectionObject, setCreateCollectionObject] = useState({ name: '', symbol: '' });
   const [createCollectionWarnning, setCreateCollectionWarning] = useState({ name: '', symbol: '' });
+
+  useEffect(() => {
+    if (!loginUser.userId) {
+      router.push('/');
+    }
+  }, [loginUser.userId]);
 
   const nextStep = (step_: number) => {
     setStep(step_);
@@ -74,6 +87,29 @@ export default function Create(props: any) {
     }
 
     const account = await getAccount();
+    if (!account) return;
+    if (account.toLowerCase() !== loginUser.wallet) {
+      console.log(account, loginUser.wallet);
+      alert('Only Signed up Metamask can use');
+      return;
+    }
+
+    const contractInstance = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_CLONE_CONTRACT_ADDRESS}`);
+
+    if (!contractInstance) return;
+
+    const newClone = await contractInstance.methods
+      .uri(1)
+      .call()
+      .then((result_: any) => {
+        console.log('result_', result_);
+        return result_;
+      });
+
+    if (!newClone) {
+      alert('Something went wrong when Create Collection');
+      return;
+    }
   };
 
   return (
