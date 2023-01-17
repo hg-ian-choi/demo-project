@@ -56,51 +56,64 @@ contract Core is ERC1155Holder {
         require(amount_ > 0, "Amount is 0");
         uint256 _balance = ICloneable(contract_).balanceOf(_msgSender(), id_);
         require(_balance >= amount_, "Not sufficient balance");
-        require(price_ >= 0, "Price should >= 0");
-        console.log("_balance", _balance);
+        require(price_ > 0, "Price should > 0");
 
         if (artist[contract_] == address(0)) {
             artist[contract_] = ICloneable(contract_).owner();
+            console.log("artist[contract_]", artist[contract_]);
         }
-        console.log("artist[contract_]", artist[contract_]);
 
         Product memory _product = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
-        console.log("_product.seller", _product.seller);
-        console.log("_product.amount", _product.amount);
-        console.log("_product.price", _product.price);
 
         if (_product.seller == address(0)) {
-            require(price_ > 0, "Price is 0");
             _product.seller = _msgSender();
-
             _product.amount = amount_;
             _product.price = price_;
-
             addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+
+            console.log("_product.seller", _product.seller);
+            console.log("_product.amount", _product.amount);
+            console.log("_product.price", _product.price);
 
             ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_, "0x00");
         } else {
-            if (price_ == 0) {
-                ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount, "0x00");
-                delete addressToContractToTokenToProduct[_msgSender()][contract_][id_];
+            if (amount_ < _product.amount) {
+                ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount - amount_, "0x00");
+                _product.amount = amount_;
+                _product.price = price_;
+                addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+            } else if (amount_ > _product.amount) {
+                ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_ - _product.amount, "0x00");
+                _product.amount = amount_;
+                _product.price = price_;
+                addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
             } else {
-                if (amount_ < _product.amount) {
-                    ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount - amount_, "0x00");
-                    _product.amount = amount_;
-                    _product.price = price_;
-                    addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
-                } else if (amount_ > _product.amount) {
-                    ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_ - _product.amount, "0x00");
-                    _product.amount = amount_;
-                    _product.price = price_;
-                    addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
-                }
+                _product.price = price_;
+                addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
             }
         }
     }
 
-    function buyProduct(address payable contract_, uint256 id_, uint256 amount_) external payable {
-        Product memory sell = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
+    function cancelProduct(address payable contract_, uint256 id_, uint256 amount_) external payable {
+        require(amount_ > 0, "Amount should > 0");
+
+        Product memory _product = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
+
+        require(_product.seller != address(0), "Product is not on sale");
+        require(amount_ <= _product.amount, "Amount should less than selling");
+
+        if (amount_ == _product.amount) {
+            ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+            delete addressToContractToTokenToProduct[_msgSender()][contract_][id_];
+        } else {
+            ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+            _product.amount = _product.amount - amount_;
+            addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+        }
+    }
+
+    function buyProduct(address payable seller_, address payable contract_, uint256 id_, uint256 amount_) external payable {
+        Product memory sell = addressToContractToTokenToProduct[seller_][contract_][id_];
 
         require(sell.seller != _msgSender(), "Can not buy own Product");
         require(sell.price > 0, "Can not buy Product whose price is 0");
@@ -124,17 +137,17 @@ contract Core is ERC1155Holder {
         require(sentToArtist, "Failed to send to Artist!");
 
         if (msg.value > totalPrice) {
-            emit receiveExtra(msg.sender, msg.value - totalPrice);
+            emit receiveExtra(_msgSender(), msg.value - totalPrice);
         }
 
         if (amount_ == sell.amount) {
-            delete addressToContractToTokenToProduct[_msgSender()][contract_][id_];
+            delete addressToContractToTokenToProduct[seller_][contract_][id_];
         } else {
             sell.amount = sell.amount - amount_;
-            addressToContractToTokenToProduct[_msgSender()][contract_][id_] = sell;
+            addressToContractToTokenToProduct[seller_][contract_][id_] = sell;
         }
 
-        emit buyProductEvent(sell.seller, msg.sender, contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
+        emit buyProductEvent(sell.seller, _msgSender(), contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 
     function getContractBalance() external view onlyOwner returns (uint256) {
