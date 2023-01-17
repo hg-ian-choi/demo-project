@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { getAccount, getContractInstance } from '../api/web3/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
-import abi from '../../abis/NftAbi.json';
+import abi from '../../abis/CloneAbi.json';
 
 const instance = axios.create({
   withCredentials: true,
@@ -88,9 +88,23 @@ export default function Create(props: any) {
 
     const account = await getAccount();
     if (!account) return;
+
+    const cookiesArray = document.cookie.split(';');
+    const cookiesMap: any = {};
+    for await (const cookie_ of cookiesArray) {
+      const _cookie = cookie_.trim().split('=');
+      cookiesMap[_cookie[0]] = _cookie[1];
+    }
+
     if (account.toLowerCase() !== loginUser.wallet) {
       console.log(account, loginUser.wallet);
       alert('Only Signed up Metamask can use');
+      return;
+    }
+
+    if (account.toLowerCase() !== cookiesMap['wallet']) {
+      alert('Session is expired, please sign in');
+      router.push('/signin');
       return;
     }
 
