@@ -56,12 +56,6 @@ export default function Create(props: any) {
   const [createCollectionObject, setCreateCollectionObject] = useState({ name: '', symbol: '' });
   const [createCollectionWarnning, setCreateCollectionWarning] = useState({ name: '', symbol: '' });
 
-  useEffect(() => {
-    if (!loginUser.userId) {
-      router.push('/');
-    }
-  }, [loginUser.userId]);
-
   const nextStep = (step_: number) => {
     setStep(step_);
   };

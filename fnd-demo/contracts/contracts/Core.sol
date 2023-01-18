@@ -116,6 +116,7 @@ contract Core is ERC1155Holder {
         Product memory sell = addressToContractToTokenToProduct[seller_][contract_][id_];
 
         require(sell.seller != _msgSender(), "Can not buy own Product");
+        require(sell.seller != address(0), "Product not exist");
         require(sell.price > 0, "Can not buy Product whose price is 0");
         require(sell.amount > 0, "Can not buy Product whose amount is 0");
         require(msg.value >= sell.price, "Not sufficient funds");
@@ -147,6 +148,7 @@ contract Core is ERC1155Holder {
             addressToContractToTokenToProduct[seller_][contract_][id_] = sell;
         }
 
+        ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
         emit buyProductEvent(sell.seller, _msgSender(), contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 
