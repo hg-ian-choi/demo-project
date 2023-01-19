@@ -1,23 +1,11 @@
 // users/users.controller.ts
 
-import {
-  Body,
-  ConflictException,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { Body, Controller, Get, Param, Patch, Post, Res } from '@nestjs/common';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
-import Web3 from 'web3';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 
@@ -37,14 +25,17 @@ export class UsersController {
    * @returns User
    */
   @Post('/')
-  private createUser(@Body() _user: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(_user);
+  private async createUser(
+    @Body('user') user_: CreateUserDto,
+    @Body('sign') sign_: string,
+  ): Promise<User> {
+    return this.usersService.createUser(user_, sign_);
   }
 
-  @Post('/metamask/signup')
-  private createUserWithMetamask(@Body() _user: CreateUserDto): Promise<User> {
-    return this.usersService.createUser(_user);
-  }
+  // @Post('/metamask/signup')
+  // private createUserWithMetamask(@Body() _user: CreateUserDto): Promise<User> {
+  //   return this.usersService.createUser(_user);
+  // }
 
   /******************************************************************************
    ************************************ READ ************************************
@@ -55,7 +46,7 @@ export class UsersController {
    * @returns User[]
    */
   @Get('/')
-  private getUsers(
+  private async getUsers(
     @Body('match') _match: FindOptionsWhere<User>,
     @Body('sort') _sort: FindOptionsOrder<User>,
   ): Promise<User[]> {
@@ -68,7 +59,7 @@ export class UsersController {
    * @returns User
    */
   @Get('/:match')
-  private getUser(
+  private async getUser(
     @Param('match') _match: FindOptionsWhere<User>,
   ): Promise<User> {
     return this.usersService.getUserWithoutPassword(_match);

@@ -145,7 +145,7 @@ export default function SignUp() {
       if (!signed) return;
 
       await axios
-        .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { ...signUpObject2, address: signed }, { withCredentials: true })
+        .post(`${process.env.NEXT_PUBLIC_API_URL}/users`, { user: signUpObject2, sign: signed }, { withCredentials: true })
         .then((_res: AxiosResponse) => {
           const data: any = _res.data;
           dispatch(setLoginUser({ ...user, wallet: signUpObject2.address }));
@@ -166,6 +166,7 @@ export default function SignUp() {
 
       const customWindow: any = window;
       customWindow.ethereum.on('accountsChanged', (accounts_: string[]) => {
+        console.log('accounts_[0]', accounts_[0]);
         if (accounts_[0]) {
           setSignUpObject2({ ...signUpObject2, address: accounts_[0] });
         }

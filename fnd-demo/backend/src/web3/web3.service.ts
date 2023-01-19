@@ -10,11 +10,8 @@ export class Web3Service {
     'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
   );
 
-  async getSignerFromSign(sign_: string): Promise<string> {
-    const signer = this.web3.eth.accounts.recover(
-      this.configService.get<string>('signInMessage'),
-      sign_,
-    );
+  async getSignerFromSign(message_: string, sign_: string): Promise<string> {
+    const signer = this.web3.eth.accounts.recover(message_, sign_);
     return signer;
   }
 }

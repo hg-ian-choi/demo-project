@@ -1,11 +1,14 @@
 // users/users.service.ts
 
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/web3/web3.service';
 import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
-import Web3 from 'web3';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 
@@ -17,6 +20,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
+
   /********************************************************************************
    ************************************ CREATE ************************************
    ********************************************************************************/
@@ -25,16 +29,22 @@ export class UsersService {
    * @param _user
    * @returns User
    */
-  public async createUser(_user: CreateUserDto): Promise<User> {
-    const username = _user.email.split('@')[0];
-    const signer = await this.web3Service.getSignerFromSign(_user.address);
-    const user = this.usersRepository.create({
-      ..._user,
-      username: username,
-      address: signer.toLowerCase(),
-    });
-    await this.usersRepository.save(user);
-    return user;
+  public async createUser(user_: CreateUserDto, sign_: string): Promise<User> {
+    const username = user_.email.split('@')[0];
+    const signer = await this.web3Service.getSignerFromSign(
+      this.configService.get<string>('signUpMessage'),
+      sign_,
+    );
+    if (signer.toLowerCase() === user_.address.toLowerCase()) {
+      const user = this.usersRepository.create({
+        ...user_,
+        username: username,
+        address: signer.toLowerCase(),
+      });
+      await this.usersRepository.save(user);
+      return user;
+    }
+    throw new BadRequestException('Wrong Signer');
   }
 
   /******************************************************************************
@@ -97,7 +107,10 @@ export class UsersService {
     _sign: string,
   ): Promise<User> {
     const user = this.usersRepository.create(_user);
-    const signer = await this.web3Service.getSignerFromSign(_sign);
+    const signer = await this.web3Service.getSignerFromSign(
+      this.configService.get<string>('signInMessage'),
+      _sign,
+    );
     if (_wallet && _wallet === signer) {
       _user.address = _wallet;
       await this.usersRepository.save(user);

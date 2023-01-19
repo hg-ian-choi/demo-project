@@ -167,5 +167,9 @@ contract Core is ERC1155Holder {
         emit withdraw(balance);
     }
 
+    function getProductInfo(address seller_, address contract_, uint256 tokenId_) external view returns (Product memory) {
+        return addressToContractToTokenToProduct[seller_][contract_][tokenId_];
+    }
+
     receive() external payable {}
 }
