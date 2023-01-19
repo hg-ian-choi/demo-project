@@ -134,8 +134,6 @@ export default function Collections(props: any) {
       return;
     }
 
-    newClone = '0x314a44e4f46d5625a7F6121d5B6e240c73a15201';
-
     setCreateCollectionObject({ ...createCollectionObject, address: newClone });
 
     const result = await axios

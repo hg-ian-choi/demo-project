@@ -40,17 +40,21 @@ export class CollectionsController {
    ******************************************************************************/
   @UseGuards(JwtAuthGuard)
   @Get('/user')
-  async getUserCollections(@GetUser() _user: User): Promise<Collection[]> {
-    const collections = await this.collectionsService.getUserCollections(
-      _user.id,
-    );
+  async getUserCollections(@GetUser() user_?: User): Promise<Collection[]> {
+    const collections = await this.collectionsService.getCollections({
+      user: { id: user_.id },
+    });
+
     return collections;
   }
 
   @Get('/:collection_id')
-  async getCollectionById(
-    @Param('collection_id') collection_id: string,
+  async getCollection(
+    @Param('collection_id') collectionId_: string,
   ): Promise<Collection> {
-    return this.collectionsService.getCollection({ id: collection_id });
+    return this.collectionsService.getCollection(
+      { id: collectionId_ },
+      { user: true },
+    );
   }
 }

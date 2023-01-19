@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
 import { Collection } from './collection.entity';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 
@@ -27,18 +27,22 @@ export class CollectionsService {
     return collection;
   }
 
-  async getUserCollections(userId_: string): Promise<Collection[]> {
+  async getCollections(
+    match_?: FindOptionsWhere<Collection>,
+  ): Promise<Collection[]> {
     const collections = await this.collectionRepository.find({
-      where: { user: { id: userId_ } },
+      where: match_,
     });
     return collections;
   }
 
   async getCollection(
     match_: FindOptionsWhere<Collection>,
+    relation_?: FindOptionsRelations<Collection>,
   ): Promise<Collection> {
     const collection = await this.collectionRepository.findOne({
       where: match_,
+      relations: relation_,
     });
     return collection;
   }
