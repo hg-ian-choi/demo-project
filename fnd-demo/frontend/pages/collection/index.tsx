@@ -36,9 +36,11 @@ const InputDiv = styled.div`
 `;
 
 const GridContainer = styled.div`
+  width: 100%;
   display: grid;
-  grid-template-columns: 4;
-  grid-template-rows: 4;
+  grid-template-columns: auto auto auto auto;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
 `;
 
 export async function getServerSideProps(context: any) {
@@ -59,9 +61,8 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-export default function Create(props: any) {
+export default function Collections(props: any) {
   const { collections } = props;
-  console.log('collections', collections);
 
   const router = useRouter();
   const loginUser = useSelector(loginUserSelector);
@@ -133,6 +134,8 @@ export default function Create(props: any) {
       return;
     }
 
+    newClone = '0x314a44e4f46d5625a7F6121d5B6e240c73a15201';
+
     setCreateCollectionObject({ ...createCollectionObject, address: newClone });
 
     const result = await axios
@@ -162,18 +165,9 @@ export default function Create(props: any) {
             {collections.length > 0 &&
               collections.map((value_: any, index_: number) => (
                 <div key={`collection_${index_}`}>
-                  <CollectionCard collectionId={value_.id} collectionName={value_.name} collectionSymbol={value_.symbol}></CollectionCard>
+                  <CollectionCard collectionId={value_.id} collectionName={value_.name} collectionSymbol={value_.symbol} num={index_} />
                 </div>
               ))}
-            <div>
-              <CollectionCard collectionName={'W'} collectionSymbol={'w'}></CollectionCard>
-            </div>
-            <div>
-              <CollectionCard collectionName={'W'} collectionSymbol={'w'}></CollectionCard>
-            </div>
-            <div>
-              <CollectionCard collectionName={'W'} collectionSymbol={'w'}></CollectionCard>
-            </div>
           </GridContainer>
           <br />
           <br />

@@ -51,7 +51,6 @@ export class CollectionsController {
   async getCollectionById(
     @Param('collection_id') collection_id: string,
   ): Promise<Collection> {
-    console.log('collection_id', collection_id);
-    return new Collection();
+    return this.collectionsService.getCollection({ id: collection_id });
   }
 }
