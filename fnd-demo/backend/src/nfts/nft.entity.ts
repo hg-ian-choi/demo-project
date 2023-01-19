@@ -1,5 +1,6 @@
 // nfts/nft.entity.ts
 
+import { Collection } from 'src/collections/collection.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -9,6 +10,15 @@ export class NFT {
   public id: string;
 
   @Column('varchar')
+  public title: string;
+
+  @Column('varchar')
+  public description?: string;
+
+  @Column('varchar')
+  public image: string;
+
+  @Column('varchar')
   public token_address: string;
 
   @Column('varchar')
@@ -16,6 +26,9 @@ export class NFT {
 
   @ManyToOne(() => User, { cascade: true })
   public creator: User;
+
+  @ManyToOne(() => Collection, { cascade: true })
+  public collection: Collection;
 
   // @OneToMany(() => Edition, (edition) => edition.nft)
   // public editions: Edition[];

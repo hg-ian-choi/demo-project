@@ -44,6 +44,7 @@ export class CollectionsService {
       where: match_,
       relations: relation_,
     });
+    delete collection.user.password;
     return collection;
   }
 }
