@@ -22,7 +22,7 @@ export async function getServerSideProps(context_: any) {
 }
 
 export default function CollectionDetail(props: collection) {
-  const { id, name, symbol, user, nfts } = props;
+  const { id, name, symbol, user, products } = props;
 
   const router = useRouter();
 

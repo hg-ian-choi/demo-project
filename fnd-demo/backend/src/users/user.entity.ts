@@ -22,8 +22,8 @@ export class User {
   // @OneToMany(() => Collection, (collection) => collection.user)
   // public collections?: Collection[];
 
-  // @OneToMany(() => NFT, (nft) => nft.creator)
-  // public nfts: NFT[];
+  // @OneToMany(() => Product, (product) => product.creator)
+  // public products: Product[];
 
   // @OneToMany(() => Edition, (edition) => edition.owner)
   // public editions: Edition[];

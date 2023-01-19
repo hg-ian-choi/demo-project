@@ -1,6 +1,6 @@
 // histories/history.entity.ts
 
-import { NFT } from 'src/nfts/nft.entity';
+import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { HistoryType } from './histories.enum';
@@ -25,6 +25,6 @@ export class History {
   @ManyToOne(() => User, { cascade: true })
   public buyer: User;
 
-  @ManyToOne(() => NFT, { cascade: true })
-  public nft: NFT;
+  @ManyToOne(() => Product, { cascade: true })
+  public product: Product;
 }

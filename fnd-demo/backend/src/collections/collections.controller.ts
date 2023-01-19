@@ -54,7 +54,7 @@ export class CollectionsController {
   ): Promise<Collection> {
     return this.collectionsService.getCollection(
       { id: collectionId_ },
-      { user: true, nfts: true },
+      { user: true, products: true },
     );
   }
 }

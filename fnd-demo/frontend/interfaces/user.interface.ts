@@ -1,7 +1,7 @@
 // interfaces/user.interface.ts
 
 import { collection } from './collection.interface';
-import { nft } from './nft.interface';
+import { product } from './product.interface';
 
 export interface user {
   id: string;
@@ -9,5 +9,5 @@ export interface user {
   username: string;
   address: string;
   collections?: collection[];
-  nfts?: nft[];
+  products?: product[];
 }

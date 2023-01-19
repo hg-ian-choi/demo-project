@@ -1,6 +1,6 @@
 // editions/edition.entity.ts
 
-import { NFT } from 'src/nfts/nft.entity';
+import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Status } from './editions.enum';
@@ -19,6 +19,6 @@ export class Edition {
   @ManyToOne(() => User, { cascade: true })
   public owner: User;
 
-  @ManyToOne(() => NFT, { cascade: true })
-  public nft: NFT;
+  @ManyToOne(() => Product, { cascade: true })
+  public product: Product;
 }

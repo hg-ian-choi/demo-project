@@ -1,11 +1,11 @@
-// nfts/nft.entity.ts
+// products/product.entity.ts
 
 import { Collection } from 'src/collections/collection.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('nfts')
-export class NFT {
+@Entity('products')
+export class Product {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
@@ -30,9 +30,9 @@ export class NFT {
   @ManyToOne(() => Collection, { cascade: true })
   public collection: Collection;
 
-  // @OneToMany(() => Edition, (edition) => edition.nft)
+  // @OneToMany(() => Edition, (edition) => edition.product)
   // public editions: Edition[];
 
-  // @OneToMany(() => History, (history) => history.nft)
+  // @OneToMany(() => History, (history) => history.product)
   // histories: History[];
 }

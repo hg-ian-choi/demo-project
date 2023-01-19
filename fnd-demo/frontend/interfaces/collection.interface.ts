@@ -1,6 +1,6 @@
 // interfaces/collection.interface.ts
 
-import { nft } from './nft.interface';
+import { product } from './product.interface';
 import { user } from './user.interface';
 
 export interface collection {
@@ -8,5 +8,5 @@ export interface collection {
   name: string;
   symbol: string;
   user?: user;
-  nfts?: nft[];
+  products?: product[];
 }
