@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { getAccount, getContractInstance } from '../api/web3/web3';
@@ -13,35 +13,6 @@ const instance = axios.create({
   withCredentials: true,
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
-
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SignInDiv = styled.div`
-  min-width: 300px;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const InputDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const GridContainer = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-column-gap: 20px;
-  grid-row-gap: 20px;
-`;
 
 export async function getServerSideProps(context: any) {
   let collections: any = [];
@@ -223,3 +194,32 @@ export default function Collections(props: any) {
     </Container>
   );
 }
+
+const Container = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const SignInDiv = styled.div`
+  min-width: 300px;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+`;
+
+const InputDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const GridContainer = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+`;

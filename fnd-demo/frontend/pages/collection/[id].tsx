@@ -2,32 +2,7 @@ import styled from '@emotion/styled';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-
-interface collection {
-  id: string;
-  name: string;
-  symbol: string;
-  user: {
-    id: string;
-    email: string;
-    username: string;
-    address: string;
-  };
-  nfts?: {
-    id: string;
-    title: string;
-    description?: string;
-    image: string;
-    token_address: string;
-    token_id: string;
-    creator: {
-      id: string;
-      email: string;
-      username: string;
-      address: string;
-    };
-  }[];
-}
+import { collection } from '../../interfaces/collection.interface';
 
 export async function getServerSideProps(context_: any) {
   let collectionObject: collection = {} as collection;
@@ -46,8 +21,8 @@ export async function getServerSideProps(context_: any) {
   return { props: collectionObject };
 }
 
-export default function CollectionDetail(props: { id: string; name: string; symbol: string; nfts: any[] }) {
-  const { id, name, symbol, nfts } = props;
+export default function CollectionDetail(props: collection) {
+  const { id, name, symbol, user, nfts } = props;
 
   const router = useRouter();
 
