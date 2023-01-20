@@ -1,33 +1,30 @@
 // pages/index.tsx
 
-import Head from 'next/head';
-import styled from '@emotion/styled';
+import * as React from 'react';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import { useSelector } from 'react-redux';
 import { loginUserSelector } from '../store/loginUserSlice';
 
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 export default function Home() {
-  const user = useSelector(loginUserSelector);
+  const loginUser = useSelector(loginUserSelector);
 
   return (
-    <>
-      <Head>
-        <title>FND Demo</title>
-        <meta name="description" content="FND Demo" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main>
-        <Container>
-          <h1>{user.username ? `Welcome, ${user.username}!` : 'Hello, World!'}</h1>
-        </Container>
-      </main>
-    </>
+    <Container maxWidth="lg">
+      <Box
+        sx={{
+          my: 4,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Typography variant="h6" component="h6" gutterBottom>
+          {loginUser.username ? `Welcome, ${loginUser.username}!` : 'Hello, World!'}
+        </Typography>
+      </Box>
+    </Container>
   );
 }

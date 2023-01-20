@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Container } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -34,5 +35,3 @@ export default function CollectionDetail(props: collection) {
 
   return <Container></Container>;
 }
-
-const Container = styled.div``;

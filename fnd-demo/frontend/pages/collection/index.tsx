@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Button, TextField } from '@mui/material';
+import { Button, Card, CardContent, Container, Grid, TextField, Typography } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -8,6 +8,8 @@ import { getAccount, getContractInstance } from '../api/web3/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
 import abi from '../../abis/NftAbi.json';
 import CollectionCard from '../../components/collection/collection_card';
+import { css } from '@emotion/css';
+import { flexbox } from '@mui/system';
 
 const instance = axios.create({
   withCredentials: true,
@@ -126,100 +128,100 @@ export default function Collections(props: any) {
     }
   };
 
+  const turnToCollection = (collectionId_: string) => {
+    router.push(`/collection/${collectionId_}`);
+  };
+
   return (
-    <Container>
+    <Container style={{ padding: '30px 0' }}>
       {step === 0 ? (
-        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <GridContainer>
+        <div style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <Grid container columnGap={3} rowGap={3} justifyContent="center">
             {collections.length > 0 &&
               collections.map((value_: any, index_: number) => (
-                <div key={`collection_${index_}`}>
-                  <CollectionCard collectionId={value_.id} collectionName={value_.name} collectionSymbol={value_.symbol} num={index_} />
-                </div>
+                <Grid item xs={3} key={`collection_${index_}`} style={{ border: 'solid 1px black', cursor: 'pointer' }}>
+                  <Card
+                    onClick={() => {
+                      turnToCollection(value_.id);
+                    }}
+                  >
+                    <CardContent>
+                      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                        Collection {index_ + 1}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                        name: {value_.name}
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                        symbol: {value_.symbol}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
               ))}
-          </GridContainer>
-          <br />
-          <br />
-          <br />
+          </Grid>
           <Button
             variant="contained"
             onClick={() => {
               nextStep(1);
             }}
+            style={{ margin: '30px 0 0 0' }}
           >
             Create Collection
           </Button>
         </div>
       ) : step === 1 ? (
-        <div>
-          <SignInDiv>
-            <InputDiv>
-              <label htmlFor="name">name</label>
-              <div>
-                <TextField
-                  label="name"
-                  name="name"
-                  type="text"
-                  variant="outlined"
-                  value={createCollectionObject.name}
-                  onChange={onCreateCollectionObjectChange}
-                />
-                <div style={{ color: 'red' }}>{createCollectionWarnning.name}</div>
-              </div>
-            </InputDiv>
-            <br />
-            <InputDiv>
-              <label htmlFor="symbol">symbol</label>
-              <div>
-                <TextField
-                  label="symbol"
-                  name="symbol"
-                  type="text"
-                  variant="outlined"
-                  value={createCollectionObject.symbol}
-                  onChange={onCreateCollectionObjectChange}
-                />
-                <div style={{ color: 'red' }}>{createCollectionWarnning.symbol}</div>
-              </div>
-            </InputDiv>
-            <br />
+        <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <label htmlFor="name">name</label>
+            <div style={{ margin: '0 0 0 30px' }}>
+              <TextField
+                label="name"
+                name="name"
+                type="text"
+                variant="outlined"
+                value={createCollectionObject.name}
+                onChange={onCreateCollectionObjectChange}
+              />
+              <div style={{ color: 'red' }}>{createCollectionWarnning.name}</div>
+            </div>
+          </Container>
+          <br />
+          <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <label htmlFor="symbol">symbol</label>
+            <div style={{ margin: '0 0 0 30px' }}>
+              <TextField
+                label="symbol"
+                name="symbol"
+                type="text"
+                variant="outlined"
+                value={createCollectionObject.symbol}
+                onChange={onCreateCollectionObjectChange}
+              />
+              <div style={{ color: 'red' }}>{createCollectionWarnning.symbol}</div>
+            </div>
+          </Container>
+          <br />
+          <div>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setStep(0);
+                setCreateCollectionWarning({ name: '', symbol: '' });
+                setCreateCollectionObject({ name: '', symbol: '', address: '' });
+              }}
+            >
+              cancel
+            </Button>
+            <span style={{ margin: '0 15px' }} />
             <Button variant="contained" onClick={createCollection}>
               Create Collection
             </Button>
-          </SignInDiv>
-        </div>
+          </div>
+        </Container>
       ) : (
         <></>
       )}
     </Container>
   );
 }
-
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SignInDiv = styled.div`
-  min-width: 300px;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const InputDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const GridContainer = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: auto auto auto auto;
-  grid-column-gap: 20px;
-  grid-row-gap: 20px;
-`;

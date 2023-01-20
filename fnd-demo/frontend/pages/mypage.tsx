@@ -7,30 +7,7 @@ import { useSelector } from 'react-redux';
 import { useAppDispatch } from '../store/hooks';
 import { loginUserSelector, setLoginUser } from '../store/loginUserSlice';
 import Web3 from 'web3';
-
-const Container = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const SignInDiv = styled.div`
-  min-width: 300px;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-`;
-
-const InputDiv = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const ButtonWrap = styled.div`
-  margin: 0 auto;
-`;
+import { Container } from '@mui/material';
 
 export default function MyPage() {
   const user = useSelector(loginUserSelector);
@@ -55,7 +32,7 @@ export default function MyPage() {
   const confirmConnect = async () => {};
 
   return (
-    <Container>
+    <Container maxWidth="lg">
       <h1>My Page</h1>
       <div>
         <div>Username: {user.username}</div>
