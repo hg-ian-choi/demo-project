@@ -11,7 +11,6 @@ import createEmotionCache from '../src/createEmotionCache';
 import Layout from '../components/layout';
 import { Provider } from 'react-redux';
 import store from '../store/store';
-import { useAppDispatch } from '../store/hooks';
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();

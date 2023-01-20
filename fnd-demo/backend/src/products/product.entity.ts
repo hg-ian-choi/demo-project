@@ -7,22 +7,22 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('products')
 export class Product {
   @PrimaryGeneratedColumn('uuid')
-  public id: string;
+  public id?: string;
 
   @Column('varchar')
-  public title: string;
+  public name?: string;
 
   @Column('varchar')
   public description?: string;
 
   @Column('varchar')
-  public image: string;
+  public image?: string;
 
-  @Column('varchar')
-  public token_address: string;
+  @Column('varchar', { nullable: true })
+  public token_id?: string;
 
-  @Column('varchar')
-  public token_id: string;
+  @Column('boolean', { default: false })
+  public show?: boolean;
 
   @ManyToOne(() => User, { cascade: true })
   public creator: User;

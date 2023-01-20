@@ -13,20 +13,20 @@ import {
 @Entity('collections')
 export class Collection {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id?: string;
 
   @Column()
-  name: string;
+  name?: string;
 
   @Column()
-  symbol: string;
+  symbol?: string;
 
   @Column()
-  address: string;
+  address?: string;
 
   @ManyToOne(() => User, { cascade: true })
-  user: User;
+  user?: User;
 
   @OneToMany(() => Product, (product) => product.collection)
-  products: Product[];
+  products?: Product[];
 }

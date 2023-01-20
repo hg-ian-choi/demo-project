@@ -4,8 +4,8 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { product } from '../../interfaces/product.interface';
 
 const instance = axios.create({
-  withCredentials: true,
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 });
 
 export async function getServerSideProps(context: any) {

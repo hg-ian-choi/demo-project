@@ -7,6 +7,7 @@ export interface collection {
   id: string;
   name: string;
   symbol: string;
+  address: string;
   user?: user;
-  products?: product[];
+  products: product[];
 }

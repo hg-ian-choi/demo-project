@@ -1,4 +1,5 @@
-import styled from '@emotion/styled';
+// pages/collection/index.tsx
+
 import { Button, Card, CardContent, Container, Grid, TextField, Typography } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useState } from 'react';
@@ -7,13 +8,10 @@ import { useRouter } from 'next/router';
 import { getAccount, getContractInstance } from '../api/web3/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
 import abi from '../../abis/NftAbi.json';
-import CollectionCard from '../../components/collection/collection_card';
-import { css } from '@emotion/css';
-import { flexbox } from '@mui/system';
 
 const instance = axios.create({
-  withCredentials: true,
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 });
 
 export async function getServerSideProps(context: any) {
@@ -170,7 +168,7 @@ export default function Collections(props: any) {
             Create Collection
           </Button>
         </div>
-      ) : step === 1 ? (
+      ) : (
         <Container style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <label htmlFor="name">name</label>
@@ -219,8 +217,6 @@ export default function Collections(props: any) {
             </Button>
           </div>
         </Container>
-      ) : (
-        <></>
       )}
     </Container>
   );
