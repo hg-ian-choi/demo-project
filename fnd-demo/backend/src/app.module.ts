@@ -34,6 +34,8 @@ import { HistoriesModule } from './histories/histories.module';
         COOKIE_SECRET: Joi.string().required(),
         SIGNUP_MESSAGE: Joi.string().required(),
         SIGNIN_MESSAGE: Joi.string().required(),
+        AWS_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,

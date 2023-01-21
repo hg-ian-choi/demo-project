@@ -19,4 +19,8 @@ export default () => ({
   cookieSecret: process.env.COOKIE_SECRET,
   signUpMessage: process.env.SIGNUP_MESSAGE,
   signInMessage: process.env.SIGNIN_MESSAGE,
+  awsCredentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
