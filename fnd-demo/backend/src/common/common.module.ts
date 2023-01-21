@@ -1,6 +1,9 @@
 // common/common.module.ts
 
 import { Module } from '@nestjs/common';
+import { CommonService } from './common.service';
 
-@Module({})
+@Module({
+  providers: [CommonService],
+})
 export class CommonModule {}

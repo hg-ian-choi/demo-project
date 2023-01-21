@@ -23,4 +23,6 @@ export default () => ({
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   },
+  awsBucket: process.env.AWS_BUCKET,
+  s3Path: process.env.S3_PATH,
 });
