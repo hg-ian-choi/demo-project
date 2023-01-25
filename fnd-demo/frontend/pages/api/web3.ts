@@ -53,9 +53,9 @@ export const personalSign = async (message_: string, password_: string) => {
 };
 
 export const getContractInstance = async (abi_: any, address_: string) => {
-  if (!abi_ || !address_) return;
+  if (!abi_ || !address_) throw new Error('ABI or Contract Address not found!');
 
-  if (!checkProvider()) return null;
+  if (!checkProvider()) return new Error('Metamask not found!');
 
   const web3 = new Web3(Web3.givenProvider);
   const contractInstance = new web3.eth.Contract(abi_, address_);

@@ -67,7 +67,7 @@ export default function Collections(props: any) {
     }
 
     const account = await getAccount();
-    if (!account) return;
+    if (!account) throw new Error('Metamask account not found!');
 
     const cookiesArray = document.cookie.split(';');
     const cookiesMap: any = {};
@@ -88,42 +88,49 @@ export default function Collections(props: any) {
       return;
     }
 
-    const contractInstance = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_CLONE_CONTRACT_ADDRESS}`);
+    const contractInstance: any = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
 
-    if (!contractInstance) throw new Error('Contract Error');
-
-    let newClone = await contractInstance.methods
-      .uri(1)
-      .call()
+    const _newClone = await contractInstance.methods
+      ._clone(createCollectionObject.name, createCollectionObject.symbol)
+      .send({ from: account })
       .then((result_: any) => {
         console.log('result_', result_);
         return result_;
-      });
-
-    if (!newClone) {
-      alert('Something went wrong when Create Collection');
-      return;
-    }
-
-    setCreateCollectionObject({ ...createCollectionObject, address: newClone });
-
-    const result = await axios
-      .post(`${process.env.NEXT_PUBLIC_API_URL}/collections`, createCollectionObject, { withCredentials: true })
-      .then((response_: AxiosResponse) => {
-        if (response_.status === 201) {
-          return response_.data;
-        }
       })
-      .catch((error_: AxiosError) => {
-        console.log('error_.message', error_.message);
-        alert(error_.message);
-        return null;
+      .catch((error_: any) => {
+        if (error_.code === 4001) {
+          console.log('error_', error_.message);
+          alert(error_.message);
+        }
       });
+    console.log('_newClone', _newClone);
 
-    if (result?.id) {
-      alert('Collection created successfully');
-      router.push(`/collection/${result.id}`);
-    }
+    return;
+
+    // if (!newClone) {
+    //   alert('Something went wrong when Create Collection');
+    //   return;
+    // }
+
+    // setCreateCollectionObject({ ...createCollectionObject, address: newClone });
+
+    // const result = await axios
+    //   .post(`${process.env.NEXT_PUBLIC_API_URL}/collections`, createCollectionObject, { withCredentials: true })
+    //   .then((response_: AxiosResponse) => {
+    //     if (response_.status === 201) {
+    //       return response_.data;
+    //     }
+    //   })
+    //   .catch((error_: AxiosError) => {
+    //     console.log('error_.message', error_.message);
+    //     alert(error_.message);
+    //     return null;
+    //   });
+
+    // if (result?.id) {
+    //   alert('Collection created successfully');
+    //   router.push(`/collection/${result.id}`);
+    // }
   };
 
   const turnToCollection = (collectionId_: string) => {

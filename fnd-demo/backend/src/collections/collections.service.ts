@@ -48,7 +48,7 @@ export class CollectionsService {
       })
       .then((collection_: Collection) => {
         collection_.products = collection_.products.filter(
-          (product_: Product) => product_.show === true,
+          (product_: Product) => product_.token_id && true,
         );
         return collection_;
       });

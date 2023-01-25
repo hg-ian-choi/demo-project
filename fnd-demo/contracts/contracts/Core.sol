@@ -3,7 +3,6 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./ICloneable.sol";
-import "hardhat/console.sol";
 
 contract Core is ERC1155Holder {
     address payable private _owner;
@@ -60,7 +59,6 @@ contract Core is ERC1155Holder {
 
         if (artist[contract_] == address(0)) {
             artist[contract_] = ICloneable(contract_).owner();
-            console.log("artist[contract_]", artist[contract_]);
         }
 
         Product memory _product = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
@@ -70,10 +68,6 @@ contract Core is ERC1155Holder {
             _product.amount = amount_;
             _product.price = price_;
             addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
-
-            console.log("_product.seller", _product.seller);
-            console.log("_product.amount", _product.amount);
-            console.log("_product.price", _product.price);
 
             ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_, "0x00");
         } else {
