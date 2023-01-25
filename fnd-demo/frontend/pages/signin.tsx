@@ -8,7 +8,7 @@ import { useState } from 'react';
 import Web3 from 'web3';
 import { useAppDispatch } from '../store/hooks';
 import { setLoginUser } from '../store/loginUserSlice';
-import { getAccount, personalSign } from './api/web3/web3';
+import { getAccount, personalSign } from './api/web3';
 
 const Container = styled.div`
   height: 100vh;

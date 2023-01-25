@@ -4,11 +4,17 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Web3Service } from 'src/web3/web3.service';
-import { FindOptionsOrder, FindOptionsWhere, Repository } from 'typeorm';
+import {
+  FindOptionsOrder,
+  FindOptionsRelations,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 
@@ -75,13 +81,15 @@ export class UsersService {
    * @param _userId
    * @returns User
    */
-  public async getUser(_match: FindOptionsWhere<User>): Promise<User> {
-    let user = await this.usersRepository.findOne({ where: _match });
-    if (!user) {
-      user = await this.usersRepository
-        .findOne({ where: _match })
-        .catch(() => null);
-    }
+  public async getUser(
+    where_?: FindOptionsWhere<User>,
+    relations_?: FindOptionsRelations<User>,
+  ): Promise<User> {
+    const user = await this.usersRepository
+      .findOne({ where: where_, relations: relations_ })
+      .catch(() => {
+        throw new NotFoundException();
+      });
     return user;
   }
 

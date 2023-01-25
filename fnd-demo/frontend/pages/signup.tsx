@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import Web3 from 'web3';
 import { useAppDispatch } from '../store/hooks';
 import { loginUserSelector, setLoginUser } from '../store/loginUserSlice';
-import { getAccount, personalSign } from './api/web3/web3';
+import { getAccount, personalSign } from './api/web3';
 
 const SignUpContainer = styled.div`
   display: flex;

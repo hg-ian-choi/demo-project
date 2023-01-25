@@ -48,6 +48,7 @@ export class ProductsController {
     @UploadedFile() file_: Express.Multer.File,
     @GetUser() user_: User,
     @Body('name') name_: string,
+    @Body('edition') edition_: string,
     @Body('description') description_?: string,
     @Body('collectionId') collectionId_?: string,
   ): Promise<Product> {
@@ -58,7 +59,12 @@ export class ProductsController {
       creator: { id: user_.id },
       collection: { id: collectionId_ },
     };
-    return this.productsService.createProduct(file_, _product);
-    return null;
+    return this.productsService.createProduct(
+      user_,
+      file_,
+      edition_,
+      collectionId_,
+      _product,
+    );
   }
 }

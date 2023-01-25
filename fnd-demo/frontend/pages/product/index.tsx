@@ -1,7 +1,7 @@
 // pages/product/index.ts
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { product } from '../../interfaces/product.interface';
+import { Product } from '../../interfaces/product.interface';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -9,9 +9,9 @@ const instance = axios.create({
 });
 
 export async function getServerSideProps(context: any) {
-  let products: product[] = {} as product[];
+  let products: Product[] = {} as Product[];
   products = await instance
-    .get('/collections/user', { headers: { Cookie: context.req.headers.cookie } })
+    .get('/collections/usser', { headers: { Cookie: context.req.headers.cookie } })
     .then((response_: AxiosResponse) => {
       return response_.data;
     })
@@ -22,7 +22,7 @@ export async function getServerSideProps(context: any) {
   return { props: products };
 }
 
-export default function Products(props: product[]) {
+export default function Products(props: Product[]) {
   console.log('props', props);
   return <>Hello, World!</>;
 }

@@ -2,6 +2,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
@@ -37,14 +38,23 @@ export class CollectionsService {
   }
 
   async getCollection(
-    match_: FindOptionsWhere<Collection>,
-    relation_?: FindOptionsRelations<Collection>,
+    where_: FindOptionsWhere<Collection>,
+    relations_?: FindOptionsRelations<Collection>,
   ): Promise<Collection> {
-    const collection = await this.collectionRepository.findOne({
-      where: match_,
-      relations: relation_,
-    });
-    delete collection.user.password;
+    const collection = await this.collectionRepository
+      .findOne({
+        where: where_,
+        relations: relations_,
+      })
+      .then((collection_: Collection) => {
+        collection_.products = collection_.products.filter(
+          (product_: Product) => product_.show === true,
+        );
+        return collection_;
+      });
+    if (collection?.user?.password) {
+      delete collection.user.password;
+    }
     return collection;
   }
 }

@@ -1,13 +1,17 @@
-// interfaces/nft.interface.ts
+// interfaces/product.interface.ts
 
-import { user } from './user.interface';
+import { Edition } from './edition.interface';
+import { History } from './history.interface';
+import { User } from './user.interface';
 
-export interface product {
+export interface Product {
   id: string;
-  title: string;
+  name: string;
   description?: string;
   image: string;
   token_address: string;
   token_id: string;
-  creator?: user;
+  creator?: User;
+  editions: Edition[];
+  histories?: History[];
 }

@@ -5,9 +5,9 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { getAccount, getContractInstance } from '../api/web3/web3';
+import { getAccount, getContractInstance } from '../api/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
-import abi from '../../abis/NftAbi.json';
+import abi from '../../abis/CloneAbi.json';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -90,7 +90,7 @@ export default function Collections(props: any) {
 
     const contractInstance = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_CLONE_CONTRACT_ADDRESS}`);
 
-    if (!contractInstance) return;
+    if (!contractInstance) throw new Error('Contract Error');
 
     let newClone = await contractInstance.methods
       .uri(1)

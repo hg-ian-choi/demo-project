@@ -24,9 +24,9 @@ export class Collection {
   @Column()
   address?: string;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User, (user) => user.collections)
   user?: User;
 
-  @OneToMany(() => Product, (product) => product.collection)
+  @OneToMany(() => Product, (product) => product.collection, { cascade: true })
   products?: Product[];
 }

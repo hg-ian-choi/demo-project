@@ -8,17 +8,17 @@ import { Status } from './editions.enum';
 @Entity('editions')
 export class Edition {
   @PrimaryGeneratedColumn('uuid')
-  public id: string;
+  public id?: string;
 
   @Column('numeric', { default: 0 })
-  public price: number;
+  public price?: number;
 
   @Column('numeric', { default: Status.Soldout })
-  public status: number;
+  public status?: number;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User)
   public owner: User;
 
-  @ManyToOne(() => Product, { cascade: true })
+  @ManyToOne(() => Product, (product) => product.editions)
   public product: Product;
 }

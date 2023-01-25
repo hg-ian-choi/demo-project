@@ -1,8 +1,16 @@
 // products/product.entity.ts
 
 import { Collection } from 'src/collections/collection.entity';
+import { Edition } from 'src/editions/edition.entity';
+import { History } from 'src/histories/history.entity';
 import { User } from 'src/users/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('products')
 export class Product {
@@ -24,15 +32,15 @@ export class Product {
   @Column('boolean', { default: false })
   public show?: boolean;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User)
   public creator: User;
 
-  @ManyToOne(() => Collection, { cascade: true })
+  @ManyToOne(() => Collection)
   public collection: Collection;
 
-  // @OneToMany(() => Edition, (edition) => edition.product)
-  // public editions: Edition[];
+  @OneToMany(() => Edition, (edition) => edition.product, { cascade: true })
+  public editions?: Edition[];
 
-  // @OneToMany(() => History, (history) => history.product)
-  // histories: History[];
+  @OneToMany(() => History, (history) => history.product, { cascade: true })
+  histories?: History[];
 }

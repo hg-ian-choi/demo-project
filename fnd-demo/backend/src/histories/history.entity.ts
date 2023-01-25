@@ -19,12 +19,12 @@ export class History {
   @Column('numeric')
   public type: HistoryType;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User)
   public seller: User;
 
-  @ManyToOne(() => User, { cascade: true })
+  @ManyToOne(() => User)
   public buyer: User;
 
-  @ManyToOne(() => Product, { cascade: true })
+  @ManyToOne(() => Product)
   public product: Product;
 }

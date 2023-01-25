@@ -10,25 +10,30 @@ export class CommonService {
   /*******************************************************************************************
    ** ------------------------------------ File Upload ------------------------------------ **
    *******************************************************************************************/
+  /*
+
   /**
-   * @description upload local file to aws s3
-   * @param src_
-   * @param path_
-   * @param mime_
+   * @description upload buffer file to aws s3
+   * @param _path
+   * @param _file
+   * @returns
    */
-  async awsUploadLocal(src_: string, path_: string, mime_: string) {
+  async awsUpload(path_: string, file_: Express.Multer.File): Promise<string> {
     try {
-      const file = fs.readFileSync(src_);
+      const path = `demo/${path_}/${Date.now()}_${file_.originalname}`;
       await new AWS.S3()
         .putObject({
-          Key: path_,
-          Body: file,
+          Key: path,
+          Body: file_.buffer,
           Bucket: this.configService.get('awsBucket'),
-          ContentType: mime_,
         })
         .promise();
+      return path;
     } catch (error_: any) {
-      throw new ForbiddenException(error_);
+      throw new ForbiddenException({
+        success: false,
+        message: [`File upload Failed`],
+      });
     }
   }
 }

@@ -1,3 +1,5 @@
+// pages/api/web3.ts
+
 import Web3 from 'web3';
 
 export const checkProvider = () => {
