@@ -2,6 +2,8 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CollectionHistoriesService } from 'src/collection-histories/collection-histories.service';
+import { CollectionHistoryType } from 'src/collection-histories/enum/collection-history.enum';
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -15,17 +17,25 @@ export class CollectionsService {
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
     private readonly usersService: UsersService,
+    private readonly collectionHistoriesService: CollectionHistoriesService,
   ) {}
 
   async createCollection(
     user_: User,
     collection_: CreateCollectionDto,
   ): Promise<Collection> {
-    const user = await this.usersService.getUser({ id: user_.id });
-    const collection = this.collectionRepository.create(collection_);
-    collection.user = user;
-    await this.collectionRepository.save(collection);
-    return collection;
+    const _collection = this.collectionRepository.create({
+      ...collection_,
+      user: { id: user_.id },
+    });
+    const _result = await this.collectionRepository.save(_collection);
+    this.collectionHistoriesService.create({
+      name: _result.name,
+      symbol: _result.symbol,
+      type: CollectionHistoryType.create,
+      operator: { id: user_.id },
+    });
+    return _result;
   }
 
   async getCollections(

@@ -10,6 +10,8 @@ contract CloneFactory {
     address private _owner;
     address private _origin;
     address payable private _core;
+    mapping(address => address) contractToWallet;
+    mapping(address => address[]) walletToContractArray;
 
     event newClone(address indexed newClone, address indexed creator, string name, string symbol);
 
@@ -28,19 +30,10 @@ contract CloneFactory {
 
         ICloneable(newClone_).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
 
+        contractToWallet[newClone_] = _msgSender();
+        walletToContractArray[_msgSender()].push(newClone_);
+
         emit newClone(newClone_, _msgSender(), name_, symbol_);
-    }
-
-    function getOrigin() external view onlyOwner returns (address) {
-        return _origin;
-    }
-
-    function getOwner() external view onlyOwner returns (address) {
-        return _owner;
-    }
-
-    function getCore() external view onlyOwner returns (address) {
-        return _core;
     }
 
     function transferOwner(address newOwner_) external onlyOwner {
@@ -49,6 +42,26 @@ contract CloneFactory {
 
     function upgradeOrigin(address newOrigin_) external onlyOwner {
         _origin = newOrigin_;
+    }
+
+    function getOrigin() external view returns (address) {
+        return _origin;
+    }
+
+    function getOwner() external view returns (address) {
+        return _owner;
+    }
+
+    function getCore() external view returns (address) {
+        return _core;
+    }
+
+    function getContractOwner(address contract_) external view returns (address) {
+        return contractToWallet[contract_];
+    }
+
+    function getWalletContracts(address wallet_) external view returns (address[] memory) {
+        return walletToContractArray[wallet_];
     }
 
     function _msgSender() private view returns (address) {

@@ -3,7 +3,7 @@
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Status } from './editions.enum';
+import { Status } from './enum/editions.enum';
 
 @Entity('editions')
 export class Edition {

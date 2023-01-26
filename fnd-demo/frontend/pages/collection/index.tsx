@@ -88,24 +88,34 @@ export default function Collections(props: any) {
       return;
     }
 
-    const contractInstance: any = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
-
-    const _newClone = await contractInstance.methods
-      ._clone(createCollectionObject.name, createCollectionObject.symbol)
-      .send({ from: account })
-      .then((result_: any) => {
-        console.log('result_', result_);
-        return result_;
-      })
-      .catch((error_: any) => {
-        if (error_.code === 4001) {
-          console.log('error_', error_.message);
-          alert(error_.message);
+    const createCollection = await instance
+      .post(`${process.env.NEXT_PUBLIC_API_URL}/collections`, createCollectionObject)
+      .then((response_: AxiosResponse) => {
+        if (response_.status === 200) {
+          return response_.data;
         }
       });
-    console.log('_newClone', _newClone);
 
-    return;
+    if (createCollection) {
+      const contractInstance: any = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
+
+      const _newClone = await contractInstance.methods
+        ._clone(createCollectionObject.name, createCollectionObject.symbol)
+        .send({ from: account })
+        .then((result_: any) => {
+          console.log('result_', result_);
+          return result_;
+        })
+        .catch((error_: any) => {
+          if (error_.code === 4001) {
+            console.log('error_', error_.message);
+            alert(error_.message);
+          }
+        });
+      console.log('_newClone', _newClone);
+    }
+
+    throw new Error('Failed to create Collection');
 
     // if (!newClone) {
     //   alert('Something went wrong when Create Collection');

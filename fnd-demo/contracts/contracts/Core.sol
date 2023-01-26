@@ -15,6 +15,7 @@ contract Core is ERC1155Holder {
 
     mapping(address => mapping(address => mapping(uint256 => Product))) addressToContractToTokenToProduct;
     mapping(address => address payable) artist;
+    mapping(address => uint256) ethBalance;
 
     event receiveExtra(address sender, uint256 value);
     event buyProductEvent(
@@ -28,7 +29,9 @@ contract Core is ERC1155Holder {
         uint256 buyerPay,
         uint256 extraValue
     );
-    event withdraw(uint256 value);
+    event depositEvent(address operator, uint256 value, uint256 balance);
+    event withdrawEvent(address operator, uint256 value, uint256 balance);
+    event adminWithdrawEvent(uint256 value, uint256 balance);
 
     constructor() {
         _owner = _msgSender();
@@ -39,18 +42,20 @@ contract Core is ERC1155Holder {
         _;
     }
 
-    function transferOwner(address payable newOwner_) external onlyOwner {
-        _owner = newOwner_;
+    // view functions
+    function owner() external view returns (address) {
+        return _owner;
+    }
+
+    function getProductInfo(address seller_, address contract_, uint256 tokenId_) external view returns (Product memory) {
+        return addressToContractToTokenToProduct[seller_][contract_][tokenId_];
     }
 
     function balanceOf(address contract_, uint256 id_) internal view returns (uint256) {
         return ICloneable(contract_).balanceOf(_msgSender(), id_);
     }
 
-    function _msgSender() private view returns (address payable) {
-        return payable(msg.sender);
-    }
-
+    // setProduct, cancelProduct, buyProduct
     function setProduct(address contract_, uint256 id_, uint256 amount_, uint256 price_) external payable {
         require(amount_ > 0, "Amount is 0");
         uint256 _balance = ICloneable(contract_).balanceOf(_msgSender(), id_);
@@ -146,24 +151,56 @@ contract Core is ERC1155Holder {
         emit buyProductEvent(sell.seller, _msgSender(), contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 
+    // balance enquiry, deposit, withdraw
+    function getBalance() external view returns (uint256) {
+        return ethBalance[_msgSender()];
+    }
+
+    function deposit(uint256 value_) public payable returns (uint256 _balance) {
+        _balance = ethBalance[_msgSender()];
+        (bool sent, ) = payable(address(this)).call{value: value_}("");
+        require(sent, "Failed to deposit");
+        ethBalance[_msgSender()] = _balance + value_;
+        emit depositEvent(_msgSender(), value_, _balance);
+    }
+
+    function withdraw(uint256 value_) public payable returns (uint256 _balance) {
+        _balance = ethBalance[_msgSender()];
+        require(_balance >= value_, "Not sufficient funds");
+        (bool sent, ) = _msgSender().call{value: value_}("");
+        require(sent, "Failed to withdraw");
+        ethBalance[_msgSender()] = _balance - value_;
+        emit withdrawEvent(_msgSender(), value_, _balance);
+    }
+
+    // admin functions
+    function adminGetBalance(address operator_) public view onlyOwner returns (uint256) {
+        return ethBalance[operator_];
+    }
+
     function getContractBalance() external view onlyOwner returns (uint256) {
         return address(this).balance;
     }
 
-    function owner() external view returns (address) {
-        return _owner;
+    function transferOwner(address payable newOwner_) external onlyOwner {
+        _owner = newOwner_;
     }
 
-    function withdrawToOwner() external onlyOwner {
-        uint256 balance = address(this).balance;
-        (bool sent, ) = _owner.call{value: balance}("");
-        require(sent, "Failed to withdraw");
-        emit withdraw(balance);
+    function adminWithdraw(uint256 value_) external payable onlyOwner returns (uint256 _newBalance) {
+        uint256 _balance = address(this).balance;
+        require(_balance >= value_, "Not sufficient funds");
+        (bool sent, ) = _owner.call{value: value_}("");
+        require(sent, "Failed to adminWithDraw");
+        _newBalance = address(this).balance;
+        emit adminWithdrawEvent(value_, _newBalance);
+        return _newBalance;
     }
 
-    function getProductInfo(address seller_, address contract_, uint256 tokenId_) external view returns (Product memory) {
-        return addressToContractToTokenToProduct[seller_][contract_][tokenId_];
+    // private functions
+    function _msgSender() private view returns (address payable) {
+        return payable(msg.sender);
     }
 
+    // functions must exist
     receive() external payable {}
 }

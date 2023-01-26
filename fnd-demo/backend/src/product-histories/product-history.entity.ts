@@ -3,10 +3,10 @@
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { HistoryType } from './histories.enum';
+import { ProductHistoryType } from './enum/product-history.enum';
 
 @Entity('histories')
-export class History {
+export class ProductHistory {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
 
@@ -17,7 +17,7 @@ export class History {
   public amount?: number;
 
   @Column('numeric')
-  public type: HistoryType;
+  public type: ProductHistoryType;
 
   @ManyToOne(() => User)
   public seller: User;

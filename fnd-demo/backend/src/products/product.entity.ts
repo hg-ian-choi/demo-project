@@ -2,7 +2,7 @@
 
 import { Collection } from 'src/collections/collection.entity';
 import { Edition } from 'src/editions/edition.entity';
-import { History } from 'src/histories/history.entity';
+import { ProductHistory } from 'src/product-histories/product-history.entity';
 import { User } from 'src/users/user.entity';
 import {
   Column,
@@ -38,9 +38,13 @@ export class Product {
   @ManyToOne(() => Collection)
   public collection: Collection;
 
-  @OneToMany(() => Edition, (edition) => edition.product, { cascade: true })
+  @OneToMany(() => Edition, (edition) => edition.product, {
+    cascade: true,
+  })
   public editions?: Edition[];
 
-  @OneToMany(() => History, (history) => history.product, { cascade: true })
-  histories?: History[];
+  @OneToMany(() => ProductHistory, (history) => history.product, {
+    cascade: true,
+  })
+  histories?: ProductHistory[];
 }

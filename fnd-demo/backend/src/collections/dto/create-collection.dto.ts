@@ -7,7 +7,4 @@ export class CreateCollectionDto extends Collection {
 
   @IsString()
   symbol: string;
-
-  @IsString()
-  address: string;
 }

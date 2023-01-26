@@ -12,7 +12,8 @@ import { CollectionsModule } from './collections/collections.module';
 import { Web3Module } from './web3/web3.module';
 import { ProductsModule } from './products/products.module';
 import { EditionsModule } from './editions/editions.module';
-import { HistoriesModule } from './histories/histories.module';
+import { ProductHistoriesModule } from './product-histories/product-histories.module';
+import { CollectionHistoriesModule } from './collection-histories/collection-histories.module';
 
 @Module({
   imports: [
@@ -65,7 +66,8 @@ import { HistoriesModule } from './histories/histories.module';
     Web3Module,
     ProductsModule,
     EditionsModule,
-    HistoriesModule,
+    ProductHistoriesModule,
+    CollectionHistoriesModule,
   ],
 })
 export class AppModule {}

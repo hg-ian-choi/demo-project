@@ -15,13 +15,13 @@ export class Collection {
   @PrimaryGeneratedColumn('uuid')
   id?: string;
 
-  @Column()
+  @Column('varchar')
   name?: string;
 
-  @Column()
+  @Column('varchar')
   symbol?: string;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true, unique: true })
   address?: string;
 
   @ManyToOne(() => User, (user) => user.collections)
