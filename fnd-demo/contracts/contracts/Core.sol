@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./ICloneable.sol";
 
 contract Core is ERC1155Holder {
-    address payable private _owner;
+    address payable _owner;
 
     struct Product {
         address payable seller;
@@ -17,7 +17,7 @@ contract Core is ERC1155Holder {
     mapping(address => address payable) artist;
     mapping(address => uint256) ethBalance;
 
-    event receiveExtra(address sender, uint256 value);
+    event receiveExtraEvent(address indexed sender, uint256 value);
     event buyProductEvent(
         address seller,
         address buyer,
@@ -29,8 +29,8 @@ contract Core is ERC1155Holder {
         uint256 buyerPay,
         uint256 extraValue
     );
-    event depositEvent(address operator, uint256 value, uint256 balance);
-    event withdrawEvent(address operator, uint256 value, uint256 balance);
+    event depositEvent(address indexed sender, uint256 value, uint256 balance);
+    event withdrawEvent(address indexed sender, uint256 value, uint256 balance);
     event adminWithdrawEvent(uint256 value, uint256 balance);
 
     constructor() {
@@ -47,11 +47,7 @@ contract Core is ERC1155Holder {
         return _owner;
     }
 
-    function getProductInfo(
-        address seller_,
-        address contract_,
-        uint256 tokenId_
-    ) external view returns (Product memory) {
+    function getProductInfo(address seller_, address contract_, uint256 tokenId_) external view returns (Product memory) {
         return addressToContractToTokenToProduct[seller_][contract_][tokenId_];
     }
 
@@ -60,12 +56,7 @@ contract Core is ERC1155Holder {
     }
 
     // setProduct, cancelProduct, buyProduct
-    function setProduct(
-        address contract_,
-        uint256 id_,
-        uint256 amount_,
-        uint256 price_
-    ) external payable {
+    function setProduct(address contract_, uint256 id_, uint256 amount_, uint256 price_) external payable {
         require(amount_ > 0, "Amount is 0");
         uint256 _balance = ICloneable(contract_).balanceOf(_msgSender(), id_);
         require(_balance >= amount_, "Not sufficient balance");
@@ -102,11 +93,7 @@ contract Core is ERC1155Holder {
         }
     }
 
-    function cancelProduct(
-        address payable contract_,
-        uint256 id_,
-        uint256 amount_
-    ) external payable {
+    function cancelProduct(address payable contract_, uint256 id_, uint256 amount_) external payable {
         require(amount_ > 0, "Amount should > 0");
 
         Product memory _product = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
@@ -124,12 +111,7 @@ contract Core is ERC1155Holder {
         }
     }
 
-    function buyProduct(
-        address payable seller_,
-        address payable contract_,
-        uint256 id_,
-        uint256 amount_
-    ) external payable {
+    function buyProduct(address payable seller_, address payable contract_, uint256 id_, uint256 amount_) external payable {
         Product memory sell = addressToContractToTokenToProduct[seller_][contract_][id_];
 
         require(sell.seller != _msgSender(), "Can not buy own Product");
@@ -155,7 +137,7 @@ contract Core is ERC1155Holder {
         require(sentToArtist, "Failed to send to Artist!");
 
         if (msg.value > totalPrice) {
-            emit receiveExtra(_msgSender(), msg.value - totalPrice);
+            emit receiveExtraEvent(_msgSender(), msg.value - totalPrice);
         }
 
         if (amount_ == sell.amount) {
@@ -205,8 +187,7 @@ contract Core is ERC1155Holder {
     }
 
     function adminWithdraw(uint256 value_) external payable onlyOwner returns (uint256 _newBalance) {
-        uint256 _balance = address(this).balance;
-        require(_balance >= value_, "Not sufficient funds");
+        require(address(this).balance >= value_, "Not sufficient funds");
         (bool sent, ) = _owner.call{value: value_}("");
         require(sent, "Failed to adminWithDraw");
         _newBalance = address(this).balance;

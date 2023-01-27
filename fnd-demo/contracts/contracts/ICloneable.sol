@@ -11,18 +11,9 @@ interface ICloneable {
         string memory suffix_
     ) external;
 
-    function balanceOf(address account, uint256 id)
-        external
-        view
-        returns (uint256);
+    function balanceOf(address account, uint256 id) external view returns (uint256);
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) external;
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
 
     function owner() external view returns (address payable);
 }
