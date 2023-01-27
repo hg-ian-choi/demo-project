@@ -46,7 +46,11 @@ contract Cloneable1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Up
         __ERC1155Supply_init();
     }
 
-    function mint(uint256 amount_, string memory uri_, bytes memory data_) public onlyOwner returns (uint256 tokenId_) {
+    function mint(
+        uint256 amount_,
+        string memory uri_,
+        bytes memory data_
+    ) public onlyOwner returns (uint256 tokenId_) {
         _tokenId.increment();
         tokenId_ = _tokenId.current();
         tokenURI[tokenId_] = uri_;

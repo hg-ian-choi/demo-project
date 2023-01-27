@@ -20,7 +20,7 @@ export class AuthService {
   async validateUser(_user: SigninDto): Promise<User> {
     let user: User;
     if (_user.password.startsWith('0x')) {
-      const signer = await this.web3Service.getSignerFromSign(
+      const signer = this.web3Service.getSignerFromSign(
         this.configService.get<string>('signInMessage'),
         _user.password,
       );

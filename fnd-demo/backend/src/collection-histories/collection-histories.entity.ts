@@ -2,7 +2,6 @@ import { Collection } from 'src/collections/collection.entity';
 import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CollectionHistoryType } from './enum/collection-history.enum';
-import { CollectionStatus } from './enum/collection-status.enum';
 
 @Entity('CollectionHistories')
 export class CollectionHistory {
@@ -17,9 +16,6 @@ export class CollectionHistory {
 
   @Column('numeric')
   type: CollectionHistoryType;
-
-  @Column('numeric', { default: CollectionStatus.nonsync })
-  status?: CollectionStatus;
 
   @ManyToOne(() => Collection)
   collection?: Collection;

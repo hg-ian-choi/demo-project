@@ -7,13 +7,15 @@ import "./ICloneable.sol";
 contract CloneFactory {
     using Clones for address;
 
-    address private _owner;
-    address private _origin;
+    address _owner;
+    address _origin;
     address payable private _core;
+
     mapping(address => address) contractToWallet;
     mapping(address => address[]) walletToContractArray;
+    mapping(string => bool) ifIdExist;
 
-    event newClone(address indexed newClone, address indexed creator, string name, string symbol);
+    event cloneEvent(string indexed id, string name, string symbol, address indexed creator, address indexed newClone);
 
     modifier onlyOwner() {
         require(_owner == _msgSender(), "ERROR: Only Owner");
@@ -25,17 +27,25 @@ contract CloneFactory {
         _core = core_;
     }
 
-    function _clone(string memory name_, string memory symbol_, string memory prefix_, string memory suffix_) external returns (address newClone_) {
-        newClone_ = _origin.cloneDeterministic(_genSalt(_msgSender()));
+    function _clone(
+        string memory id_,
+        string memory name_,
+        string memory symbol_,
+        string memory prefix_,
+        string memory suffix_
+    ) external returns (address _newClone) {
+        require(!ifIdExist[id_], "Id already exist");
+        _newClone = _origin.cloneDeterministic(_genSalt(_msgSender()));
 
-        ICloneable(newClone_).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
+        ICloneable(_newClone).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
 
-        contractToWallet[newClone_] = _msgSender();
-        walletToContractArray[_msgSender()].push(newClone_);
+        contractToWallet[_newClone] = _msgSender();
+        walletToContractArray[_msgSender()].push(_newClone);
 
-        emit newClone(newClone_, _msgSender(), name_, symbol_);
+        emit cloneEvent(id_, name_, symbol_, _msgSender(), _newClone);
     }
 
+    // admin functions
     function transferOwner(address newOwner_) external onlyOwner {
         _owner = newOwner_;
     }
@@ -44,6 +54,7 @@ contract CloneFactory {
         _origin = newOrigin_;
     }
 
+    // view functions
     function getOrigin() external view returns (address) {
         return _origin;
     }
@@ -64,6 +75,7 @@ contract CloneFactory {
         return walletToContractArray[wallet_];
     }
 
+    // private functions
     function _msgSender() private view returns (address) {
         return msg.sender;
     }

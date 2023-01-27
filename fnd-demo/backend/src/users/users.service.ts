@@ -37,7 +37,7 @@ export class UsersService {
    */
   public async createUser(user_: CreateUserDto, sign_: string): Promise<User> {
     const username = user_.email.split('@')[0];
-    const signer = await this.web3Service.getSignerFromSign(
+    const signer = this.web3Service.getSignerFromSign(
       this.configService.get<string>('signUpMessage'),
       sign_,
     );
@@ -115,7 +115,7 @@ export class UsersService {
     _sign: string,
   ): Promise<User> {
     const user = this.usersRepository.create(_user);
-    const signer = await this.web3Service.getSignerFromSign(
+    const signer = this.web3Service.getSignerFromSign(
       this.configService.get<string>('signInMessage'),
       _sign,
     );
