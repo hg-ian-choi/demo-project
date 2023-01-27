@@ -8,14 +8,14 @@ export class CreateUserDto extends User {
   // @Matches(/^[A-Za-z][A-Za-z0-9]*$/, {
   //   message: `English or number characters only`,
   // })
-  // username?: string;
+  // public username?: string;
 
   @IsEmail()
-  email: string;
+  public email: string;
 
   @IsString()
-  password?: string;
+  public password?: string;
 
   @IsString()
-  address?: string;
+  public address?: string;
 }

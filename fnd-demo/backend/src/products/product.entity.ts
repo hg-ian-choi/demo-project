@@ -46,5 +46,5 @@ export class Product {
   @OneToMany(() => ProductHistory, (history) => history.product, {
     cascade: true,
   })
-  histories?: ProductHistory[];
+  public histories?: ProductHistory[];
 }

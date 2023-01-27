@@ -3,5 +3,5 @@ import { CreateCollectionHistoryDto } from './create-collection-history.dto';
 
 export class UpdateCollectionHistoryDto extends CreateCollectionHistoryDto {
   @IsString()
-  address: string;
+  public address: string;
 }

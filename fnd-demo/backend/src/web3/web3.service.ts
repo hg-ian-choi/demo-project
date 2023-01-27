@@ -7,23 +7,21 @@ import { AbiItem } from './interfaces/abi.interfaces';
 export class Web3Service {
   constructor(private readonly configService: ConfigService) {}
 
-  web3 = new Web3(
-    'https://mainnet.infura.io/v3/ef8917d7093a4c54b95cbfff266200bd',
-  );
+  private web3 = new Web3(this.configService.get<string>('web3Provider'));
 
-  getContractInstance(abi_: AbiItem[] | AbiItem, address_: string): any {
+  public getContractInstance(abi_: AbiItem[] | AbiItem, address_: string): any {
     return new this.web3.eth.Contract(abi_, address_);
   }
 
-  getSignerFromSign(message_: string, sign_: string): string {
+  public getSignerFromSign(message_: string, sign_: string): string {
     return this.web3.eth.accounts.recover(message_, sign_);
   }
 
-  sha3(value_: string): string {
+  public sha3(value_: string): string {
     return this.web3.utils.sha3(value_);
   }
 
-  get64LengthAddress(address_: string): string {
+  public get64LengthAddress(address_: string): string {
     return this.web3.utils.padLeft(address_, 64);
   }
 }

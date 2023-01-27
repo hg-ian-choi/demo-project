@@ -18,7 +18,7 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/signin')
-  async signIn(
+  private async signIn(
     @GetUser() _user: User,
     @Res({ passthrough: true }) _res: Response,
   ): Promise<object> {
@@ -112,7 +112,7 @@ export class AuthController {
   // }
 
   @Post('/signout')
-  signOut(@Res({ passthrough: true }) _res: Response): boolean {
+  private signOut(@Res({ passthrough: true }) _res: Response): boolean {
     _res
       .cookie('at_auth', '', { maxAge: 0 })
       .cookie('userId', '', { maxAge: 0 })
@@ -123,7 +123,7 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  getProfile(@GetUser() _user: User) {
+  private getProfile(@GetUser() _user: User) {
     return _user;
   }
 }

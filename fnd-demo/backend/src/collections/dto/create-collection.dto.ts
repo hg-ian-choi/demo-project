@@ -3,8 +3,8 @@ import { Collection } from '../collection.entity';
 
 export class CreateCollectionDto extends Collection {
   @IsString()
-  name: string;
+  public name: string;
 
   @IsString()
-  symbol: string;
+  public symbol: string;
 }

@@ -6,20 +6,20 @@ import { CollectionHistoryType } from './enum/collection-history.enum';
 @Entity('CollectionHistories')
 export class CollectionHistory {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  public id?: string;
 
   @Column('varchar')
-  name: string;
+  public name: string;
 
   @Column('varchar')
-  symbol: string;
+  public symbol: string;
 
   @Column('numeric')
-  type: CollectionHistoryType;
+  public type: CollectionHistoryType;
 
   @ManyToOne(() => Collection)
-  collection?: Collection;
+  public collection: Collection;
 
   @ManyToOne(() => User)
-  operator?: User;
+  public operator: User;
 }

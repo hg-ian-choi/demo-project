@@ -17,7 +17,10 @@ export class CommonService {
    * @param _file
    * @returns
    */
-  async awsUpload(path_: string, file_: Express.Multer.File): Promise<string> {
+  public async awsUpload(
+    path_: string,
+    file_: Express.Multer.File,
+  ): Promise<string> {
     try {
       const path = `demo/${path_}/${Date.now()}_${file_.originalname}`;
       await new AWS.S3()

@@ -67,7 +67,7 @@ export class UsersController {
 
   // @UseGuards(JwtAuthGuard)
   @Patch('/connectWallet')
-  public async connectWallet(
+  private async connectWallet(
     @GetUser() _user: User,
     @Body('wallet') _wallet: string,
     @Body('sign') _sign: string,

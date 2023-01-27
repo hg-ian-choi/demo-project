@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(_req: Request, _payload: User): Promise<User> {
+  private async validate(_req: Request, _payload: User): Promise<User> {
     const userId = _req.params.user_id;
 
     if (userId && userId !== _payload.id) {

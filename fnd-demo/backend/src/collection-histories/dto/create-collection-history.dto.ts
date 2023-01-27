@@ -3,8 +3,8 @@ import { CollectionHistory } from '../collection-histories.entity';
 
 export class CreateCollectionHistoryDto extends CollectionHistory {
   @IsString()
-  name: string;
+  public name: string;
 
   @IsString()
-  symbol: string;
+  public symbol: string;
 }

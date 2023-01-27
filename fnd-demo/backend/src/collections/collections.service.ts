@@ -20,7 +20,7 @@ export class CollectionsService {
     private readonly collectionHistoriesService: CollectionHistoriesService,
   ) {}
 
-  async createCollection(
+  public async createCollection(
     user_: User,
     collection_: CreateCollectionDto,
   ): Promise<Collection> {
@@ -29,16 +29,17 @@ export class CollectionsService {
       user: { id: user_.id },
     });
     const _result = await this.collectionRepository.save(_collection);
-    this.collectionHistoriesService.create({
+    await this.collectionHistoriesService.create({
       name: _result.name,
       symbol: _result.symbol,
       type: CollectionHistoryType.create,
       operator: { id: user_.id },
+      collection: { id: _result.id },
     });
     return _result;
   }
 
-  async getCollections(
+  public async getCollections(
     match_?: FindOptionsWhere<Collection>,
   ): Promise<Collection[]> {
     const collections = await this.collectionRepository.find({
@@ -47,7 +48,7 @@ export class CollectionsService {
     return collections;
   }
 
-  async getCollection(
+  public async getCollection(
     where_: FindOptionsWhere<Collection>,
     relations_?: FindOptionsRelations<Collection>,
   ): Promise<Collection> {

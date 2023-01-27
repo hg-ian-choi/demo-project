@@ -17,7 +17,7 @@ export class AuthService {
     private readonly web3Service: Web3Service,
   ) {}
 
-  async validateUser(_user: SigninDto): Promise<User> {
+  public async validateUser(_user: SigninDto): Promise<User> {
     let user: User;
     if (_user.password.startsWith('0x')) {
       const signer = this.web3Service.getSignerFromSign(
@@ -41,7 +41,7 @@ export class AuthService {
     return null;
   }
 
-  async signIn(_user: User): Promise<string> {
+  public async signIn(_user: User): Promise<string> {
     const paylod: User = {
       id: _user.id,
       email: _user.email,

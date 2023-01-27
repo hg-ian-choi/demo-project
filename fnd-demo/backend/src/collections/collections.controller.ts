@@ -40,7 +40,9 @@ export class CollectionsController {
    ******************************************************************************/
   @UseGuards(JwtAuthGuard)
   @Get('/user')
-  async getUserCollections(@GetUser() user_?: User): Promise<Collection[]> {
+  private async getUserCollections(
+    @GetUser() user_?: User,
+  ): Promise<Collection[]> {
     const collections = await this.collectionsService.getCollections({
       user: { id: user_.id },
     });
@@ -49,7 +51,7 @@ export class CollectionsController {
   }
 
   @Get('/:collection_id')
-  async getCollection(
+  private async getCollection(
     @Param('collection_id') collectionId_: string,
   ): Promise<Collection> {
     return this.collectionsService.getCollection(

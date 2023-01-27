@@ -5,8 +5,8 @@ import { User } from 'src/users/user.entity';
 
 export class SigninDto extends User {
   @IsEmail()
-  email?: string;
+  public email?: string;
 
   @IsString()
-  password?: string;
+  public password?: string;
 }

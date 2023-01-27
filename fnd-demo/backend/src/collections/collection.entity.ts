@@ -1,5 +1,6 @@
 // collections/collection.entity.ts
 
+import { CollectionHistory } from 'src/collection-histories/collection-histories.entity';
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import {
@@ -13,20 +14,26 @@ import {
 @Entity('collections')
 export class Collection {
   @PrimaryGeneratedColumn('uuid')
-  id?: string;
+  public id?: string;
 
   @Column('varchar')
-  name?: string;
+  public name?: string;
 
   @Column('varchar')
-  symbol?: string;
+  public symbol?: string;
 
   @Column({ type: 'varchar', nullable: true, unique: true })
-  address?: string;
+  public address?: string;
 
   @ManyToOne(() => User, (user) => user.collections)
-  user?: User;
+  public user?: User;
 
   @OneToMany(() => Product, (product) => product.collection, { cascade: true })
-  products?: Product[];
+  public products?: Product[];
+
+  @OneToMany(
+    () => CollectionHistory,
+    (collectionHistory) => collectionHistory.collection,
+  )
+  public histories?: CollectionHistory[];
 }

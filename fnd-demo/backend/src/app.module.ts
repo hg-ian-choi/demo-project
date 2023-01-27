@@ -39,6 +39,7 @@ import { CollectionHistoriesModule } from './collection-histories/collection-his
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         AWS_BUCKET: Joi.string().required(),
         S3_PATH: Joi.string().required(),
+        WEB3_PROVIDER: Joi.string().required(),
       }),
       validationOptions: {
         allowUnknown: true,
