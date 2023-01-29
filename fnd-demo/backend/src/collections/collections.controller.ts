@@ -6,6 +6,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -58,5 +59,18 @@ export class CollectionsController {
       { id: collectionId_ },
       { owner: true, products: { editions: true } },
     );
+  }
+
+  /********************************************************************************
+   ************************************ UPDATE ************************************
+   ********************************************************************************/
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:collection_id/sync')
+  public async syncCollection(
+    @Param('collection_id') id_: string,
+    @Body() address_: string,
+  ): Promise<Collection> {
+    const _result = this.collectionsService.syncCollection(id_, address_);
+    return _result;
   }
 }

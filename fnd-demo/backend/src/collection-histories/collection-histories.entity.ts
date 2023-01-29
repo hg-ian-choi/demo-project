@@ -19,7 +19,4 @@ export class CollectionHistory {
 
   @ManyToOne(() => Collection)
   public collection: Collection;
-
-  @ManyToOne(() => User)
-  public operator: User;
 }

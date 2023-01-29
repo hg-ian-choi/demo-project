@@ -64,7 +64,7 @@ export class ProductsService {
       ...product_,
       editions: [],
     });
-    const _path = await this.commonService.awsUpload(
+    const _path = await this.commonService.awsUploadFile(
       `${_user.username}/${_user.collections[0].name}/image`,
       file_,
     );

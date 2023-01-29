@@ -33,7 +33,6 @@ export class CollectionsService {
       name: _collection.name,
       symbol: _collection.symbol,
       type: CollectionHistoryType.create,
-      operator: _collection.owner,
       collection: _collection,
     });
     const _upadtedCollection = await this.collectionRepository.save({
@@ -72,5 +71,27 @@ export class CollectionsService {
       delete collection.owner.password;
     }
     return collection;
+  }
+
+  public async syncCollection(
+    id_: string,
+    address_: string,
+  ): Promise<Collection> {
+    const _collection = await this.collectionRepository.findOne({
+      where: { id: id_ },
+    });
+    _collection.address = address_;
+    const _collectionHistory = await this.collectionHistoriesService.create({
+      name: _collection.name,
+      symbol: _collection.symbol,
+      type: CollectionHistoryType.sync,
+      collection: _collection,
+    });
+    _collection.histories.push(_collectionHistory);
+    const _upadtedCollection = await this.collectionRepository.save(
+      _collection,
+    );
+
+    return _upadtedCollection;
   }
 }

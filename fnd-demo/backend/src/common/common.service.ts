@@ -6,35 +6,62 @@ import * as AWS from 'aws-sdk';
 export class CommonService {
   constructor(private readonly configService: ConfigService) {}
 
-  /*******************************************************************************************
-   ** ------------------------------------ File Upload ------------------------------------ **
-   *******************************************************************************************/
-  /*
+  /***************************************************************************************
+   ** ------------------------------------ Uploads ------------------------------------ **
+   ***************************************************************************************/
 
   /**
-   * @description upload buffer file to aws s3
-   * @param _path
-   * @param _file
+   * @description upload file to aws s3
+   * @param path_
+   * @param file_
    * @returns
    */
-  public async awsUpload(
+  public async awsUploadFile(
     path_: string,
     file_: Express.Multer.File,
   ): Promise<string> {
     try {
-      const path = `demo/${path_}/${Date.now()}_${file_.originalname}`;
+      const _path = `demo/${path_}/${Date.now()}_${file_.originalname}`;
       await new AWS.S3()
         .putObject({
-          Key: path,
+          Key: _path,
           Body: file_.buffer,
           Bucket: this.configService.get('awsBucket'),
         })
         .promise();
-      return path;
+      return _path;
     } catch (error_: any) {
       throw new ForbiddenException({
         success: false,
         message: [`File upload Failed`],
+      });
+    }
+  }
+
+  /**
+   * @description upload buffer to aws s3
+   * @param path_
+   * @param buffer_
+   * @returns
+   */
+  public async awsUploadBuffer(
+    path_: string,
+    buffer_: Buffer,
+  ): Promise<string> {
+    try {
+      const _path = `demo/${path_}/${Date.now()}_metadata.json`;
+      await new AWS.S3()
+        .putObject({
+          Key: _path,
+          Body: buffer_,
+          Bucket: this.configService.get('awsBucket'),
+        })
+        .promise();
+      return _path;
+    } catch (error_: any) {
+      throw new ForbiddenException({
+        success: false,
+        message: [`Buffer upload Failed`],
       });
     }
   }
