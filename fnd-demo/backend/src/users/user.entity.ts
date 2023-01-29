@@ -21,7 +21,7 @@ export class User {
   @Column({ type: 'varchar', nullable: true, unique: true })
   public address?: string;
 
-  @OneToMany(() => Collection, (collection) => collection.user, {
+  @OneToMany(() => Collection, (collection) => collection.owner, {
     cascade: true,
   })
   public collections?: Collection[];

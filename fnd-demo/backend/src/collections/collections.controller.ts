@@ -44,7 +44,7 @@ export class CollectionsController {
     @GetUser() user_?: User,
   ): Promise<Collection[]> {
     const collections = await this.collectionsService.getCollections({
-      user: { id: user_.id },
+      owner: { id: user_.id },
     });
 
     return collections;
@@ -56,7 +56,7 @@ export class CollectionsController {
   ): Promise<Collection> {
     return this.collectionsService.getCollection(
       { id: collectionId_ },
-      { user: true, products: { editions: true } },
+      { owner: true, products: { editions: true } },
     );
   }
 }

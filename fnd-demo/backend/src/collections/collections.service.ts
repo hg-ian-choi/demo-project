@@ -24,19 +24,24 @@ export class CollectionsService {
     user_: User,
     collection_: CreateCollectionDto,
   ): Promise<Collection> {
-    const _collection = this.collectionRepository.create({
+    const _collectionObject = this.collectionRepository.create({
       ...collection_,
-      user: { id: user_.id },
+      owner: { id: user_.id },
     });
-    const _result = await this.collectionRepository.save(_collection);
-    await this.collectionHistoriesService.create({
-      name: _result.name,
-      symbol: _result.symbol,
+    const _collection = await this.collectionRepository.save(_collectionObject);
+    const _collectionHistory = await this.collectionHistoriesService.create({
+      name: _collection.name,
+      symbol: _collection.symbol,
       type: CollectionHistoryType.create,
-      operator: { id: user_.id },
-      collection: { id: _result.id },
+      operator: _collection.owner,
+      collection: _collection,
     });
-    return _result;
+    const _upadtedCollection = await this.collectionRepository.save({
+      ..._collection,
+      histories: [_collectionHistory],
+    });
+
+    return _upadtedCollection;
   }
 
   public async getCollections(
@@ -63,8 +68,8 @@ export class CollectionsService {
         );
         return collection_;
       });
-    if (collection?.user?.password) {
-      delete collection.user.password;
+    if (collection?.owner?.password) {
+      delete collection.owner.password;
     }
     return collection;
   }
