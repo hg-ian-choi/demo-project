@@ -14,7 +14,7 @@ import {
 @Entity('collections')
 export class Collection {
   @PrimaryGeneratedColumn('uuid')
-  public id?: string;
+  public id: string;
 
   @Column('varchar')
   public name?: string;

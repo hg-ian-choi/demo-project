@@ -1,6 +1,6 @@
 // enums/history-type.enum.ts
 
-export enum HistoryType {
+export enum ProductHistoryType {
   burn = 0,
   mint = 1,
   transfer = 2,

@@ -42,8 +42,6 @@ export class CollectionsService {
     });
     const _collection = await this.collectionRepository.save(_collectionObject);
     const _collectionHistory = await this.collectionHistoriesService.create({
-      name: _collection.name,
-      symbol: _collection.symbol,
       type: CollectionHistoryType.create,
       collection: _collection,
     });
@@ -97,8 +95,6 @@ export class CollectionsService {
     const _collection = await this.getCollection({ id: id_ }, { owner: true });
     _collection.address = address_;
     const _collectionHistory = await this.collectionHistoriesService.create({
-      name: _collection.name,
-      symbol: _collection.symbol,
       type: CollectionHistoryType.sync,
       collection: _collection,
     });

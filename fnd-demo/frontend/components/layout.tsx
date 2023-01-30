@@ -66,6 +66,10 @@ export default function Layout({ children }: { children: ReactNode }) {
       });
   };
 
+  const turnToWallet = () => {
+    router.push('/wallet');
+  };
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -76,6 +80,9 @@ export default function Layout({ children }: { children: ReactNode }) {
             </IconButton>
             {loginUser.userId ? (
               <div>
+                <Button color="inherit" onClick={turnToWallet}>
+                  my wallet
+                </Button>
                 <Button color="inherit" onClick={turnToCollection}>
                   my collection
                 </Button>

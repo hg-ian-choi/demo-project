@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { getAccount, getContractInstance } from '../api/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
 import factoryABI from '../../abis/factory.abi.json';
-
+import { Collection } from '../../interfaces/collection.interface';
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
@@ -39,7 +39,7 @@ export default function Collections(props: any) {
   const loginUser = useSelector(loginUserSelector);
 
   const [step, setStep] = useState(0);
-  const [createCollectionObject, setCreateCollectionObject] = useState({ name: '', symbol: '', address: '' });
+  const [createCollectionObject, setCreateCollectionObject] = useState({ name: '', symbol: '' });
   const [createCollectionWarnning, setCreateCollectionWarning] = useState({ name: '', symbol: '' });
 
   const nextStep = (step_: number) => {
@@ -88,31 +88,53 @@ export default function Collections(props: any) {
       return;
     }
 
-    const createCollection = await instance
+    const _collection: Collection = await instance
       .post(`${process.env.NEXT_PUBLIC_API_URL}/collections`, createCollectionObject)
       .then((response_: AxiosResponse) => {
-        if (response_.status === 200) {
+        if (response_.status === 201) {
           return response_.data;
         }
+      })
+      .catch((error_: AxiosError) => {
+        console.log('[create collection error_] =>', error_);
       });
 
-    if (createCollection) {
+    if (_collection) {
       const contractInstance: any = await getContractInstance(factoryABI, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
 
       const _newClone = await contractInstance.methods
-        ._clone(createCollectionObject.name, createCollectionObject.symbol)
+        .newClone(
+          _collection.id,
+          createCollectionObject.name,
+          createCollectionObject.symbol,
+          `${process.env.NEXT_PUBLIC_S3_PATH}/demo/${_collection.user?.username}/metadata/`,
+          '.json'
+        )
         .send({ from: account })
         .then((result_: any) => {
           console.log('result_', result_);
           return result_;
         })
         .catch((error_: any) => {
-          if (error_.code === 4001) {
-            console.log('error_', error_.message);
-            alert(error_.message);
-          }
-          throw new Error('Fail to Clone');
+          console.log('error_', error_.message);
+          alert(error_.message);
         });
+
+      if (_newClone) {
+        const _result = await instance
+          .patch(`${process.env.NEXT_PUBLIC_API_URL}/collections/${_collection.id}/sync`, { address: _newClone })
+          .then((response_: AxiosResponse) => {
+            if (response_.status === 200) {
+              return response_.data;
+            }
+          })
+          .catch((error_: AxiosError) => {
+            if (error_.code === '401') {
+              alert('Please sign in');
+            }
+            console.log('error_', error_);
+          });
+      }
     }
 
     // if (!newClone) {
@@ -221,7 +243,7 @@ export default function Collections(props: any) {
               onClick={() => {
                 setStep(0);
                 setCreateCollectionWarning({ name: '', symbol: '' });
-                setCreateCollectionObject({ name: '', symbol: '', address: '' });
+                setCreateCollectionObject({ name: '', symbol: '' });
               }}
             >
               cancel

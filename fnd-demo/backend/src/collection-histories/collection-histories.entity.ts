@@ -8,14 +8,11 @@ export class CollectionHistory {
   @PrimaryGeneratedColumn('uuid')
   public id?: string;
 
-  @Column('varchar')
-  public name: string;
-
-  @Column('varchar')
-  public symbol: string;
-
   @Column('numeric')
   public type: CollectionHistoryType;
+
+  @Column('varchar', { nullable: true })
+  public transactionHash?: string;
 
   @ManyToOne(() => Collection)
   public collection: Collection;

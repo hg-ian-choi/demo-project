@@ -1,7 +1,7 @@
 // interfaces/product.interface.ts
 
 import { Edition } from './edition.interface';
-import { History } from './history.interface';
+import { ProductHistory } from './product-history.interface';
 import { User } from './user.interface';
 
 export interface Product {
@@ -9,9 +9,8 @@ export interface Product {
   name: string;
   description?: string;
   image: string;
-  token_address: string;
-  token_id: string;
-  creator?: User;
+  token_id?: string;
+  creator: User;
   editions: Edition[];
-  histories?: History[];
+  histories?: ProductHistory[];
 }

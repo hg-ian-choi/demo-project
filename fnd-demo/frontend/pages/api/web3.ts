@@ -62,3 +62,11 @@ export const getContractInstance = async (abi_: any, address_: string) => {
 
   return contractInstance;
 };
+
+export const fromWei = (value_: string) => {
+  return Web3.utils.fromWei(value_);
+};
+
+export const toWei = (value_: string) => {
+  return Web3.utils.toWei(value_);
+};

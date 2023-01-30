@@ -7,7 +7,7 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  address: string;
+  address?: string;
   collections?: Collection[];
   products?: Product[];
 }

@@ -4,12 +4,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "id",
-        "type": "string"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "operator",
         "type": "address"
@@ -35,12 +29,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "id",
-        "type": "string"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
         "name": "operator",
         "type": "address"
@@ -62,13 +50,7 @@
     "type": "event"
   },
   {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "id_",
-        "type": "string"
-      }
-    ],
+    "inputs": [],
     "name": "deposit",
     "outputs": [],
     "stateMutability": "payable",
@@ -115,11 +97,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "string",
-        "name": "id_",
-        "type": "string"
-      },
       {
         "internalType": "uint256",
         "name": "value_",
