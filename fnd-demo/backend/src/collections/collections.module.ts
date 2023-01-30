@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CollectionHistoriesModule } from 'src/collection-histories/collection-histories.module';
 import { UsersModule } from 'src/users/users.module';
+import { Web3Module } from 'src/web3/web3.module';
 import { Collection } from './collection.entity';
 import { CollectionsController } from './collections.controller';
 import { CollectionsService } from './collections.service';
@@ -13,8 +14,10 @@ import { CollectionsService } from './collections.service';
     TypeOrmModule.forFeature([Collection]),
     UsersModule,
     CollectionHistoriesModule,
+    Web3Module,
   ],
   controllers: [CollectionsController],
   providers: [CollectionsService],
+  exports: [CollectionsService],
 })
 export class CollectionsModule {}

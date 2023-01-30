@@ -16,29 +16,28 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly web3Service: Web3Service,
   ) {}
-
-  public async validateUser(_user: SigninDto): Promise<User> {
-    let user: User;
-    if (_user.password.startsWith('0x')) {
+  public async validateUser(user_: SigninDto): Promise<User> {
+    if (user_.password.startsWith('0x') && user_.password.length == 42) {
       const signer = this.web3Service.getSignerFromSign(
         this.configService.get<string>('signInMessage'),
-        _user.password,
+        user_.password,
       );
-      user = await this.usersService.getUserWithoutPassword({
+      const user = await this.usersService.getUserWithoutPassword({
         address: signer.toLowerCase(),
       });
       return user;
     } else {
-      user = await this.usersService.getUser({ email: _user.email });
+      const user = await this.usersService.getUser({
+        email: user_.email,
+      });
       if (user) {
-        if (_user.password === user.password) {
-          const { password, ...result } = user;
-          return result;
+        if (user_.password === user.password) {
+          delete user.password;
+          return user;
         }
         throw new ForbiddenException(`Wrong password`);
       }
     }
-    return null;
   }
 
   public async signIn(_user: User): Promise<string> {

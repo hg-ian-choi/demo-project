@@ -1,21 +1,33 @@
 // collections/collections.service.ts
 
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CollectionHistoriesService } from 'src/collection-histories/collection-histories.service';
 import { CollectionHistoryType } from 'src/collection-histories/enum/collection-history.enum';
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { FindOptionsRelations, FindOptionsWhere, Repository } from 'typeorm';
+import { Web3Service } from 'src/web3/web3.service';
+import {
+  FindOptionsOrder,
+  FindOptionsRelations,
+  FindOptionsSelect,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
 import { Collection } from './collection.entity';
 import { CreateCollectionDto } from './dto/create-collection.dto';
+import factoryABI from '../web3/abis/fund.abi.json';
+import { AbiItem } from '../web3/interfaces/abi.interfaces';
 
 @Injectable()
 export class CollectionsService {
   constructor(
     @InjectRepository(Collection)
     private readonly collectionRepository: Repository<Collection>,
+    private readonly configService: ConfigService,
+    private readonly web3Service: Web3Service,
     private readonly usersService: UsersService,
     private readonly collectionHistoriesService: CollectionHistoriesService,
   ) {}
@@ -44,10 +56,16 @@ export class CollectionsService {
   }
 
   public async getCollections(
-    match_?: FindOptionsWhere<Collection>,
+    where_?: FindOptionsWhere<Collection>,
+    relations_?: FindOptionsRelations<Collection>,
+    select_?: FindOptionsSelect<Collection>,
+    order_?: FindOptionsOrder<Collection>,
   ): Promise<Collection[]> {
     const collections = await this.collectionRepository.find({
-      where: match_,
+      where: where_,
+      relations: relations_,
+      order: order_,
+      select: select_,
     });
     return collections;
   }
@@ -55,11 +73,13 @@ export class CollectionsService {
   public async getCollection(
     where_: FindOptionsWhere<Collection>,
     relations_?: FindOptionsRelations<Collection>,
+    select_?: FindOptionsSelect<Collection>,
   ): Promise<Collection> {
     const collection = await this.collectionRepository
       .findOne({
         where: where_,
         relations: relations_,
+        select: select_,
       })
       .then((collection_: Collection) => {
         collection_.products = collection_.products.filter(
@@ -73,13 +93,8 @@ export class CollectionsService {
     return collection;
   }
 
-  public async syncCollection(
-    id_: string,
-    address_: string,
-  ): Promise<Collection> {
-    const _collection = await this.collectionRepository.findOne({
-      where: { id: id_ },
-    });
+  public async syncCollection(id_: string, address_: string): Promise<void> {
+    const _collection = await this.getCollection({ id: id_ }, { owner: true });
     _collection.address = address_;
     const _collectionHistory = await this.collectionHistoriesService.create({
       name: _collection.name,
@@ -88,10 +103,43 @@ export class CollectionsService {
       collection: _collection,
     });
     _collection.histories.push(_collectionHistory);
-    const _upadtedCollection = await this.collectionRepository.save(
-      _collection,
-    );
+    await this.collectionRepository.save(_collection);
+  }
 
-    return _upadtedCollection;
+  public async checkCollectionSync(userId_: string): Promise<void> {
+    const _nonsyncCollections = await this.getCollections({
+      owner: { id: userId_ },
+      address: null,
+    });
+
+    if (_nonsyncCollections) {
+      const contractInstance = await this.web3Service.getContractInstance(
+        factoryABI as AbiItem[],
+        this.configService.get<string>('web3.factory'),
+      );
+      for await (const _nonsyncCollection of _nonsyncCollections) {
+        const _events = await contractInstance
+          .getPastEvents('cloneEvent', {
+            topics: [
+              ,
+              this.web3Service.sha3(_nonsyncCollection.id),
+              this.web3Service.get64LengthAddress(
+                _nonsyncCollection.owner.address,
+              ),
+            ],
+            fromBlock: 0,
+            toBlock: 'latest',
+          })
+          .then((events_: any) => events_)
+          .catch((error_: any) => {
+            console.log('error_', error_);
+          });
+        console.log('_events', _events);
+        console.log(
+          '_events[0].returnValues.operator',
+          _events[0].returnValues.operator,
+        );
+      }
+    }
   }
 }

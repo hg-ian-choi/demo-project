@@ -25,5 +25,9 @@ export default () => ({
   },
   awsBucket: process.env.AWS_BUCKET,
   s3Path: process.env.S3_PATH,
-  web3Provider: process.env.WEB3_PROVIDER,
+  web3: {
+    provider: process.env.WEB3_PROVIDER,
+    factory: process.env.WEB3_FACTORY,
+    core: process.env.WEB3_CORE,
+  },
 });

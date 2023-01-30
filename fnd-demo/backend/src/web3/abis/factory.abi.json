@@ -41,6 +41,16 @@
         "internalType": "string",
         "name": "symbol_",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "prefix_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "suffix_",
+        "type": "string"
       }
     ],
     "name": "_clone",
@@ -52,6 +62,38 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "contract_",
+        "type": "address"
+      }
+    ],
+    "name": "getContractOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCore",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -84,24 +126,30 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "newOwner_",
+        "name": "wallet_",
         "type": "address"
       }
     ],
-    "name": "transferOwner",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "getWalletContracts",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "newCore_",
+        "name": "newOwner_",
         "type": "address"
       }
     ],
-    "name": "upgradeCore",
+    "name": "transferOwner",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

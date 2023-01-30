@@ -15,7 +15,7 @@ contract CloneFactory {
     mapping(address => address[]) walletToContractArray;
     mapping(string => bool) ifIdExist;
 
-    event cloneEvent(string indexed id, string name, string symbol, address indexed creator, address indexed newClone);
+    event cloneEvent(string indexed id, address indexed creator, string name, string symbol, address indexed newClone);
 
     modifier onlyOwner() {
         require(_owner == _msgSender(), "ERROR: Only Owner");
@@ -42,7 +42,7 @@ contract CloneFactory {
         contractToWallet[_newClone] = _msgSender();
         walletToContractArray[_msgSender()].push(_newClone);
 
-        emit cloneEvent(id_, name_, symbol_, _msgSender(), _newClone);
+        emit cloneEvent(id_, _msgSender(), name_, symbol_, _newClone);
     }
 
     // admin functions

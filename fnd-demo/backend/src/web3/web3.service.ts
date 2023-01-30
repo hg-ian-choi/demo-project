@@ -7,7 +7,7 @@ import { AbiItem } from './interfaces/abi.interfaces';
 export class Web3Service {
   constructor(private readonly configService: ConfigService) {}
 
-  private web3 = new Web3(this.configService.get<string>('web3Provider'));
+  private web3 = new Web3(this.configService.get<string>('web3.provider'));
 
   public getContractInstance(abi_: AbiItem[] | AbiItem, address_: string): any {
     return new this.web3.eth.Contract(abi_, address_);

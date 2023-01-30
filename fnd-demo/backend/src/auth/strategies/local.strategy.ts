@@ -6,10 +6,14 @@ import { PassportStrategy } from '@nestjs/passport';
 import { AuthService } from '../auth.service';
 import { SigninDto } from '../dto/signin.dto';
 import { User } from 'src/users/user.entity';
+import { CollectionsService } from 'src/collections/collections.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(private readonly authService: AuthService) {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly collectionsService: CollectionsService,
+  ) {
     super({ usernameField: 'email' });
   }
 
@@ -17,6 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     const _user: SigninDto = { email, password };
     const user = await this.authService.validateUser(_user);
     if (user) {
+      await this.collectionsService.checkCollectionSync(user.id);
       return user;
     }
     throw new NotFoundException({
