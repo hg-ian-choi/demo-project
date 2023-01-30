@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import "./Ownable.sol";
 
-contract Cloneable721 is Initializable, ERC721Upgradeable, ERC721URIStorageUpgradeable, PausableUpgradeable, ERC721BurnableUpgradeable, Ownable {
+contract Product721 is Initializable, ERC721Upgradeable, ERC721URIStorageUpgradeable, PausableUpgradeable, ERC721BurnableUpgradeable, Ownable {
     using StringsUpgradeable for uint256;
     using CountersUpgradeable for CountersUpgradeable.Counter;
 

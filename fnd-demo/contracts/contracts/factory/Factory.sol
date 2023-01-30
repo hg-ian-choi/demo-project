@@ -2,9 +2,9 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/proxy/Clones.sol";
-import "./ICloneable.sol";
+import "./IFactory.sol";
 
-contract CloneFactory {
+contract Factory {
     using Clones for address;
 
     address _owner;
@@ -22,12 +22,11 @@ contract CloneFactory {
         _;
     }
 
-    constructor(address payable core_) {
+    constructor() {
         _owner = _msgSender();
-        _core = core_;
     }
 
-    function _clone(
+    function newClone(
         string memory id_,
         string memory name_,
         string memory symbol_,
@@ -37,10 +36,11 @@ contract CloneFactory {
         require(!ifIdExist[id_], "Id already exist");
         _newClone = _origin.cloneDeterministic(_genSalt(_msgSender()));
 
-        ICloneable(_newClone).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
+        IFactory(_newClone).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
 
         contractToWallet[_newClone] = _msgSender();
         walletToContractArray[_msgSender()].push(_newClone);
+        ifIdExist[id_] = true;
 
         emit cloneEvent(id_, _msgSender(), name_, symbol_, _newClone);
     }
@@ -52,6 +52,10 @@ contract CloneFactory {
 
     function upgradeOrigin(address newOrigin_) external onlyOwner {
         _origin = newOrigin_;
+    }
+
+    function upgradeCore(address payable newCore_) external onlyOwner {
+        _origin = newCore_;
     }
 
     // view functions

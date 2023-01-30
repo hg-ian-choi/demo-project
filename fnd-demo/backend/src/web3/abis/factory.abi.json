@@ -4,9 +4,9 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "newClone",
-        "type": "address"
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
       },
       {
         "indexed": true,
@@ -25,44 +25,16 @@
         "internalType": "string",
         "name": "symbol",
         "type": "string"
-      }
-    ],
-    "name": "newClone",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "name_",
-        "type": "string"
       },
       {
-        "internalType": "string",
-        "name": "symbol_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "prefix_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "suffix_",
-        "type": "string"
-      }
-    ],
-    "name": "_clone",
-    "outputs": [
-      {
+        "indexed": true,
         "internalType": "address",
-        "name": "newClone_",
+        "name": "newClone",
         "type": "address"
       }
     ],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "name": "cloneEvent",
+    "type": "event"
   },
   {
     "inputs": [
@@ -144,12 +116,64 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "id_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "prefix_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "suffix_",
+        "type": "string"
+      }
+    ],
+    "name": "newClone",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_newClone",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "newOwner_",
         "type": "address"
       }
     ],
     "name": "transferOwner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address payable",
+        "name": "newCore_",
+        "type": "address"
+      }
+    ],
+    "name": "upgradeCore",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -107,10 +107,13 @@ export class CollectionsService {
   }
 
   public async checkCollectionSync(userId_: string): Promise<void> {
-    const _nonsyncCollections = await this.getCollections({
-      owner: { id: userId_ },
-      address: null,
-    });
+    const _nonsyncCollections = await this.getCollections(
+      {
+        owner: { id: userId_ },
+        address: null,
+      },
+      { owner: true },
+    );
 
     if (_nonsyncCollections) {
       const contractInstance = await this.web3Service.getContractInstance(
@@ -118,27 +121,32 @@ export class CollectionsService {
         this.configService.get<string>('web3.factory'),
       );
       for await (const _nonsyncCollection of _nonsyncCollections) {
-        const _events = await contractInstance
-          .getPastEvents('cloneEvent', {
-            topics: [
-              ,
-              this.web3Service.sha3(_nonsyncCollection.id),
-              this.web3Service.get64LengthAddress(
-                _nonsyncCollection.owner.address,
-              ),
-            ],
-            fromBlock: 0,
-            toBlock: 'latest',
-          })
-          .then((events_: any) => events_)
-          .catch((error_: any) => {
-            console.log('error_', error_);
-          });
-        console.log('_events', _events);
-        console.log(
-          '_events[0].returnValues.operator',
-          _events[0].returnValues.operator,
-        );
+        try {
+          const _events = await contractInstance
+            .getPastEvents('cloneEvent', {
+              topics: [
+                ,
+                this.web3Service.sha3(_nonsyncCollection.id),
+                this.web3Service.get64LengthAddress(
+                  _nonsyncCollection.owner.address,
+                ),
+              ],
+              fromBlock: 0,
+              toBlock: 'latest',
+            })
+            .then((events_: any) => events_)
+            .catch(() => null);
+          if (_events) {
+            const _event = _events[0];
+            const _creator = _event.returnValues.creator;
+            const _newClone = _event.returnValues.newClone;
+            console.log('_creator', _creator);
+            console.log('_newClone', _newClone);
+          }
+        } catch (error_: any) {
+          console.log('[getPastEvents error_] => ', error_);
+          return;
+        }
       }
     }
   }

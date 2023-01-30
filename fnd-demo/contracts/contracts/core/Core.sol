@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "./ICloneable.sol";
+import "../I1155.sol";
 
 contract Core is ERC1155Holder {
     address payable _owner;
@@ -52,18 +52,18 @@ contract Core is ERC1155Holder {
     }
 
     function balanceOf(address contract_, uint256 id_) internal view returns (uint256) {
-        return ICloneable(contract_).balanceOf(_msgSender(), id_);
+        return I1155(contract_).balanceOf(_msgSender(), id_);
     }
 
     // setProduct, cancelProduct, buyProduct
     function setProduct(address contract_, uint256 id_, uint256 amount_, uint256 price_) external payable {
         require(amount_ > 0, "Amount is 0");
-        uint256 _balance = ICloneable(contract_).balanceOf(_msgSender(), id_);
+        uint256 _balance = I1155(contract_).balanceOf(_msgSender(), id_);
         require(_balance >= amount_, "Not sufficient balance");
         require(price_ > 0, "Price should > 0");
 
         if (artist[contract_] == address(0)) {
-            artist[contract_] = ICloneable(contract_).owner();
+            artist[contract_] = I1155(contract_).owner();
         }
 
         Product memory _product = addressToContractToTokenToProduct[_msgSender()][contract_][id_];
@@ -74,15 +74,15 @@ contract Core is ERC1155Holder {
             _product.price = price_;
             addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
 
-            ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_, "0x00");
+            I1155(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_, "0x00");
         } else {
             if (amount_ < _product.amount) {
-                ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount - amount_, "0x00");
+                I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount - amount_, "0x00");
                 _product.amount = amount_;
                 _product.price = price_;
                 addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
             } else if (amount_ > _product.amount) {
-                ICloneable(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_ - _product.amount, "0x00");
+                I1155(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_ - _product.amount, "0x00");
                 _product.amount = amount_;
                 _product.price = price_;
                 addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
@@ -102,10 +102,10 @@ contract Core is ERC1155Holder {
         require(amount_ <= _product.amount, "Amount should less than selling");
 
         if (amount_ == _product.amount) {
-            ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+            I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
             delete addressToContractToTokenToProduct[_msgSender()][contract_][id_];
         } else {
-            ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+            I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
             _product.amount = _product.amount - amount_;
             addressToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
         }
@@ -147,7 +147,7 @@ contract Core is ERC1155Holder {
             addressToContractToTokenToProduct[seller_][contract_][id_] = sell;
         }
 
-        ICloneable(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+        I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
         emit buyProductEvent(sell.seller, _msgSender(), contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 

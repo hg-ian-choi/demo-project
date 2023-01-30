@@ -5,7 +5,7 @@ import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ProductHistoryType } from './enum/product-history.enum';
 
-@Entity('histories')
+@Entity('product_histories')
 export class ProductHistory {
   @PrimaryGeneratedColumn('uuid')
   public id: string;

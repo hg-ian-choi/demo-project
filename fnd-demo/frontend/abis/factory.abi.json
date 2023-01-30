@@ -4,9 +4,9 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "newClone",
-        "type": "address"
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
       },
       {
         "indexed": true,
@@ -25,33 +25,47 @@
         "internalType": "string",
         "name": "symbol",
         "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newClone",
+        "type": "address"
       }
     ],
-    "name": "newClone",
+    "name": "cloneEvent",
     "type": "event"
   },
   {
     "inputs": [
       {
-        "internalType": "string",
-        "name": "name_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "symbol_",
-        "type": "string"
-      }
-    ],
-    "name": "_clone",
-    "outputs": [
-      {
         "internalType": "address",
-        "name": "newClone_",
+        "name": "contract_",
         "type": "address"
       }
     ],
-    "stateMutability": "nonpayable",
+    "name": "getContractOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCore",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -84,6 +98,64 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "wallet_",
+        "type": "address"
+      }
+    ],
+    "name": "getWalletContracts",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "id_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "name_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "symbol_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "prefix_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "suffix_",
+        "type": "string"
+      }
+    ],
+    "name": "newClone",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "_newClone",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "newOwner_",
         "type": "address"
       }
@@ -96,7 +168,7 @@
   {
     "inputs": [
       {
-        "internalType": "address",
+        "internalType": "address payable",
         "name": "newCore_",
         "type": "address"
       }

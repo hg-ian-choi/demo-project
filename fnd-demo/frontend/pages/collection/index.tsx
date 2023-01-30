@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
 import { getAccount, getContractInstance } from '../api/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
-import abi from '../../abis/CloneAbi.json';
+import factoryABI from '../../abis/factory.abi.json';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -97,7 +97,7 @@ export default function Collections(props: any) {
       });
 
     if (createCollection) {
-      const contractInstance: any = await getContractInstance(abi, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
+      const contractInstance: any = await getContractInstance(factoryABI, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
 
       const _newClone = await contractInstance.methods
         ._clone(createCollectionObject.name, createCollectionObject.symbol)
@@ -111,11 +111,9 @@ export default function Collections(props: any) {
             console.log('error_', error_.message);
             alert(error_.message);
           }
+          throw new Error('Fail to Clone');
         });
-      console.log('_newClone', _newClone);
     }
-
-    throw new Error('Failed to create Collection');
 
     // if (!newClone) {
     //   alert('Something went wrong when Create Collection');

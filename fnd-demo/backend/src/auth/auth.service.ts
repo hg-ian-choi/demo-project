@@ -17,7 +17,7 @@ export class AuthService {
     private readonly web3Service: Web3Service,
   ) {}
   public async validateUser(user_: SigninDto): Promise<User> {
-    if (user_.password.startsWith('0x') && user_.password.length == 42) {
+    if (user_.password.startsWith('0x')) {
       const signer = this.web3Service.getSignerFromSign(
         this.configService.get<string>('signInMessage'),
         user_.password,
