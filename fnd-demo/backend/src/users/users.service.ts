@@ -98,12 +98,18 @@ export class UsersService {
    * @param _match
    * @returns User
    */
-  public async getUserWithoutPassword(
+  public async getUserWithPassword(
     _where: FindOptionsWhere<User>,
   ): Promise<User | null> {
     const user = await this.usersRepository.findOne({
+      select: {
+        id: true,
+        username: true,
+        address: true,
+        email: true,
+        password: true,
+      },
       where: _where,
-      select: { password: false },
     });
     return user;
   }

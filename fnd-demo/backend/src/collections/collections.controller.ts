@@ -42,28 +42,20 @@ export class CollectionsController {
   @UseGuards(JwtAuthGuard)
   @Get('/user')
   private async getUserCollections(
-    @GetUser() user_?: User,
+    @GetUser() user_: User,
   ): Promise<Collection[]> {
     await this.collectionsService.checkCollectionSync(user_.id);
-    const collections = await this.collectionsService.getCollections(
-      {
-        owner: { id: user_.id },
-      },
-      null,
-      null,
-      null,
-    );
-
-    return collections;
+    return this.collectionsService.getValidCollections(user_.id);
   }
 
   @Get('/:collection_id')
   private async getCollection(
     @Param('collection_id') collectionId_: string,
   ): Promise<Collection> {
-    return this.collectionsService.getCollection(
+    return this.collectionsService.getValidCollection(
       { id: collectionId_ },
-      { owner: true, products: { editions: true } },
+      { owner: { password: false } },
+      { owner: true, histories: true, products: { editions: true } },
     );
   }
 
@@ -74,8 +66,13 @@ export class CollectionsController {
   @Patch('/:collection_id/sync')
   private async syncCollection(
     @Param('collection_id') id_: string,
-    @Body() address_: string,
-  ): Promise<boolean> {
-    return this.collectionsService.syncCollection(id_, address_);
+    @Body('address') address_: string,
+    @Body('transactionHash') transactionHash_: string,
+  ): Promise<Collection> {
+    return this.collectionsService.syncCollection(
+      id_,
+      address_,
+      transactionHash_,
+    );
   }
 }

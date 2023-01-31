@@ -34,7 +34,7 @@ export async function getServerSideProps(context_: any) {
 }
 
 export default function CollectionDetail(props: Collection) {
-  const { id, name, symbol, address, products } = props;
+  const { id, name, symbol, address, products, histories } = props;
 
   const router = useRouter();
 
@@ -120,17 +120,20 @@ export default function CollectionDetail(props: Collection) {
           <Typography>Name: </Typography>
           <Typography>Symbol: </Typography>
           <Typography>Contract address: </Typography>
+          {histories && histories[1] && histories[1].transactionHash && <Typography>Transaction Hash: </Typography>}
         </Box>
         <Box ml={3}>
           <Typography>{name}</Typography>
           <Typography>{symbol}</Typography>
           <Typography>{address}</Typography>
+          {histories && histories[1] && histories[1].transactionHash && <Typography>{histories[1].transactionHash}</Typography>}
         </Box>
       </Box>
       {step === 0 ? (
         <Box width="100%" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
           <Grid container columnGap={3} rowGap={3} justifyContent="center">
-            {products?.length > 0 &&
+            {products &&
+              products.length > 0 &&
               products.map((product_: Product, index_: number) => (
                 <Grid item xs={3} key={`collection_${index_}`} border="solid 1px black" style={{ cursor: 'pointer' }}>
                   <Card onClick={() => {}}>

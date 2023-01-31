@@ -22,12 +22,12 @@ export class AuthService {
         this.configService.get<string>('signInMessage'),
         user_.password,
       );
-      const user = await this.usersService.getUserWithoutPassword({
+      const user = await this.usersService.getUser({
         address: signer.toLowerCase(),
       });
       return user;
     } else {
-      const user = await this.usersService.getUser({
+      const user = await this.usersService.getUserWithPassword({
         email: user_.email,
       });
       if (user) {

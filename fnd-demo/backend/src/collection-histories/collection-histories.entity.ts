@@ -1,5 +1,4 @@
 import { Collection } from 'src/collections/collection.entity';
-import { User } from 'src/users/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { CollectionHistoryType } from './enum/collection-history.enum';
 
@@ -14,6 +13,6 @@ export class CollectionHistory {
   @Column('varchar', { nullable: true })
   public transactionHash?: string;
 
-  @ManyToOne(() => Collection)
+  @ManyToOne(() => Collection, { onDelete: 'CASCADE' })
   public collection: Collection;
 }

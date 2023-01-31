@@ -12,7 +12,7 @@ export class User {
   @Column({ type: 'varchar', unique: true })
   public email?: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', select: false })
   public password?: string;
 
   @Column({ type: 'varchar', unique: true })

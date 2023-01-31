@@ -62,7 +62,7 @@ export class UsersController {
   private async getUser(
     @Param('match') _match: FindOptionsWhere<User>,
   ): Promise<User> {
-    return this.usersService.getUserWithoutPassword(_match);
+    return this.usersService.getUser(_match);
   }
 
   // @UseGuards(JwtAuthGuard)

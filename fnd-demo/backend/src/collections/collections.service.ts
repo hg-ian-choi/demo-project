@@ -14,6 +14,8 @@ import {
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
+  IsNull,
+  Not,
   Repository,
 } from 'typeorm';
 import { Collection } from './collection.entity';
@@ -32,6 +34,9 @@ export class CollectionsService {
     private readonly collectionHistoriesService: CollectionHistoriesService,
   ) {}
 
+  /********************************************************************************
+   ************************************ CREATE ************************************
+   ********************************************************************************/
   public async createCollection(
     user_: User,
     collection_: CreateCollectionDto,
@@ -53,66 +58,98 @@ export class CollectionsService {
     return _upadtedCollection;
   }
 
-  public async getCollections(
-    where_?: FindOptionsWhere<Collection>,
-    relations_?: FindOptionsRelations<Collection>,
-    select_?: FindOptionsSelect<Collection>,
-    order_?: FindOptionsOrder<Collection>,
-  ): Promise<Collection[]> {
-    const collections = await this.collectionRepository.find({
-      where: where_,
-      relations: relations_,
-      order: order_,
-      select: select_,
-    });
-    return collections;
+  /******************************************************************************
+   ************************************ READ ************************************
+   ******************************************************************************/
+  public getValidCollections(userId: string): Promise<Collection[]> {
+    return this.getCollections(
+      null,
+      {
+        owner: { id: userId },
+        address: Not(IsNull()),
+      },
+      null,
+      { products: true },
+    );
   }
 
-  public async getCollection(
+  public async getValidCollection(
     where_: FindOptionsWhere<Collection>,
-    relations_?: FindOptionsRelations<Collection>,
     select_?: FindOptionsSelect<Collection>,
+    relations_?: FindOptionsRelations<Collection>,
   ): Promise<Collection> {
-    const collection = await this.collectionRepository
-      .findOne({
-        where: where_,
-        relations: relations_,
-        select: select_,
-      })
-      .then((collection_: Collection) => {
-        if (collection?.products) {
-          collection_.products = collection_.products.filter(
-            (product_: Product) => product_.token_id && true,
-          );
-        }
-        return collection_;
-      });
+    const collection = await this.getCollection(
+      where_,
+      select_,
+      relations_,
+    ).then((collection_: Collection) => {
+      if (collection_?.products) {
+        collection_.products = collection_.products.filter(
+          (product_: Product) => product_.token_id && true,
+        );
+      }
+      return collection_;
+    });
     if (collection?.owner?.password) {
       delete collection.owner.password;
     }
     return collection;
   }
 
-  public async syncCollection(id_: string, address_: string): Promise<boolean> {
-    const _collection = await this.getCollection({ id: id_ }, { owner: true });
-    _collection.address = address_;
-    const _collectionHistory = await this.collectionHistoriesService.create({
-      type: CollectionHistoryType.sync,
-      collection: _collection,
-    });
-    _collection.histories.push(_collectionHistory);
-    await this.collectionRepository.save(_collection);
-    return true;
+  /******************************************************************************
+   ************************************ UPDATE **********************************
+   ******************************************************************************/
+  /**
+   * @description sync collection
+   * @param id
+   * @param address
+   * @param transactionHash
+   * @returns boolean
+   */
+  public async syncCollection(
+    id_: string,
+    address_: string,
+    transactionHash_: string,
+  ): Promise<Collection> {
+    try {
+      const _collection = await this.getCollection(
+        { id: id_ },
+        { owner: { password: false } },
+        {
+          owner: true,
+          histories: true,
+        },
+      );
+      if (!_collection.address) {
+        _collection.address = address_;
+      }
+      const _collectionHistory = await this.collectionHistoriesService.create({
+        type: CollectionHistoryType.sync,
+        transactionHash: transactionHash_,
+        collection: _collection,
+      });
+      _collection.histories.push(_collectionHistory);
+      return this.collectionRepository.save(_collection);
+    } catch (error_: any) {
+      console.log('[collections.service.ts / syncCollection] => ', error_);
+      return null;
+    }
   }
 
+  /******************************************************************************
+   ************************************ CHECK ***********************************
+   ******************************************************************************/
   public async checkCollectionSync(userId_: string): Promise<void> {
     const _nonsyncCollections = await this.getCollections(
+      null,
       {
         owner: { id: userId_ },
-        address: null,
+        address: IsNull(),
       },
+      null,
       { owner: true },
     );
+    console.log('_nonsyncCollections', _nonsyncCollections);
 
     if (_nonsyncCollections) {
       const contractInstance = await this.web3Service.getContractInstance(
@@ -120,28 +157,98 @@ export class CollectionsService {
         this.configService.get<string>('web3.factory'),
       );
       for await (const _nonsyncCollection of _nonsyncCollections) {
+        console.log('_nonsyncCollection', _nonsyncCollection);
         try {
+          console.log(
+            this.web3Service.get64LengthAddress(
+              _nonsyncCollection.owner.address,
+            ),
+          );
           const _events = await contractInstance
             .getPastEvents('cloneEvent', {
-              topics: [, this.web3Service.sha3(_nonsyncCollection.id)],
+              topics: [
+                ,
+                this.web3Service.sha3(_nonsyncCollection.id),
+                this.web3Service.get64LengthAddress(
+                  _nonsyncCollection.owner.address,
+                ),
+              ],
               fromBlock: 0,
               toBlock: 'latest',
             })
             .then((events_: any) => events_)
             .catch(() => null);
           console.log('_events', _events);
-          if (_events) {
+          return;
+          if (_events.length > 0) {
+            console.log(_events);
             const _event = _events[0];
-            const _creator = _event.returnValues.creator;
             const _newClone = _event.returnValues.newClone;
-            console.log('_creator', _creator);
-            console.log('_newClone', _newClone);
+            const _transactionHash = _event.transactionHash;
+            await this.syncCollection(
+              _nonsyncCollection.id,
+              _newClone,
+              _transactionHash,
+            );
+          } else {
+            await this.deleteCollection(_nonsyncCollection.id);
           }
         } catch (error_: any) {
           console.log('[getPastEvents error_] => ', error_);
-          return;
         }
       }
     }
+  }
+
+  /*******************************************************************************************
+   ************************************ private functions ************************************
+   *******************************************************************************************/
+  /**
+   * @description find Collections
+   * @param select
+   * @param where
+   * @param order
+   * @param relations
+   * @returns Collection[]
+   */
+  private getCollections(
+    select_?: FindOptionsSelect<Collection>,
+    where_?: FindOptionsWhere<Collection>,
+    order_?: FindOptionsOrder<Collection>,
+    relations_?: FindOptionsRelations<Collection>,
+  ): Promise<Collection[]> {
+    return this.collectionRepository.find({
+      select: select_,
+      where: where_,
+      order: order_,
+      relations: relations_,
+    });
+  }
+
+  /**
+   * @description find Collection
+   * @param where
+   * @param select
+   * @param relations
+   * @returns Collection
+   */
+  private getCollection(
+    where_: FindOptionsWhere<Collection>,
+    select_?: FindOptionsSelect<Collection>,
+    relations_?: FindOptionsRelations<Collection>,
+  ): Promise<Collection> {
+    return this.collectionRepository.findOne({
+      select: select_,
+      where: where_,
+      relations: relations_,
+    });
+  }
+
+  /**
+   * @description delete Collection
+   * @param collectionId
+   */
+  private async deleteCollection(collectionId_: string): Promise<void> {
+    await this.collectionRepository.delete({ id: collectionId_ });
   }
 }

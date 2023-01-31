@@ -34,6 +34,7 @@ export class Collection {
   @OneToMany(
     () => CollectionHistory,
     (collectionHistory) => collectionHistory.collection,
+    { onDelete: 'CASCADE' },
   )
   public histories?: CollectionHistory[];
 }

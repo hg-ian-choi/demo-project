@@ -5,4 +5,5 @@ export interface CollectionHistory {
   id: string;
   type: CollectionHistoryType;
   collection: Collection;
+  transactionHash?: string;
 }
