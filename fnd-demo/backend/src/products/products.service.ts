@@ -56,7 +56,7 @@ export class ProductsService {
     if (!file_) {
       throw new ForbiddenException('Image not found!');
     }
-    const _user = await this.usersService.getUser(
+    const _user = await this.usersService.findOneUser(
       { id: user_.id, collections: { id: collectionId_ } },
       { collections: true },
     );

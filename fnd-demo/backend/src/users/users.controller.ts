@@ -2,7 +2,12 @@
 
 import { Body, Controller, Get, Param, Patch, Post, Res } from '@nestjs/common';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { FindOptionsOrder, FindOptionsWhere } from 'typeorm';
+import {
+  FindOptionsOrder,
+  FindOptionsRelations,
+  FindOptionsSelect,
+  FindOptionsWhere,
+} from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
@@ -47,10 +52,9 @@ export class UsersController {
    */
   @Get('/')
   private async getUsers(
-    @Body('match') _match: FindOptionsWhere<User>,
-    @Body('sort') _sort: FindOptionsOrder<User>,
+    @Body('match') where_?: FindOptionsWhere<User>,
   ): Promise<User[]> {
-    return this.usersService.getUsers(_match, _sort);
+    return this.usersService.findUserList(where_);
   }
 
   /**
@@ -60,9 +64,9 @@ export class UsersController {
    */
   @Get('/:match')
   private async getUser(
-    @Param('match') _match: FindOptionsWhere<User>,
+    @Param('where') where_: FindOptionsWhere<User>,
   ): Promise<User> {
-    return this.usersService.getUser(_match);
+    return this.usersService.findOneUser(where_);
   }
 
   // @UseGuards(JwtAuthGuard)

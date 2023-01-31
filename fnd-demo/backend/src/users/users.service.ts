@@ -12,6 +12,7 @@ import { Web3Service } from 'src/web3/web3.service';
 import {
   FindOptionsOrder,
   FindOptionsRelations,
+  FindOptionsSelect,
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
@@ -41,7 +42,7 @@ export class UsersService {
       this.configService.get<string>('signUpMessage'),
       sign_,
     );
-    if (signer.toLowerCase() === user_.address.toLowerCase()) {
+    if (signer.toLowerCase() === user_.address) {
       const user = this.usersRepository.create({
         ...user_,
         username: username,
@@ -61,19 +62,13 @@ export class UsersService {
    * @param _userId
    * @returns User
    */
-  public async getUsers(
-    _match?: FindOptionsWhere<User>,
-    _sort?: FindOptionsOrder<User>,
+  public async findUserList(
+    where_?: FindOptionsWhere<User>,
+    relations_?: FindOptionsRelations<User>,
+    order_?: FindOptionsOrder<User>,
+    select_?: FindOptionsSelect<User>,
   ): Promise<User[]> {
-    const users = await this.usersRepository.find({
-      where: _match,
-      order: _sort,
-    });
-    const result = users.map((_value: User) => {
-      const { password, ...rest } = _value;
-      return rest;
-    });
-    return result;
+    return await this.getUsers(where_, relations_, order_, select_);
   }
 
   /**
@@ -81,16 +76,12 @@ export class UsersService {
    * @param _userId
    * @returns User
    */
-  public async getUser(
-    where_?: FindOptionsWhere<User>,
+  public async findOneUser(
+    where_: FindOptionsWhere<User>,
     relations_?: FindOptionsRelations<User>,
+    select_?: FindOptionsSelect<User>,
   ): Promise<User> {
-    const user = await this.usersRepository
-      .findOne({ where: where_, relations: relations_ })
-      .catch(() => {
-        throw new NotFoundException();
-      });
-    return user;
+    return this.getUser(where_, relations_, select_);
   }
 
   /**
@@ -98,20 +89,15 @@ export class UsersService {
    * @param _match
    * @returns User
    */
-  public async getUserWithPassword(
-    _where: FindOptionsWhere<User>,
-  ): Promise<User | null> {
-    const user = await this.usersRepository.findOne({
-      select: {
-        id: true,
-        username: true,
-        address: true,
-        email: true,
-        password: true,
-      },
-      where: _where,
+  public async findOneUserWithPassword(
+    where_: FindOptionsWhere<User>,
+  ): Promise<User> {
+    return this.getUser(where_, null, {
+      id: true,
+      username: true,
+      address: true,
+      password: true,
     });
-    return user;
   }
 
   public async connectWallet(
@@ -125,12 +111,54 @@ export class UsersService {
       _sign,
     );
     if (_wallet && _wallet === signer) {
-      _user.address = _wallet;
-      await this.usersRepository.save(user);
+      _user.address = _wallet.toLowerCase();
+      return this.usersRepository.save(user);
     } else {
       throw new ConflictException(`Signer Not Match!`);
     }
+  }
 
-    return;
+  /*******************************************************************************************
+   ************************************ private functions ************************************
+   *******************************************************************************************/
+  /**
+   * @description get Users
+   * @param where
+   * @param relations
+   * @param order
+   * @param select
+   * @returns User[]
+   */
+  private async getUsers(
+    where_?: FindOptionsWhere<User>,
+    relations_?: FindOptionsRelations<User>,
+    order_?: FindOptionsOrder<User>,
+    select_?: FindOptionsSelect<User>,
+  ): Promise<User[]> {
+    return this.usersRepository.find({
+      select: select_,
+      where: where_,
+      order: order_,
+      relations: relations_,
+    });
+  }
+
+  /**
+   * @description get User
+   * @param where
+   * @param relations
+   * @param select
+   * @returns User
+   */
+  private async getUser(
+    where_: FindOptionsWhere<User>,
+    relations_?: FindOptionsRelations<User>,
+    select_?: FindOptionsSelect<User>,
+  ): Promise<User> {
+    return this.usersRepository.findOne({
+      where: where_,
+      relations: relations_,
+      select: select_,
+    });
   }
 }
