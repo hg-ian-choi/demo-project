@@ -5,8 +5,8 @@ interface IFactory {
     function initialize(
         string memory name_,
         string memory symbol_,
-        address payable core_,
-        address payable sender_,
+        address core_,
+        address sender_,
         string memory prefix_,
         string memory suffix_
     ) external;

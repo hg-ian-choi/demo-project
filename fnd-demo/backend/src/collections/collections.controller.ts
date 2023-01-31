@@ -75,7 +75,7 @@ export class CollectionsController {
   private async syncCollection(
     @Param('collection_id') id_: string,
     @Body() address_: string,
-  ): Promise<void> {
-    const _result = this.collectionsService.syncCollection(id_, address_);
+  ): Promise<boolean> {
+    return this.collectionsService.syncCollection(id_, address_);
   }
 }

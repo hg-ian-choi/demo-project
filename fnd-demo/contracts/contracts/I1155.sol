@@ -6,5 +6,5 @@ interface I1155 {
 
     function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes memory data) external;
 
-    function owner() external view returns (address payable);
+    function getOwner() external view returns (address);
 }

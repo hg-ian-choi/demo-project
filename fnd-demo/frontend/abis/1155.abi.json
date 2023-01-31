@@ -302,6 +302,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getOwner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -314,14 +327,24 @@
         "type": "string"
       },
       {
-        "internalType": "address payable",
+        "internalType": "address",
         "name": "core_",
         "type": "address"
       },
       {
-        "internalType": "address payable",
+        "internalType": "address",
         "name": "sender_",
         "type": "address"
+      },
+      {
+        "internalType": "string",
+        "name": "prefix_",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "suffix_",
+        "type": "string"
       }
     ],
     "name": "initialize",
@@ -372,35 +395,13 @@
       }
     ],
     "name": "mint",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "outputs": [
       {
-        "internalType": "address",
-        "name": "to_",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "ids_",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "amounts_",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "bytes",
-        "name": "data_",
-        "type": "bytes"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "mintBatch",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -412,19 +413,6 @@
         "internalType": "string",
         "name": "",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -530,24 +518,6 @@
       }
     ],
     "name": "setApprovalForAll",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "prefix_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "suffix_",
-        "type": "string"
-      }
-    ],
-    "name": "setPrefixAndSuffix",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

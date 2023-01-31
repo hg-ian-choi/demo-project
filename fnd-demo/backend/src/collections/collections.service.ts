@@ -18,7 +18,7 @@ import {
 } from 'typeorm';
 import { Collection } from './collection.entity';
 import { CreateCollectionDto } from './dto/create-collection.dto';
-import factoryABI from '../web3/abis/fund.abi.json';
+import factoryABI from '../web3/abis/factory.abi.json';
 import { AbiItem } from '../web3/interfaces/abi.interfaces';
 
 @Injectable()
@@ -80,9 +80,11 @@ export class CollectionsService {
         select: select_,
       })
       .then((collection_: Collection) => {
-        collection_.products = collection_.products.filter(
-          (product_: Product) => product_.token_id && true,
-        );
+        if (collection?.products) {
+          collection_.products = collection_.products.filter(
+            (product_: Product) => product_.token_id && true,
+          );
+        }
         return collection_;
       });
     if (collection?.owner?.password) {
@@ -91,7 +93,7 @@ export class CollectionsService {
     return collection;
   }
 
-  public async syncCollection(id_: string, address_: string): Promise<void> {
+  public async syncCollection(id_: string, address_: string): Promise<boolean> {
     const _collection = await this.getCollection({ id: id_ }, { owner: true });
     _collection.address = address_;
     const _collectionHistory = await this.collectionHistoriesService.create({
@@ -100,6 +102,7 @@ export class CollectionsService {
     });
     _collection.histories.push(_collectionHistory);
     await this.collectionRepository.save(_collection);
+    return true;
   }
 
   public async checkCollectionSync(userId_: string): Promise<void> {
@@ -120,18 +123,13 @@ export class CollectionsService {
         try {
           const _events = await contractInstance
             .getPastEvents('cloneEvent', {
-              topics: [
-                ,
-                this.web3Service.sha3(_nonsyncCollection.id),
-                this.web3Service.get64LengthAddress(
-                  _nonsyncCollection.owner.address,
-                ),
-              ],
+              topics: [, this.web3Service.sha3(_nonsyncCollection.id)],
               fromBlock: 0,
               toBlock: 'latest',
             })
             .then((events_: any) => events_)
             .catch(() => null);
+          console.log('_events', _events);
           if (_events) {
             const _event = _events[0];
             const _creator = _event.returnValues.creator;

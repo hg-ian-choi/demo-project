@@ -21,9 +21,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
     const _user: SigninDto = { email, password };
     const user = await this.authService.validateUser(_user);
     if (user) {
-      if (user.address) {
-        await this.collectionsService.checkCollectionSync(user.id);
-      }
       return user;
     }
     throw new NotFoundException({

@@ -22,14 +22,16 @@ export default function Wallet() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    getBalance();
-    const custWindow: any = window;
-    custWindow.ethereum.on('accountsChanged', function (accounts: string[]) {
-      if (accounts[0].toLowerCase() !== loginUser.wallet.toLowerCase()) {
-        signOut();
-      }
-    });
-  }, []);
+    if (loginUser.wallet) {
+      getBalance();
+      const custWindow: any = window;
+      custWindow.ethereum.on('accountsChanged', function (accounts: string[]) {
+        if (accounts[0].toLowerCase() !== loginUser.wallet.toLowerCase()) {
+          signOut();
+        }
+      });
+    }
+  }, [loginUser]);
 
   const signOut = async () => {
     await instance
@@ -38,7 +40,6 @@ export default function Wallet() {
         if (_res.status === 201 && _res.data) {
           dispatch(setLoginUser({ userId: '', username: '', wallet: '' }));
           router.push('/');
-          return _res.data;
         }
       })
       .catch((_error: AxiosError) => {
@@ -52,7 +53,7 @@ export default function Wallet() {
       setBalance('N/A');
       return;
     }
-    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_FUND_CONTRACT_ADDRESS}`);
+    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_CORE}`);
     await contractInstance.methods
       .getBalance()
       .call({ from: account })
@@ -83,7 +84,7 @@ export default function Wallet() {
       return;
     }
 
-    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_FUND_CONTRACT_ADDRESS}`);
+    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_CORE}`);
     await contractInstance.methods
       .deposit()
       .send({ from: account, value: toWei(deposit) })
@@ -113,7 +114,7 @@ export default function Wallet() {
       return;
     }
 
-    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_FUND_CONTRACT_ADDRESS}`);
+    const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_CORE}`);
     await contractInstance.methods
       .withdraw(toWei(withdraw))
       .send({ from: account })

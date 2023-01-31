@@ -4,52 +4,66 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "string",
-        "name": "id",
-        "type": "string"
-      },
-      {
-        "indexed": true,
         "internalType": "address",
-        "name": "creator",
+        "name": "operator",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "symbol",
-        "type": "string"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newClone",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
       }
     ],
-    "name": "cloneEvent",
+    "name": "depositEvent",
     "type": "event"
   },
   {
+    "anonymous": false,
     "inputs": [
       {
+        "indexed": true,
         "internalType": "address",
-        "name": "contract_",
+        "name": "operator",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
       }
     ],
-    "name": "getContractOwner",
+    "name": "withdrawEvent",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "deposit",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getBalance",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -57,25 +71,12 @@
   },
   {
     "inputs": [],
-    "name": "getCore",
+    "name": "getFundBalance",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getOrigin",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -97,98 +98,18 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "wallet_",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "value_",
+        "type": "uint256"
       }
     ],
-    "name": "getWalletContracts",
-    "outputs": [
-      {
-        "internalType": "address[]",
-        "name": "",
-        "type": "address[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "id_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "name_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "symbol_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "prefix_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "suffix_",
-        "type": "string"
-      }
-    ],
-    "name": "newClone",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "_newClone",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOwner_",
-        "type": "address"
-      }
-    ],
-    "name": "transferOwner",
+    "name": "withdraw",
     "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "payable",
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address payable",
-        "name": "newCore_",
-        "type": "address"
-      }
-    ],
-    "name": "upgradeCore",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "newOrigin_",
-        "type": "address"
-      }
-    ],
-    "name": "upgradeOrigin",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]

@@ -7,9 +7,9 @@ import "./IFactory.sol";
 contract Factory {
     using Clones for address;
 
-    address _owner;
-    address _origin;
-    address payable private _core;
+    address owner;
+    address origin;
+    address core;
 
     mapping(address => address) contractToWallet;
     mapping(address => address[]) walletToContractArray;
@@ -18,12 +18,12 @@ contract Factory {
     event cloneEvent(string indexed id, address indexed creator, string name, string symbol, address indexed newClone);
 
     modifier onlyOwner() {
-        require(_owner == _msgSender(), "ERROR: Only Owner");
+        require(owner == _msgSender(), "ERROR: Only Owner");
         _;
     }
 
     constructor() {
-        _owner = _msgSender();
+        owner = _msgSender();
     }
 
     function newClone(
@@ -32,43 +32,44 @@ contract Factory {
         string memory symbol_,
         string memory prefix_,
         string memory suffix_
-    ) external returns (address _newClone) {
+    ) external returns (address) {
         require(!ifIdExist[id_], "Id already exist");
-        _newClone = _origin.cloneDeterministic(_genSalt(_msgSender()));
+        address _newClone = origin.cloneDeterministic(_genSalt(_msgSender()));
 
-        IFactory(_newClone).initialize(name_, symbol_, _core, payable(_msgSender()), prefix_, suffix_);
+        IFactory(_newClone).initialize(name_, symbol_, core, _msgSender(), prefix_, suffix_);
 
         contractToWallet[_newClone] = _msgSender();
         walletToContractArray[_msgSender()].push(_newClone);
         ifIdExist[id_] = true;
 
         emit cloneEvent(id_, _msgSender(), name_, symbol_, _newClone);
+        return _newClone;
     }
 
     // admin functions
     function transferOwner(address newOwner_) external onlyOwner {
-        _owner = newOwner_;
+        owner = newOwner_;
     }
 
     function upgradeOrigin(address newOrigin_) external onlyOwner {
-        _origin = newOrigin_;
+        origin = newOrigin_;
     }
 
-    function upgradeCore(address payable newCore_) external onlyOwner {
-        _origin = newCore_;
+    function upgradeCore(address newCore_) external onlyOwner {
+        core = newCore_;
     }
 
     // view functions
     function getOrigin() external view returns (address) {
-        return _origin;
+        return origin;
     }
 
     function getOwner() external view returns (address) {
-        return _owner;
+        return owner;
     }
 
     function getCore() external view returns (address) {
-        return _core;
+        return core;
     }
 
     function getContractOwner(address contract_) external view returns (address) {

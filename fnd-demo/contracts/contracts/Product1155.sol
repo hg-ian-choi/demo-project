@@ -12,13 +12,13 @@ import "./Ownable.sol";
 
 contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgradeable, ERC1155BurnableUpgradeable, ERC1155SupplyUpgradeable {
     using Counters for Counters.Counter;
-    Counters.Counter private _tokenId;
+    Counters.Counter tokenId;
 
     string public name;
     string public symbol;
-    string private _prefix;
-    string private _suffix;
-    address payable private _core;
+    string prefix;
+    string suffix;
+    address core;
 
     mapping(uint256 => string) tokenURI;
 
@@ -29,16 +29,16 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
     function initialize(
         string memory name_,
         string memory symbol_,
-        address payable core_,
-        address payable sender_,
+        address core_,
+        address sender_,
         string memory prefix_,
         string memory suffix_
     ) public initializer {
         name = name_;
         symbol = symbol_;
-        _core = core_;
-        _prefix = prefix_;
-        _suffix = suffix_;
+        core = core_;
+        prefix = prefix_;
+        suffix = suffix_;
         __ERC1155_init("");
         __Ownable_init(sender_);
         __Pausable_init();
@@ -46,12 +46,13 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         __ERC1155Supply_init();
     }
 
-    function mint(uint256 amount_, string memory uri_, bytes memory data_) public onlyOwner returns (uint256 tokenId_) {
-        _tokenId.increment();
-        tokenId_ = _tokenId.current();
-        tokenURI[tokenId_] = uri_;
-        _mint(_msgSender(), tokenId_, amount_, data_);
-        setApprovalForAll(_core, true);
+    function mint(uint256 amount_, string memory uri_, bytes memory data_) public onlyOwner returns (uint256) {
+        tokenId.increment();
+        uint256 _tokenId = getCurrentTokenId();
+        tokenURI[_tokenId] = uri_;
+        _mint(_msgSender(), _tokenId, amount_, data_);
+        setApprovalForAll(core, true);
+        return _tokenId;
     }
 
     function pause() public onlyOwner {
@@ -61,15 +62,6 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
     function unpause() public onlyOwner {
         _unpause();
     }
-
-    // function mintBatch(
-    //     address to_,
-    //     uint256[] memory ids_,
-    //     uint256[] memory amounts_,
-    //     bytes memory data_
-    // ) public onlyOwner {
-    //     _mintBatch(to_, ids_, amounts_, data_);
-    // }
 
     function _beforeTokenTransfer(
         address operator_,
@@ -83,15 +75,10 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
     }
 
     function uri(uint256 id_) public view override returns (string memory) {
-        return string.concat(_prefix, tokenURI[id_], _suffix);
-    }
-
-    function setPrefixAndSuffix(string memory prefix_, string memory suffix_) external onlyOwner {
-        _prefix = prefix_;
-        _suffix = suffix_;
+        return string.concat(prefix, tokenURI[id_], suffix);
     }
 
     function getCurrentTokenId() public view returns (uint256) {
-        return _tokenId.current();
+        return tokenId.current();
     }
 }

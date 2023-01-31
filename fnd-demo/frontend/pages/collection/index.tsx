@@ -100,7 +100,7 @@ export default function Collections(props: any) {
       });
 
     if (_collection) {
-      const contractInstance: any = await getContractInstance(factoryABI, `${process.env.NEXT_PUBLIC_FACTORY_CONTRACT_ADDRESS}`);
+      const contractInstance: any = await getContractInstance(factoryABI, `${process.env.NEXT_PUBLIC_FACTORY}`);
 
       const _newClone = await contractInstance.methods
         .newClone(
@@ -113,16 +113,22 @@ export default function Collections(props: any) {
         .send({ from: account })
         .then((result_: any) => {
           console.log('result_', result_);
-          return result_;
+          return {
+            transactionHash: result_.transactionHash,
+            address: result_.events.cloneEvent.returnValues.newClone,
+          };
         })
         .catch((error_: any) => {
           console.log('error_', error_.message);
           alert(error_.message);
         });
-
-      if (_newClone) {
+      console.log('_newClone', _newClone);
+      if (_newClone.transactionHash && _newClone.address) {
         const _result = await instance
-          .patch(`${process.env.NEXT_PUBLIC_API_URL}/collections/${_collection.id}/sync`, { address: _newClone })
+          .patch(`${process.env.NEXT_PUBLIC_API_URL}/collections/${_collection.id}/sync`, {
+            address: _newClone.address,
+            transactionHash: _newClone.transactionHash,
+          })
           .then((response_: AxiosResponse) => {
             if (response_.status === 200) {
               return response_.data;
@@ -136,31 +142,6 @@ export default function Collections(props: any) {
           });
       }
     }
-
-    // if (!newClone) {
-    //   alert('Something went wrong when Create Collection');
-    //   return;
-    // }
-
-    // setCreateCollectionObject({ ...createCollectionObject, address: newClone });
-
-    // const result = await axios
-    //   .post(`${process.env.NEXT_PUBLIC_API_URL}/collections`, createCollectionObject, { withCredentials: true })
-    //   .then((response_: AxiosResponse) => {
-    //     if (response_.status === 201) {
-    //       return response_.data;
-    //     }
-    //   })
-    //   .catch((error_: AxiosError) => {
-    //     console.log('error_.message', error_.message);
-    //     alert(error_.message);
-    //     return null;
-    //   });
-
-    // if (result?.id) {
-    //   alert('Collection created successfully');
-    //   router.push(`/collection/${result.id}`);
-    // }
   };
 
   const turnToCollection = (collectionId_: string) => {

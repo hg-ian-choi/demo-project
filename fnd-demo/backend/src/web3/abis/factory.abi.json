@@ -145,7 +145,7 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "_newClone",
+        "name": "",
         "type": "address"
       }
     ],
@@ -168,7 +168,7 @@
   {
     "inputs": [
       {
-        "internalType": "address payable",
+        "internalType": "address",
         "name": "newCore_",
         "type": "address"
       }
