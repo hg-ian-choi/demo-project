@@ -17,8 +17,10 @@ export class Edition {
   public status?: number;
 
   @ManyToOne(() => User)
-  public owner: User;
+  public owner?: User;
 
-  @ManyToOne(() => Product, (product) => product.editions)
-  public product: Product;
+  @ManyToOne(() => Product, (product) => product.editions, {
+    onUpdate: 'CASCADE',
+  })
+  public product?: Product;
 }

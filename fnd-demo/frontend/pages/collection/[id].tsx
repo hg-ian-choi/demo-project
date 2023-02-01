@@ -119,8 +119,8 @@ export default function CollectionDetail(props: Collection) {
         <Box ml={3}>
           <Typography>Name: </Typography>
           <Typography>Symbol: </Typography>
-          <Typography>Contract address: </Typography>
-          {histories && histories[1] && histories[1].transactionHash && <Typography>Transaction Hash: </Typography>}
+          <Typography>Address: </Typography>
+          {histories && histories[1] && histories[1].transactionHash && <Typography>Txn Hash: </Typography>}
         </Box>
         <Box ml={3}>
           <Typography>{name}</Typography>
@@ -222,7 +222,6 @@ export default function CollectionDetail(props: Collection) {
                     name="edition"
                     type="number"
                     variant="outlined"
-                    defaultValue={1}
                     required
                     value={createProductObject.edition}
                     onChange={(event_: React.ChangeEvent<HTMLInputElement>) => {
@@ -232,7 +231,6 @@ export default function CollectionDetail(props: Collection) {
                   />
                 </Box>
               </Box>
-
               <br />
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <label htmlFor="description">

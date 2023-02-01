@@ -67,12 +67,8 @@ export class CollectionsController {
   private async syncCollection(
     @Param('collection_id') id_: string,
     @Body('address') address_: string,
-    @Body('transactionHash') transactionHash_: string,
+    @Body('transactionHash') txnHash_: string,
   ): Promise<Collection> {
-    return this.collectionsService.syncCollection(
-      id_,
-      address_,
-      transactionHash_,
-    );
+    return this.collectionsService.syncCollection(id_, address_, txnHash_);
   }
 }

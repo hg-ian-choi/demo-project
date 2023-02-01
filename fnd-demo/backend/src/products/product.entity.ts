@@ -23,20 +23,20 @@ export class Product {
   @Column('varchar')
   public description?: string;
 
-  @Column('varchar')
+  @Column('varchar', { nullable: true })
+  public metadata?: string;
+
+  @Column('varchar', { nullable: true })
   public image?: string;
 
   @Column('varchar', { nullable: true })
   public token_id?: string;
 
-  @Column('boolean', { default: false })
-  public show?: boolean;
-
   @ManyToOne(() => User)
-  public creator: User;
+  public creator?: User;
 
   @ManyToOne(() => Collection)
-  public collection: Collection;
+  public collection?: Collection;
 
   @OneToMany(() => Edition, (edition) => edition.product, {
     cascade: true,

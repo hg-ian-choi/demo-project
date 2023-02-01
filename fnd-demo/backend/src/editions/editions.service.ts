@@ -2,8 +2,6 @@
 
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from 'src/products/product.entity';
-import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { Edition } from './edition.entity';
 
@@ -14,11 +12,21 @@ export class EditionsService {
     private readonly editionRepository: Repository<Edition>,
   ) {}
 
-  public async create(owner_: User, product_: Product) {
-    const _edition = this.editionRepository.create({
-      owner: { id: owner_.id },
-      product: { id: product_.id },
-    });
-    return _edition;
+  /**
+   * @description create Edition object
+   * @param user_
+   * @returns Edition
+   */
+  public createEdition(edition_: Edition): Edition {
+    return this._create(edition_);
+  }
+
+  /**
+   * @description create Edition object
+   * @param edition_
+   * @returns Edition
+   */
+  private _create(edition_: Edition): Edition {
+    return this.editionRepository.create(edition_);
   }
 }

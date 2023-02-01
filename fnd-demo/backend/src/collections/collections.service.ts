@@ -62,7 +62,7 @@ export class CollectionsService {
    ************************************ READ ************************************
    ******************************************************************************/
   public getValidCollections(userId: string): Promise<Collection[]> {
-    return this.getCollections(
+    return this._selectMany(
       null,
       {
         owner: { id: userId },
@@ -78,18 +78,16 @@ export class CollectionsService {
     select_?: FindOptionsSelect<Collection>,
     relations_?: FindOptionsRelations<Collection>,
   ): Promise<Collection> {
-    const collection = await this.getCollection(
-      where_,
-      select_,
-      relations_,
-    ).then((collection_: Collection) => {
-      if (collection_?.products) {
-        collection_.products = collection_.products.filter(
-          (product_: Product) => product_.token_id && true,
-        );
-      }
-      return collection_;
-    });
+    const collection = await this._selectOne(where_, select_, relations_).then(
+      (collection_: Collection) => {
+        if (collection_?.products) {
+          collection_.products = collection_.products.filter(
+            (product_: Product) => product_.token_id && true,
+          );
+        }
+        return collection_;
+      },
+    );
     if (collection?.owner?.password) {
       delete collection.owner.password;
     }
@@ -109,10 +107,10 @@ export class CollectionsService {
   public async syncCollection(
     id_: string,
     address_: string,
-    transactionHash_: string,
+    txnHash_: string,
   ): Promise<Collection> {
     try {
-      const _collection = await this.getCollection(
+      const _collection = await this._selectOne(
         { id: id_ },
         { owner: { password: false } },
         {
@@ -125,7 +123,7 @@ export class CollectionsService {
       }
       const _collectionHistory = await this.collectionHistoriesService.create({
         type: CollectionHistoryType.sync,
-        transactionHash: transactionHash_,
+        txn_hash: txnHash_,
         collection: _collection,
       });
       _collection.histories.push(_collectionHistory);
@@ -140,7 +138,7 @@ export class CollectionsService {
    ************************************ CHECK ***********************************
    ******************************************************************************/
   public async checkCollectionSync(userId_: string): Promise<void> {
-    const _nonsyncCollections = await this.getCollections(
+    const _nonsyncCollections = await this._selectMany(
       null,
       {
         owner: { id: userId_ },
@@ -149,7 +147,6 @@ export class CollectionsService {
       null,
       { owner: true },
     );
-    console.log('_nonsyncCollections', _nonsyncCollections);
 
     if (_nonsyncCollections) {
       const contractInstance = await this.web3Service.getContractInstance(
@@ -157,13 +154,7 @@ export class CollectionsService {
         this.configService.get<string>('web3.factory'),
       );
       for await (const _nonsyncCollection of _nonsyncCollections) {
-        console.log('_nonsyncCollection', _nonsyncCollection);
         try {
-          console.log(
-            this.web3Service.get64LengthAddress(
-              _nonsyncCollection.owner.address,
-            ),
-          );
           const _events = await contractInstance
             .getPastEvents('cloneEvent', {
               topics: [
@@ -178,10 +169,7 @@ export class CollectionsService {
             })
             .then((events_: any) => events_)
             .catch(() => null);
-          console.log('_events', _events);
-          return;
           if (_events.length > 0) {
-            console.log(_events);
             const _event = _events[0];
             const _newClone = _event.returnValues.newClone;
             const _transactionHash = _event.transactionHash;
@@ -191,7 +179,7 @@ export class CollectionsService {
               _transactionHash,
             );
           } else {
-            await this.deleteCollection(_nonsyncCollection.id);
+            await this._delete(_nonsyncCollection.id);
           }
         } catch (error_: any) {
           console.log('[getPastEvents error_] => ', error_);
@@ -211,7 +199,7 @@ export class CollectionsService {
    * @param relations
    * @returns Collection[]
    */
-  private getCollections(
+  private _selectMany(
     select_?: FindOptionsSelect<Collection>,
     where_?: FindOptionsWhere<Collection>,
     order_?: FindOptionsOrder<Collection>,
@@ -232,7 +220,7 @@ export class CollectionsService {
    * @param relations
    * @returns Collection
    */
-  private getCollection(
+  private _selectOne(
     where_: FindOptionsWhere<Collection>,
     select_?: FindOptionsSelect<Collection>,
     relations_?: FindOptionsRelations<Collection>,
@@ -248,7 +236,7 @@ export class CollectionsService {
    * @description delete Collection
    * @param collectionId
    */
-  private async deleteCollection(collectionId_: string): Promise<void> {
+  private async _delete(collectionId_: string): Promise<void> {
     await this.collectionRepository.delete({ id: collectionId_ });
   }
 }

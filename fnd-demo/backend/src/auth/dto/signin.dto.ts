@@ -3,10 +3,10 @@
 import { IsEmail, IsString } from 'class-validator';
 import { User } from 'src/users/user.entity';
 
-export class SigninDto extends User {
+export class SigninDto {
   @IsEmail()
-  public email?: string;
+  public email: string;
 
   @IsString()
-  public password?: string;
+  public password: string;
 }

@@ -8,7 +8,7 @@ import { ProductHistoryType } from './enum/product-history.enum';
 @Entity('product_histories')
 export class ProductHistory {
   @PrimaryGeneratedColumn('uuid')
-  public id: string;
+  public id?: string;
 
   @Column('numeric', { default: 0 })
   public price?: number;
@@ -17,14 +17,22 @@ export class ProductHistory {
   public amount?: number;
 
   @Column('numeric')
-  public type: ProductHistoryType;
+  public type?: ProductHistoryType;
+
+  @Column('varchar', { nullable: true })
+  public txn_hash?: string;
+
+  @ManyToOne(() => Product, {
+    onUpdate: 'CASCADE',
+  })
+  public product?: Product;
 
   @ManyToOne(() => User)
-  public seller: User;
+  public operator?: User;
 
-  @ManyToOne(() => User)
-  public buyer: User;
+  @ManyToOne(() => User, { nullable: true })
+  public seller?: User;
 
-  @ManyToOne(() => Product)
-  public product: Product;
+  @ManyToOne(() => User, { nullable: true })
+  public buyer?: User;
 }

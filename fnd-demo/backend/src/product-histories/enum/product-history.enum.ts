@@ -1,12 +1,11 @@
 // histories/histories.enum.ts
 
 export enum ProductHistoryType {
-  mint = 0,
+  create = 0,
   sync = 1,
   list = 2,
-  setPrice = 3,
-  delist = 4,
-  buy = 5,
-  transfer = 6,
+  delist = 3,
+  buy = 4,
+  transfer = 5,
   burn = 9,
 }

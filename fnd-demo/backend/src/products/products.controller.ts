@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Get,
+  ParseIntPipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -48,23 +49,20 @@ export class ProductsController {
     @UploadedFile() file_: Express.Multer.File,
     @GetUser() user_: User,
     @Body('name') name_: string,
-    @Body('edition') edition_: string,
+    @Body('edition', ParseIntPipe) edition_: number,
     @Body('description') description_?: string,
     @Body('collectionId') collectionId_?: string,
   ): Promise<Product> {
-    const _product: CreateProductDto = {
+    const createProductDto: CreateProductDto = {
       name: name_,
       description: description_,
-      token_id: null,
-      creator: { id: user_.id },
-      collection: { id: collectionId_ },
     };
     return this.productsService.createProduct(
       user_,
       file_,
       edition_,
       collectionId_,
-      _product,
+      createProductDto,
     );
   }
 }

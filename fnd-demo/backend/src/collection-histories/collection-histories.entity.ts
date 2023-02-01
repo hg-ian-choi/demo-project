@@ -8,11 +8,11 @@ export class CollectionHistory {
   public id?: string;
 
   @Column('numeric')
-  public type: CollectionHistoryType;
+  public type?: CollectionHistoryType;
 
   @Column('varchar', { nullable: true })
-  public transactionHash?: string;
+  public txn_hash?: string;
 
   @ManyToOne(() => Collection, { onDelete: 'CASCADE' })
-  public collection: Collection;
+  public collection?: Collection;
 }

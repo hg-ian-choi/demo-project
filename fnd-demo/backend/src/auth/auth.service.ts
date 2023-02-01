@@ -40,11 +40,12 @@ export class AuthService {
     }
   }
 
-  public async signIn(_user: User): Promise<string> {
+  public async signIn(user_: User): Promise<string> {
     const paylod: User = {
-      id: _user.id,
-      email: _user.email,
-      username: _user.username,
+      id: user_.id,
+      email: user_.email,
+      username: user_.username,
+      address: user_.address,
     };
 
     return this.jwtService.sign(paylod);

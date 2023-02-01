@@ -27,11 +27,5 @@ export class User {
   public collections?: Collection[];
 
   @OneToMany(() => Product, (product) => product.creator, { cascade: true })
-  public createds?: Product[];
-
-  // @OneToMany(() => Edition, (edition) => edition.owner)
-  // public editions: Edition[];
-
-  // @OneToMany(() => History, (history) => history.buyer)
-  // histories: History[];
+  public created?: Product[];
 }

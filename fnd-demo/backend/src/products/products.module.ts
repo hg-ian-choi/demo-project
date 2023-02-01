@@ -8,6 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'src/common/common.module';
 import { UsersModule } from 'src/users/users.module';
 import { EditionsModule } from 'src/editions/editions.module';
+import { ProductHistoriesModule } from 'src/product-histories/product-histories.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { EditionsModule } from 'src/editions/editions.module';
     CommonModule,
     UsersModule,
     EditionsModule,
+    ProductHistoriesModule,
   ],
   providers: [ProductsService],
   controllers: [ProductsController],

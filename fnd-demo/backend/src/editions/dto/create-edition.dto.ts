@@ -1,12 +1,9 @@
-import { IsString } from 'class-validator';
-import { Product } from 'src/products/product.entity';
-import { User } from 'src/users/user.entity';
+import { IsNumber } from 'class-validator';
 import { Edition } from '../edition.entity';
 
 export class CreateEditionDto extends Edition {
-  @IsString()
-  public owner: User;
+  public price?: number;
 
-  @IsString()
-  public product: Product;
+  @IsNumber()
+  public status?: number;
 }

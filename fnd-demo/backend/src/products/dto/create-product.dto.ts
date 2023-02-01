@@ -1,7 +1,4 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
-import { Collection } from 'src/collections/collection.entity';
-import { Edition } from 'src/editions/edition.entity';
-import { User } from 'src/users/user.entity';
 import { Product } from '../product.entity';
 
 export class CreateProductDto extends Product {
@@ -9,23 +6,18 @@ export class CreateProductDto extends Product {
   public name: string;
 
   @IsString()
+  @IsOptional()
   public description?: string;
 
   @IsString()
+  @IsOptional()
+  public metadata?: string;
+
+  @IsString()
+  @IsOptional()
   public image?: string;
 
-  @IsString()
+  @IsNumber()
   @IsOptional()
   public token_id?: string;
-
-  @IsNumber()
-  public editions?: Edition[];
-
-  @IsString()
-  @IsOptional()
-  public creator: User;
-
-  @IsString()
-  @IsOptional()
-  public collection: Collection;
 }
