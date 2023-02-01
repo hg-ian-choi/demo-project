@@ -9,7 +9,7 @@ import React, { useEffect, useState } from 'react';
 import { Collection } from '../../interfaces/collection.interface';
 import { Product } from '../../interfaces/product.interface';
 import { getAccount, getContractInstance } from '../api/web3';
-import productABI from '../../abis/1155.abi.json';
+import productABI from '../../abis/product.abi.json';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,

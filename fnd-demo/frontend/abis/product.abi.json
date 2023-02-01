@@ -176,6 +176,37 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "creater",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "mintEvent",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -335,16 +366,6 @@
         "internalType": "address",
         "name": "sender_",
         "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "prefix_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "suffix_",
-        "type": "string"
       }
     ],
     "name": "initialize",
@@ -378,6 +399,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "string",
+        "name": "id_",
+        "type": "string"
+      },
       {
         "internalType": "uint256",
         "name": "amount_",

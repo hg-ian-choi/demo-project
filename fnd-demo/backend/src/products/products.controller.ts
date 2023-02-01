@@ -4,7 +4,9 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   ParseIntPipe,
+  Patch,
   Post,
   UploadedFile,
   UseGuards,
@@ -70,5 +72,19 @@ export class ProductsController {
       collectionId_,
       createProductDto,
     );
+  }
+
+  /********************************************************************************
+   ************************************ UPDATE ************************************
+   ********************************************************************************/
+  @UseGuards(JwtAuthGuard)
+  @Patch('/:product_id/sync')
+  private async syncProduct(
+    @GetUser() user_: User,
+    @Param('product_id') id_: string,
+    @Body('tokenId') tokenId_: string,
+    @Body('transactionHash') txnHash_: string,
+  ): Promise<Product> {
+    return this.productsService.syncProduct(id_, tokenId_, txnHash_);
   }
 }

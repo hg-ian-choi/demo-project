@@ -3,6 +3,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CollectionHistoriesModule } from 'src/collection-histories/collection-histories.module';
+import { ProductsModule } from 'src/products/products.module';
 import { UsersModule } from 'src/users/users.module';
 import { Web3Module } from 'src/web3/web3.module';
 import { Collection } from './collection.entity';
@@ -15,6 +16,7 @@ import { CollectionsService } from './collections.service';
     UsersModule,
     CollectionHistoriesModule,
     Web3Module,
+    ProductsModule,
   ],
   controllers: [CollectionsController],
   providers: [CollectionsService],

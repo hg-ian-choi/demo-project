@@ -22,6 +22,7 @@ import { Collection } from './collection.entity';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import factoryABI from '../web3/abis/factory.abi.json';
 import { AbiItem } from '../web3/interfaces/abi.interfaces';
+import { ProductsService } from 'src/products/products.service';
 
 @Injectable()
 export class CollectionsService {
@@ -32,6 +33,7 @@ export class CollectionsService {
     private readonly web3Service: Web3Service,
     private readonly usersService: UsersService,
     private readonly collectionHistoriesService: CollectionHistoriesService,
+    private readonly productsService: ProductsService,
   ) {}
 
   /********************************************************************************
@@ -61,24 +63,22 @@ export class CollectionsService {
   /******************************************************************************
    ************************************ READ ************************************
    ******************************************************************************/
-  public getValidCollections(userId: string): Promise<Collection[]> {
+  public getValidCollections(user_: User): Promise<Collection[]> {
     return this._selectMany(
-      null,
       {
-        owner: { id: userId },
+        owner: { id: user_.id },
         address: Not(IsNull()),
       },
-      null,
       { products: true },
     );
   }
 
   public async getValidCollection(
     where_: FindOptionsWhere<Collection>,
-    select_?: FindOptionsSelect<Collection>,
     relations_?: FindOptionsRelations<Collection>,
+    select_?: FindOptionsSelect<Collection>,
   ): Promise<Collection> {
-    const collection = await this._selectOne(where_, select_, relations_).then(
+    const collection = await this._selectOne(where_, relations_, select_).then(
       (collection_: Collection) => {
         if (collection_?.products) {
           collection_.products = collection_.products.filter(
@@ -112,7 +112,6 @@ export class CollectionsService {
     try {
       const _collection = await this._selectOne(
         { id: id_ },
-        { owner: { password: false } },
         {
           owner: true,
           histories: true,
@@ -137,14 +136,12 @@ export class CollectionsService {
   /******************************************************************************
    ************************************ CHECK ***********************************
    ******************************************************************************/
-  public async checkCollectionSync(userId_: string): Promise<void> {
+  public async checkCollectionsSync(user_: User): Promise<void> {
     const _nonsyncCollections = await this._selectMany(
-      null,
       {
-        owner: { id: userId_ },
+        owner: { id: user_.id },
         address: IsNull(),
       },
-      null,
       { owner: true },
     );
 
@@ -179,13 +176,17 @@ export class CollectionsService {
               _transactionHash,
             );
           } else {
-            await this._delete(_nonsyncCollection.id);
+            await this._delete({ id: _nonsyncCollection.id });
           }
         } catch (error_: any) {
           console.log('[getPastEvents error_] => ', error_);
         }
       }
     }
+  }
+
+  public async checkProductsSync(collectionId_: string): Promise<void> {
+    await this.productsService.checkProductsSync(collectionId_);
   }
 
   /*******************************************************************************************
@@ -200,10 +201,10 @@ export class CollectionsService {
    * @returns Collection[]
    */
   private _selectMany(
-    select_?: FindOptionsSelect<Collection>,
     where_?: FindOptionsWhere<Collection>,
-    order_?: FindOptionsOrder<Collection>,
     relations_?: FindOptionsRelations<Collection>,
+    order_?: FindOptionsOrder<Collection>,
+    select_?: FindOptionsSelect<Collection>,
   ): Promise<Collection[]> {
     return this.collectionRepository.find({
       select: select_,
@@ -222,8 +223,8 @@ export class CollectionsService {
    */
   private _selectOne(
     where_: FindOptionsWhere<Collection>,
-    select_?: FindOptionsSelect<Collection>,
     relations_?: FindOptionsRelations<Collection>,
+    select_?: FindOptionsSelect<Collection>,
   ): Promise<Collection> {
     return this.collectionRepository.findOne({
       select: select_,
@@ -236,7 +237,7 @@ export class CollectionsService {
    * @description delete Collection
    * @param collectionId
    */
-  private async _delete(collectionId_: string): Promise<void> {
-    await this.collectionRepository.delete({ id: collectionId_ });
+  private async _delete(where_: FindOptionsWhere<Collection>): Promise<void> {
+    await this.collectionRepository.delete(where_);
   }
 }

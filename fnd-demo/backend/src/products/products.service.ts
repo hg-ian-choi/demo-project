@@ -13,14 +13,18 @@ import { ProductHistoryType } from 'src/product-histories/enum/product-history.e
 import { ProductHistoriesService } from 'src/product-histories/product-histories.service';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { AbiItem } from 'src/web3/interfaces/abi.interfaces';
+import { Web3Service } from 'src/web3/web3.service';
 import {
   FindOptionsOrder,
   FindOptionsRelations,
   FindOptionsSelect,
   FindOptionsWhere,
+  IsNull,
   Repository,
 } from 'typeorm';
 import { Product } from './product.entity';
+import productABI from '../web3/abis/product.abi.json';
 
 @Injectable()
 export class ProductsService {
@@ -32,6 +36,7 @@ export class ProductsService {
     private readonly usersService: UsersService,
     private readonly editionsService: EditionsService,
     private readonly productHistoriesService: ProductHistoriesService,
+    private readonly web3Service: Web3Service,
   ) {}
 
   /******************************************************************************
@@ -132,6 +137,99 @@ export class ProductsService {
     return product;
   }
 
+  /******************************************************************************
+   ************************************ UPDATE **********************************
+   ******************************************************************************/
+  /**
+   * @description sync Product
+   * @param productId
+   * @param tokenId
+   * @param transactionHash
+   * @returns Product
+   */
+  public async syncProduct(
+    productId_: string,
+    tokenId_: string,
+    txnHash_: string,
+  ): Promise<Product> {
+    try {
+      const product = await this._selectOne(
+        { id: productId_ },
+        {
+          histories: true,
+        },
+      );
+      if (!product.token_id) {
+        product.token_id = tokenId_;
+      }
+      const productHistory = await this.productHistoriesService.create({
+        type: ProductHistoryType.sync,
+        txn_hash: txnHash_,
+        product: { id: product.id },
+        operator: { id: product.creator.id },
+      });
+      product.histories.push(productHistory);
+      return this._insert(product);
+    } catch (error_: any) {
+      console.log('[collections.service.ts / syncCollection] => ', error_);
+      return null;
+    }
+  }
+
+  /******************************************************************************
+   ************************************ CHECK ***********************************
+   ******************************************************************************/
+
+  /**
+   * @description check Products sync
+   * @param user
+   * @param collectionId
+   */
+  public async checkProductsSync(collectionId_: string): Promise<void> {
+    const nonsyncProducts = await this._selectMany(
+      {
+        collection: { id: collectionId_ },
+        token_id: IsNull(),
+      },
+      { collection: true },
+    );
+
+    if (nonsyncProducts) {
+      for await (const nonsyncProduct of nonsyncProducts) {
+        const contractInstance = await this.web3Service.getContractInstance(
+          productABI as AbiItem[],
+          nonsyncProduct.collection.address,
+        );
+        try {
+          const events = await contractInstance
+            .getPastEvents('mintEvent', {
+              topics: [
+                ,
+                this.web3Service.sha3(nonsyncProduct.id),
+                this.web3Service.get64LengthAddress(
+                  nonsyncProduct.creator.address,
+                ),
+              ],
+              fromBlock: 0,
+              toBlock: 'latest',
+            })
+            .then((events_: any) => events_)
+            .catch(() => null);
+          if (events.length > 0) {
+            const event = events[0];
+            const tokenId = event.returnValues.tokenId;
+            const transactionHash = event.transactionHash;
+            await this.syncProduct(nonsyncProduct.id, tokenId, transactionHash);
+          } else {
+            await this._delete({ id: nonsyncProduct.id });
+          }
+        } catch (error_: any) {
+          console.log('[getPastEvents error_] => ', error_);
+        }
+      }
+    }
+  }
+
   /*********************************************************************************
    ************************************ PRIVATE ************************************
    *********************************************************************************/
@@ -177,5 +275,13 @@ export class ProductsService {
       relations: relations_,
       select: select_,
     });
+  }
+
+  /**
+   * @description delete Product
+   * @param product
+   */
+  private async _delete(where_: FindOptionsWhere<Product>): Promise<void> {
+    await this.productRepository.delete(where_);
   }
 }

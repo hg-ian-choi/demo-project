@@ -9,6 +9,7 @@ import { CommonModule } from 'src/common/common.module';
 import { UsersModule } from 'src/users/users.module';
 import { EditionsModule } from 'src/editions/editions.module';
 import { ProductHistoriesModule } from 'src/product-histories/product-histories.module';
+import { Web3Module } from 'src/web3/web3.module';
 
 @Module({
   imports: [
@@ -17,8 +18,10 @@ import { ProductHistoriesModule } from 'src/product-histories/product-histories.
     UsersModule,
     EditionsModule,
     ProductHistoriesModule,
+    Web3Module,
   ],
   providers: [ProductsService],
   controllers: [ProductsController],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

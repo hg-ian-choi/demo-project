@@ -129,16 +129,6 @@
         "internalType": "string",
         "name": "symbol_",
         "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "prefix_",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "suffix_",
-        "type": "string"
       }
     ],
     "name": "newClone",

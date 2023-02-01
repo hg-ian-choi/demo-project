@@ -20,7 +20,7 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
 
     mapping(uint256 => string) tokenURI;
 
-    event mintEvent(uint256 indexed tokenId, uint256 amount);
+    event mintEvent(string indexed id, address indexed creater, uint256 indexed tokenId, uint256 amount);
 
     constructor() {
         _disableInitializers();
@@ -37,13 +37,13 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         __ERC1155Supply_init();
     }
 
-    function mint(uint256 amount_, string memory uri_, bytes memory data_) public onlyOwner returns (uint256) {
+    function mint(string memory id_, uint256 amount_, string memory uri_, bytes memory data_) public onlyOwner returns (uint256) {
         tokenId.increment();
         uint256 _tokenId = getCurrentTokenId();
         tokenURI[_tokenId] = uri_;
-        _mint(_msgSender(), _tokenId, amount_, data_);
+        _mint(_sender(), _tokenId, amount_, data_);
         setApprovalForAll(core, true);
-        emit mintEvent(_tokenId, amount_);
+        emit mintEvent(id_, _sender(), _tokenId, amount_);
         return _tokenId;
     }
 

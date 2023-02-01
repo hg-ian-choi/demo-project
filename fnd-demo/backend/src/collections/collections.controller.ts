@@ -44,17 +44,18 @@ export class CollectionsController {
   private async getUserCollections(
     @GetUser() user_: User,
   ): Promise<Collection[]> {
-    await this.collectionsService.checkCollectionSync(user_.id);
-    return this.collectionsService.getValidCollections(user_.id);
+    await this.collectionsService.checkCollectionsSync(user_);
+    return this.collectionsService.getValidCollections(user_);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/:collection_id')
   private async getCollection(
     @Param('collection_id') collectionId_: string,
   ): Promise<Collection> {
+    await this.collectionsService.checkProductsSync(collectionId_);
     return this.collectionsService.getValidCollection(
       { id: collectionId_ },
-      { owner: { password: false } },
       { owner: true, histories: true, products: { editions: true } },
     );
   }
