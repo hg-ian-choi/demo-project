@@ -66,10 +66,14 @@ export class CollectionsController {
   @UseGuards(JwtAuthGuard)
   @Patch('/:collection_id/sync')
   private async syncCollection(
-    @Param('collection_id') id_: string,
+    @Param('collection_id') collectionId_: string,
     @Body('address') address_: string,
     @Body('transactionHash') txnHash_: string,
   ): Promise<Collection> {
-    return this.collectionsService.syncCollection(id_, address_, txnHash_);
+    return this.collectionsService.syncCollection(
+      collectionId_,
+      address_,
+      txnHash_,
+    );
   }
 }

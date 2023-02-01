@@ -42,7 +42,15 @@ export class ProductsService {
   /******************************************************************************
    ************************************ READ ************************************
    ******************************************************************************/
-  async getProducts(
+  /**
+   * @description get Product List
+   * @param where
+   * @param relations
+   * @param order
+   * @param select
+   * @returns Product[]
+   */
+  public async getProducts(
     where_?: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
     order_?: FindOptionsOrder<Product>,
@@ -51,7 +59,14 @@ export class ProductsService {
     return this._selectMany(where_, relations_, order_, select_);
   }
 
-  async getProduct(
+  /**
+   * @description get Product
+   * @param where
+   * @param relations
+   * @param select
+   * @returns Product
+   */
+  public async getProduct(
     where_: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
     select_?: FindOptionsSelect<Product>,
@@ -62,7 +77,17 @@ export class ProductsService {
   /********************************************************************************
    ************************************ CREATE ************************************
    ********************************************************************************/
-  async createProduct(
+  /**
+   * @visibility public
+   * @description create Product Object
+   * @param user
+   * @param file
+   * @param edition
+   * @param collectionId
+   * @param createProductDto
+   * @returns Product
+   */
+  public async createProduct(
     user_: User,
     file_: Express.Multer.File,
     edition_: number,
@@ -141,6 +166,7 @@ export class ProductsService {
    ************************************ UPDATE **********************************
    ******************************************************************************/
   /**
+   * @visibility public
    * @description sync Product
    * @param productId
    * @param tokenId
@@ -175,10 +201,6 @@ export class ProductsService {
       return null;
     }
   }
-
-  /******************************************************************************
-   ************************************ CHECK ***********************************
-   ******************************************************************************/
 
   /**
    * @description check Products sync
@@ -234,7 +256,8 @@ export class ProductsService {
    ************************************ PRIVATE ************************************
    *********************************************************************************/
   /**
-   * @description create Product bject
+   * @visibility private
+   * @description create Product Object
    * @param product
    * @returns Product
    */
@@ -243,7 +266,8 @@ export class ProductsService {
   }
 
   /**
-   * @description insert Product into DB
+   * @visibility private
+   * @description insert Product
    * @param product
    * @returns Product
    */
@@ -251,6 +275,15 @@ export class ProductsService {
     return this.productRepository.save(product_);
   }
 
+  /**
+   * @visibility private
+   * @description select Product list
+   * @param where
+   * @param relations
+   * @param order
+   * @param selelt
+   * @returns Product[]
+   */
   private async _selectMany(
     where_?: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
@@ -265,6 +298,14 @@ export class ProductsService {
     });
   }
 
+  /**
+   * @visibility private
+   * @description select Product
+   * @param where
+   * @param relations
+   * @param select
+   * @returns Product
+   */
   private async _selectOne(
     where_: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
@@ -278,6 +319,7 @@ export class ProductsService {
   }
 
   /**
+   * @visibility private
    * @description delete Product
    * @param product
    */

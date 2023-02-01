@@ -54,8 +54,8 @@ export class ProductsController {
   @UseInterceptors(FileInterceptor('image'))
   @Post('/')
   private async createProduct(
-    @UploadedFile() file_: Express.Multer.File,
     @GetUser() user_: User,
+    @UploadedFile() file_: Express.Multer.File,
     @Body('name') name_: string,
     @Body('edition', ParseIntPipe) edition_: number,
     @Body('description') description_?: string,

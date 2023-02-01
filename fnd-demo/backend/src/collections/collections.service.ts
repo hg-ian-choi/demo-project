@@ -193,7 +193,8 @@ export class CollectionsService {
    ************************************ private functions ************************************
    *******************************************************************************************/
   /**
-   * @description find Collections
+   * @visibility private
+   * @description select Collection list
    * @param select
    * @param where
    * @param order
@@ -215,7 +216,8 @@ export class CollectionsService {
   }
 
   /**
-   * @description find Collection
+   * @visibility private
+   * @description select Collection
    * @param where
    * @param select
    * @param relations
@@ -234,6 +236,7 @@ export class CollectionsService {
   }
 
   /**
+   * @visibility private
    * @description delete Collection
    * @param collectionId
    */
