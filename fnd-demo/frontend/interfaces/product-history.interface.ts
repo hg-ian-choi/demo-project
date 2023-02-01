@@ -9,6 +9,7 @@ export interface ProductHistory {
   price?: number | 0;
   amount?: number | 1;
   type: ProductHistoryType;
+  created_at: string;
   seller: User;
   buyer: User;
   product: Product;

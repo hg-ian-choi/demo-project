@@ -26,17 +26,11 @@ contract Factory {
         owner = _msgSender();
     }
 
-    function newClone(
-        string memory id_,
-        string memory name_,
-        string memory symbol_,
-        string memory prefix_,
-        string memory suffix_
-    ) external returns (address) {
+    function newClone(string memory id_, string memory name_, string memory symbol_) external returns (address) {
         require(!ifIdExist[id_], "Id already exist");
         address _newClone = origin.cloneDeterministic(_genSalt(_msgSender()));
 
-        IFactory(_newClone).initialize(name_, symbol_, core, _msgSender(), prefix_, suffix_);
+        IFactory(_newClone).initialize(name_, symbol_, core, _msgSender());
 
         contractToWallet[_newClone] = _msgSender();
         walletToContractArray[_msgSender()].push(_newClone);

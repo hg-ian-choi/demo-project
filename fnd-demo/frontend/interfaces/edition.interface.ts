@@ -10,4 +10,5 @@ export interface Edition {
   status: number | Status.Soldout;
   owner: User;
   product: Product;
+  created_at: string;
 }

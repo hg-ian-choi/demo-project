@@ -16,6 +16,7 @@ import { UsersService } from 'src/users/users.service';
 import {
   FindOptionsOrder,
   FindOptionsRelations,
+  FindOptionsSelect,
   FindOptionsWhere,
   Repository,
 } from 'typeorm';
@@ -38,14 +39,19 @@ export class ProductsService {
    ******************************************************************************/
   async getProducts(
     where_?: FindOptionsWhere<Product>,
-    order_?: FindOptionsOrder<Product>,
     relations_?: FindOptionsRelations<Product>,
+    order_?: FindOptionsOrder<Product>,
+    select_?: FindOptionsSelect<Product>,
   ): Promise<Product[]> {
-    return this.productRepository.find({
-      where: { ...where_ },
-      order: order_,
-      relations: relations_,
-    });
+    return this._selectMany(where_, relations_, order_, select_);
+  }
+
+  async getProduct(
+    where_: FindOptionsWhere<Product>,
+    relations_?: FindOptionsRelations<Product>,
+    select_?: FindOptionsSelect<Product>,
+  ): Promise<Product> {
+    return this._selectOne(where_, relations_, select_);
   }
 
   /********************************************************************************
@@ -89,7 +95,7 @@ export class ProductsService {
     };
     const metadataBuffer = Buffer.from(JSON.stringify(metadata));
     const metadataPath = await this.commonService.awsUploadBuffer(
-      `${user.username}/${user.collections[0].name}/metadata`,
+      `${user.username}/${user.collections[0].symbol}/metadata`,
       metadataBuffer,
     );
     const fullMetadataPath = this.configService
@@ -145,5 +151,31 @@ export class ProductsService {
    */
   private async _insert(product_: Product): Promise<Product> {
     return this.productRepository.save(product_);
+  }
+
+  private async _selectMany(
+    where_?: FindOptionsWhere<Product>,
+    relations_?: FindOptionsRelations<Product>,
+    order_?: FindOptionsOrder<Product>,
+    selelt_?: FindOptionsSelect<Product>,
+  ): Promise<Product[]> {
+    return this.productRepository.find({
+      where: where_,
+      relations: relations_,
+      order: order_,
+      select: selelt_,
+    });
+  }
+
+  private async _selectOne(
+    where_: FindOptionsWhere<Product>,
+    relations_?: FindOptionsRelations<Product>,
+    select_?: FindOptionsSelect<Product>,
+  ): Promise<Product> {
+    return this.productRepository.findOne({
+      where: where_,
+      relations: relations_,
+      select: select_,
+    });
   }
 }

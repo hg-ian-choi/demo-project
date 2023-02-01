@@ -2,7 +2,13 @@
 
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ProductHistoryType } from './enum/product-history.enum';
 
 @Entity('product_histories')
@@ -35,4 +41,7 @@ export class ProductHistory {
 
   @ManyToOne(() => User, { nullable: true })
   public buyer?: User;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  public created_at?: Date;
 }

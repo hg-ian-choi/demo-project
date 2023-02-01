@@ -2,7 +2,13 @@
 
 import { Collection } from 'src/collections/collection.entity';
 import { Product } from 'src/products/product.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -28,4 +34,7 @@ export class User {
 
   @OneToMany(() => Product, (product) => product.creator, { cascade: true })
   public created?: Product[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  public created_at?: Date;
 }

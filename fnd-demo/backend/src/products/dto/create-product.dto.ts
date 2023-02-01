@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Product } from '../product.entity';
 
 export class CreateProductDto extends Product {
@@ -8,16 +8,4 @@ export class CreateProductDto extends Product {
   @IsString()
   @IsOptional()
   public description?: string;
-
-  @IsString()
-  @IsOptional()
-  public metadata?: string;
-
-  @IsString()
-  @IsOptional()
-  public image?: string;
-
-  @IsNumber()
-  @IsOptional()
-  public token_id?: string;
 }

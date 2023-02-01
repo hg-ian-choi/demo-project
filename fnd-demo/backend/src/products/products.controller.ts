@@ -18,6 +18,8 @@ import {
   FindOptionsOrder,
   FindOptionsRelations,
   FindOptionsWhere,
+  IsNull,
+  Not,
 } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { Product } from './product.entity';
@@ -36,7 +38,11 @@ export class ProductsController {
     @Body('order') order_?: FindOptionsOrder<Product>,
     @Body('relations') relations_?: FindOptionsRelations<Product>,
   ): Promise<Product[]> {
-    return this.productsService.getProducts(where_, order_, relations_);
+    return this.getProducts(
+      { ...where_, token_id: Not(IsNull()) },
+      order_,
+      relations_,
+    );
   }
 
   /********************************************************************************

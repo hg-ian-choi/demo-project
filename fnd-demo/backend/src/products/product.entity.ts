@@ -6,6 +6,7 @@ import { ProductHistory } from 'src/product-histories/product-history.entity';
 import { User } from 'src/users/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -20,7 +21,7 @@ export class Product {
   @Column('varchar')
   public name?: string;
 
-  @Column('varchar')
+  @Column('varchar', { nullable: true })
   public description?: string;
 
   @Column('varchar', { nullable: true })
@@ -47,4 +48,7 @@ export class Product {
     cascade: true,
   })
   public histories?: ProductHistory[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  public created_at?: Date;
 }

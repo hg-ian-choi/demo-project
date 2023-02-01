@@ -2,8 +2,14 @@
 
 import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Status } from './enum/editions.enum';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Status } from './enum/status.enum';
 
 @Entity('editions')
 export class Edition {
@@ -23,4 +29,7 @@ export class Edition {
     onUpdate: 'CASCADE',
   })
   public product?: Product;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  public created_at?: Date;
 }

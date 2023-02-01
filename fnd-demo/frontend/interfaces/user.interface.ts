@@ -8,6 +8,7 @@ export interface User {
   email: string;
   username: string;
   address?: string;
+  created_at: string;
   collections?: Collection[];
   products?: Product[];
 }

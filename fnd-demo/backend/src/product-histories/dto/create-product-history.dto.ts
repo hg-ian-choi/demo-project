@@ -14,8 +14,7 @@ export class CreateProductHistoryDto extends ProductHistory {
   public amount?: number;
 
   @IsNumber()
-  @IsOptional()
-  public type?: ProductHistoryType;
+  public type: ProductHistoryType;
 
   @IsString()
   @IsOptional()

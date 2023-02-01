@@ -16,29 +16,20 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
 
     string public name;
     string public symbol;
-    string prefix;
-    string suffix;
     address core;
 
     mapping(uint256 => string) tokenURI;
+
+    event mintEvent(uint256 indexed tokenId, uint256 amount);
 
     constructor() {
         _disableInitializers();
     }
 
-    function initialize(
-        string memory name_,
-        string memory symbol_,
-        address core_,
-        address sender_,
-        string memory prefix_,
-        string memory suffix_
-    ) public initializer {
+    function initialize(string memory name_, string memory symbol_, address core_, address sender_) public initializer {
         name = name_;
         symbol = symbol_;
         core = core_;
-        prefix = prefix_;
-        suffix = suffix_;
         __ERC1155_init("");
         __Ownable_init(sender_);
         __Pausable_init();
@@ -52,6 +43,7 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         tokenURI[_tokenId] = uri_;
         _mint(_msgSender(), _tokenId, amount_, data_);
         setApprovalForAll(core, true);
+        emit mintEvent(_tokenId, amount_);
         return _tokenId;
     }
 
@@ -75,7 +67,7 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
     }
 
     function uri(uint256 id_) public view override returns (string memory) {
-        return string.concat(prefix, tokenURI[id_], suffix);
+        return tokenURI[id_];
     }
 
     function getCurrentTokenId() public view returns (uint256) {

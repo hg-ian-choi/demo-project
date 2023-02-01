@@ -4,8 +4,7 @@ import { CollectionHistoryType } from '../enum/collection-history.enum';
 
 export class CreateCollectionHistoryDto extends CollectionHistory {
   @IsNumber()
-  @IsOptional()
-  public type?: CollectionHistoryType;
+  public type: CollectionHistoryType;
 
   @IsString()
   @IsOptional()

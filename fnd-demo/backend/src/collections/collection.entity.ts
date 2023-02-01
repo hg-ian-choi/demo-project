@@ -5,13 +5,16 @@ import { Product } from 'src/products/product.entity';
 import { User } from 'src/users/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('collections')
+@Index(['symbol', 'owner'], { unique: true })
 export class Collection {
   @PrimaryGeneratedColumn('uuid')
   public id: string;
@@ -37,4 +40,7 @@ export class Collection {
     { onDelete: 'CASCADE' },
   )
   public histories?: CollectionHistory[];
+
+  @CreateDateColumn({ type: 'timestamp' })
+  public created_at?: Date;
 }

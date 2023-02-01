@@ -9,6 +9,7 @@ export interface Collection {
   name: string;
   symbol: string;
   address?: string;
+  created_at: string;
   user: User;
   products?: Product[];
   histories?: CollectionHistory[];

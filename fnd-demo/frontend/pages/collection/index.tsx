@@ -107,13 +107,7 @@ export default function Collections(props: any) {
       const contractInstance: any = await getContractInstance(factoryABI, `${process.env.NEXT_PUBLIC_FACTORY}`);
 
       const _newClone = await contractInstance.methods
-        .newClone(
-          _collection.id,
-          createCollectionObject.name,
-          createCollectionObject.symbol,
-          `${process.env.NEXT_PUBLIC_S3_PATH}/demo/${_collection.user?.username}/metadata/`,
-          '.json'
-        )
+        .newClone(_collection.id, createCollectionObject.name, createCollectionObject.symbol)
         .send({ from: account })
         .then((result_: any) => {
           console.log('result_', result_);

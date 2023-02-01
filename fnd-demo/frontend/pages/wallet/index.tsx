@@ -1,4 +1,4 @@
-import { Box, Button, Container, Input, TextField } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Input, TextField } from '@mui/material';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { fromWei, getAccount, getContractInstance, toWei } from '../api/web3';
 import fundABI from '../../abis/fund.abi.json';
@@ -15,6 +15,7 @@ const instance = axios.create({
 
 export default function Wallet() {
   const router = useRouter();
+  const [progress, setProgress] = useState(false);
   const [balance, setBalance] = useState('0');
   const [deposit, setDeposit] = useState('0.01');
   const [withdraw, setWithdraw] = useState('0.01');
@@ -84,6 +85,7 @@ export default function Wallet() {
       return;
     }
 
+    setProgress(true);
     const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_CORE}`);
     await contractInstance.methods
       .deposit()
@@ -97,6 +99,7 @@ export default function Wallet() {
         alert('Fail to deposit');
         console.log('error_', error_);
       });
+    setProgress(false);
   };
 
   const onWithdrawClick = async () => {
@@ -114,6 +117,7 @@ export default function Wallet() {
       return;
     }
 
+    setProgress(true);
     const contractInstance: any = await getContractInstance(fundABI, `${process.env.NEXT_PUBLIC_CORE}`);
     await contractInstance.methods
       .withdraw(toWei(withdraw))
@@ -127,29 +131,38 @@ export default function Wallet() {
         alert('Fail to withdraw');
         console.log('error_', error_);
       });
+    setProgress(false);
   };
 
   return (
     <Container>
-      <Box mt={10} display={'flex'} flexDirection={'column'} alignItems={'center'}>
-        {balance === 'N/A' && (
-          <Box color={'red'} mb={10}>
-            Unverified Wallet address
+      {progress ? (
+        <Box width={'100%'} height={'700px'} display={'flex'} justifyContent="center" alignItems={'center'}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Container>
+          <Box mt={10} display={'flex'} flexDirection={'column'} alignItems={'center'}>
+            {balance === 'N/A' && (
+              <Box color={'red'} mb={10}>
+                Unverified Wallet address
+              </Box>
+            )}
+            <Box display={'flex'} justifyContent={'space-between'} minWidth={300}>
+              <Box>Balance:</Box>
+              <Box>{balance} Eth</Box>
+            </Box>
+            <Box mt={3} display={'flex'} justifyContent={'space-between'} minWidth={300}>
+              <TextField value={deposit} onChange={onDepositChange} />
+              <Button onClick={onDepositClick}>deposit</Button>
+            </Box>
+            <Box mt={3} display={'flex'} justifyContent={'space-between'} minWidth={300}>
+              <TextField value={withdraw} onChange={onWithdrawChange} />
+              <Button onClick={onWithdrawClick}>withdraw</Button>
+            </Box>
           </Box>
-        )}
-        <Box display={'flex'} justifyContent={'space-between'} minWidth={300}>
-          <Box>Balance:</Box>
-          <Box>{balance} Eth</Box>
-        </Box>
-        <Box mt={3} display={'flex'} justifyContent={'space-between'} minWidth={300}>
-          <TextField value={deposit} onChange={onDepositChange} />
-          <Button onClick={onDepositClick}>deposit</Button>
-        </Box>
-        <Box mt={3} display={'flex'} justifyContent={'space-between'} minWidth={300}>
-          <TextField value={withdraw} onChange={onWithdrawChange} />
-          <Button onClick={onWithdrawClick}>withdraw</Button>
-        </Box>
-      </Box>
+        </Container>
+      )}
     </Container>
   );
 }

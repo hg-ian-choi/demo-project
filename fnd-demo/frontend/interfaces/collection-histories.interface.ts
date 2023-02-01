@@ -4,6 +4,7 @@ import { Collection } from './collection.interface';
 export interface CollectionHistory {
   id: string;
   type: CollectionHistoryType;
-  collection: Collection;
   transactionHash?: string;
+  created_at: string;
+  collection: Collection;
 }
