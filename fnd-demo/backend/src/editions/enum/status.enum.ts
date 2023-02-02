@@ -1,4 +1,4 @@
-// editions/editions.enum.ts
+// editions/enum/status.enum.ts
 
 export enum Status {
   Soldout = 0,

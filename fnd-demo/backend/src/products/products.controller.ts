@@ -47,6 +47,16 @@ export class ProductsController {
     );
   }
 
+  @Get('/:product_id')
+  private async getProduct(
+    @Param('product_id') productId_: string,
+  ): Promise<Product> {
+    return this.productsService.getProduct(
+      { id: productId_ },
+      { collection: true, creator: true, editions: { owner: true } },
+    );
+  }
+
   /********************************************************************************
    ************************************ CREATE ************************************
    ********************************************************************************/

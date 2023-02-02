@@ -118,7 +118,7 @@ export class ProductsService {
 
     const metadata = {
       name: createProductDto_.name,
-      describe: createProductDto_.description,
+      description: createProductDto_.description,
       image: fullImagePath,
       edition: edition_,
       creator: user_.address,
@@ -159,7 +159,7 @@ export class ProductsService {
     productObject.histories.push(history);
 
     const product = await this._insert(productObject);
-    return product;
+    return this.getProduct({ id: product.id }, { collection: true });
   }
 
   /******************************************************************************
@@ -183,6 +183,7 @@ export class ProductsService {
         { id: productId_ },
         {
           histories: true,
+          creator: true,
         },
       );
       if (!product.token_id) {
@@ -213,7 +214,7 @@ export class ProductsService {
         collection: { id: collectionId_ },
         token_id: IsNull(),
       },
-      { collection: true },
+      { collection: true, creator: true },
     );
 
     if (nonsyncProducts) {
@@ -236,7 +237,7 @@ export class ProductsService {
               toBlock: 'latest',
             })
             .then((events_: any) => events_)
-            .catch(() => null);
+            .catch(() => []);
           if (events.length > 0) {
             const event = events[0];
             const tokenId = event.returnValues.tokenId;

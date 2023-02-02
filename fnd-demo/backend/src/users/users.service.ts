@@ -42,7 +42,7 @@ export class UsersService {
       this.configService.get<string>('signUpMessage'),
       sign_,
     );
-    if (signer.toLowerCase() === user_.address) {
+    if (signer.toLowerCase() === user_.address.toLowerCase()) {
       const user = this.usersRepository.create({
         ...user_,
         username: username,

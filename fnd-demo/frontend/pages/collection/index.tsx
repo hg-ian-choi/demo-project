@@ -14,11 +14,11 @@ const instance = axios.create({
   withCredentials: true,
 });
 
-export async function getServerSideProps(context: any) {
+export async function getServerSideProps(context_: any) {
   let collections: any = [];
-  if (context.req.headers.cookie) {
+  if (context_.req.headers.cookie) {
     collections = await instance
-      .get('/collections/user', { headers: { Cookie: context.req.headers.cookie } })
+      .get('/collections/user', { headers: { Cookie: context_.req.headers.cookie } })
       .then((response_: AxiosResponse) => {
         return response_.data;
       })
@@ -110,7 +110,6 @@ export default function Collections(props: any) {
         .newClone(_collection.id, createCollectionObject.name, createCollectionObject.symbol)
         .send({ from: account })
         .then((result_: any) => {
-          console.log('result_', result_);
           return {
             transactionHash: result_.transactionHash,
             address: result_.events.cloneEvent.returnValues.newClone,
@@ -145,7 +144,6 @@ export default function Collections(props: any) {
       await instance
         .get(`/collections/user`)
         .then((response_: AxiosResponse) => {
-          console.log(response_.status);
           if (response_.status === 200) {
             setCollectionsState(response_.data);
             setStep(0);
@@ -159,8 +157,8 @@ export default function Collections(props: any) {
     }
   };
 
-  const turnToCollection = (collectionId_: string) => {
-    router.push(`/collection/${collectionId_}`);
+  const turnToProduct = (productId_: string) => {
+    router.push(`/collection/${productId_}`);
   };
 
   return (
@@ -179,7 +177,7 @@ export default function Collections(props: any) {
                     <Grid item xs={3} key={`collection_${index_}`} style={{ border: 'solid 1px black', cursor: 'pointer' }}>
                       <Card
                         onClick={() => {
-                          turnToCollection(value_.id);
+                          turnToProduct(value_.id);
                         }}
                       >
                         <CardContent>

@@ -10,6 +10,7 @@ import { Collection } from '../../interfaces/collection.interface';
 import { Product } from '../../interfaces/product.interface';
 import { getAccount, getContractInstance } from '../api/web3';
 import productABI from '../../abis/product.abi.json';
+import { ServerSideResponse } from '../../interfaces/serverside-response.interface';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -17,30 +18,34 @@ const instance = axios.create({
 });
 
 export async function getServerSideProps(context_: any) {
-  let collectionObject: Collection = {} as Collection;
+  let collectionObject: ServerSideResponse<Collection> = {};
 
-  if (context_.params?.id) {
+  if (context_.params?.id && context_.req.headers.cookie) {
     collectionObject = await instance
-      .get(`/collections/${context_.params.id}`)
+      .get(`/collections/${context_.params.id}`, { headers: { Cookie: context_.req.headers.cookie } })
       .then((response_: AxiosResponse) => {
         if (response_.status === 200) {
-          return response_.data;
+          return { data: response_.data };
         }
+        return {};
       })
       .catch((error_: AxiosError) => {
-        console.log('error_', error_);
-        return {} as Collection;
+        console.log(error_);
+        if (error_.response?.status === 401) {
+          return { error: 401 };
+        }
+        return { error: 402 };
       });
   }
   return { props: collectionObject };
 }
 
-export default function CollectionDetail(props: Collection) {
-  const { id, name, symbol, address, products, histories } = props;
+export default function CollectionDetail(props: ServerSideResponse<Collection>) {
+  const { data, error } = props;
 
   const router = useRouter();
 
-  const [productsState, setProductsState] = useState(products);
+  const [productsState, setProductsState] = useState(data?.products);
   const [progress, setProgress] = useState(false);
   const [step, setStep] = useState(0);
   const [createProductObject, setCreateProductObject] = useState({ name: '', description: '', edition: 1 });
@@ -48,10 +53,10 @@ export default function CollectionDetail(props: Collection) {
   const [createProductWarning, setCreateProductWarning] = useState({ name: '', image: '', edition: '' });
 
   useEffect(() => {
-    if (!id) {
-      router.push('/collection');
+    if (error === 401) {
+      router.push('/signin');
     }
-  }, [id, router]);
+  }, []);
 
   const onTextChange = (event_: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (event_.target.name === 'name') {
@@ -94,83 +99,90 @@ export default function CollectionDetail(props: Collection) {
       return;
     }
 
-    const _formData = new FormData();
-    _formData.append('image', imageFile);
-    _formData.append('name', createProductObject.name);
-    _formData.append('collectionId', id);
-    _formData.append('edition', createProductObject.edition.toString());
-    if (createProductObject.description) {
-      _formData.append('description', createProductObject.description);
-    }
+    if (data?.id) {
+      setProgress(true);
+      const _formData = new FormData();
+      _formData.append('image', imageFile);
+      _formData.append('name', createProductObject.name);
+      _formData.append('collectionId', data.id);
+      _formData.append('edition', createProductObject.edition.toString());
+      if (createProductObject.description) {
+        _formData.append('description', createProductObject.description);
+      }
 
-    const _product: Product = await instance
-      .post('/products', _formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-      .then((response_: AxiosResponse) => {
-        if (response_.status === 201) {
-          return response_.data;
-        }
-        return null;
-      })
-      .catch((error_: AxiosError) => {
-        console.log('error_', error_);
-        return null;
-      });
-
-    if (_product && _product.collection?.address && _product.metadata) {
-      const _account = await getAccount();
-      const _contractInstance: any = await getContractInstance(productABI, _product.collection?.address);
-
-      const _newProduct = await _contractInstance.methods
-        .mint(createProductObject.edition, _product.metadata)
-        .send({ from: _account })
-        .then((result_: any) => {
-          console.log('result_', result_);
-          return {
-            transactionHash: result_.transactionHash,
-            address: result_.events.mintEvent.returnValues.tokenId,
-          };
+      const _product: Product = await instance
+        .post('/products', _formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then((response_: AxiosResponse) => {
+          if (response_.status === 201) {
+            return response_.data;
+          }
+          return null;
         })
-        .catch((error_: any) => {
-          console.log('error_', error_.message);
-          alert(error_.message);
+        .catch((error_: AxiosError) => {
+          console.log('error_', error_);
           return null;
         });
 
-      if (_newProduct && _newProduct.transactionHash && _newProduct.tokenId) {
-        await instance
-          .patch(`${process.env.NEXT_PUBLIC_API_URL}/products/${_product.id}/sync`, {
-            tokenId: _newProduct.tokenId,
-            transactionHash: _newProduct.transactionHash,
+      if (_product && _product.collection?.address && _product.metadata) {
+        const _account = await getAccount();
+        const _contractInstance: any = await getContractInstance(productABI, _product.collection?.address);
+
+        const _newProduct = await _contractInstance.methods
+          .mint(_product.id, createProductObject.edition, _product.metadata, '0x00')
+          .send({ from: _account })
+          .then((result_: any) => {
+            return {
+              transactionHash: result_.transactionHash,
+              tokenId: result_.events.mintEvent.returnValues.tokenId,
+            };
           })
+          .catch((error_: any) => {
+            console.log('error_', error_.message);
+            alert(error_.message);
+            return null;
+          });
+
+        if (_newProduct && _newProduct.transactionHash && _newProduct.tokenId) {
+          await instance
+            .patch(`${process.env.NEXT_PUBLIC_API_URL}/products/${_product.id}/sync`, {
+              tokenId: _newProduct.tokenId,
+              transactionHash: _newProduct.transactionHash,
+            })
+            .then((response_: AxiosResponse) => {
+              if (response_.status === 200) {
+                return response_.data;
+              }
+            })
+            .catch((error_: AxiosError) => {
+              if (error_.code === '401') {
+                alert('Please sign in');
+              }
+              console.log('error_', error_);
+              return null;
+            });
+        }
+
+        await instance
+          .get(`/collections/${data?.id}`)
           .then((response_: AxiosResponse) => {
             if (response_.status === 200) {
-              return response_.data;
+              console.log(response_.data);
+              if (response_.data.products) {
+                setProductsState(response_.data.products);
+              }
+              setStep(0);
             }
           })
           .catch((error_: AxiosError) => {
-            if (error_.code === '401') {
-              alert('Please sign in');
-            }
-            console.log('error_', error_);
-            return null;
+            console.log('[collection /index] => ', error_);
           });
       }
-
-      await instance
-        .get(`/collections/${id}`)
-        .then((response_: AxiosResponse) => {
-          console.log(response_.status);
-          if (response_.status === 200) {
-            setProductsState(response_.data);
-            setStep(0);
-          }
-        })
-        .catch((error_: AxiosError) => {
-          console.log('[collection /index] => ', error_);
-        });
-
       setProgress(false);
     }
+  };
+
+  const turnToProduct = (productId_: string) => {
+    router.push(`/product/${productId_}`);
   };
 
   return (
@@ -186,13 +198,15 @@ export default function CollectionDetail(props: Collection) {
               <Typography>Name: </Typography>
               <Typography>Symbol: </Typography>
               <Typography>Address: </Typography>
-              {histories && histories[1] && histories[1].transactionHash && <Typography>Txn Hash: </Typography>}
+              {data?.histories && data.histories[1] && data.histories[1].transactionHash && <Typography>Txn Hash: </Typography>}
             </Box>
             <Box ml={3}>
-              <Typography>{name}</Typography>
-              <Typography>{symbol}</Typography>
-              <Typography>{address}</Typography>
-              {histories && histories[1] && histories[1].transactionHash && <Typography>{histories[1].transactionHash}</Typography>}
+              <Typography>{data?.name}</Typography>
+              <Typography>{data?.symbol}</Typography>
+              <Typography>{data?.address}</Typography>
+              {data?.histories && data.histories[1] && data.histories[1].transactionHash && (
+                <Typography>{data.histories[1].transactionHash}</Typography>
+              )}
             </Box>
           </Box>
           {step === 0 ? (
@@ -202,7 +216,11 @@ export default function CollectionDetail(props: Collection) {
                   productsState.length > 0 &&
                   productsState.map((product_: Product, index_: number) => (
                     <Grid item xs={3} key={`collection_${index_}`} border="solid 1px black" style={{ cursor: 'pointer' }}>
-                      <Card onClick={() => {}}>
+                      <Card
+                        onClick={() => {
+                          turnToProduct(product_.id);
+                        }}
+                      >
                         <CardContent>
                           <Typography sx={{ fontSize: 16 }} color="text.secondary" gutterBottom>
                             Product {index_ + 1}
