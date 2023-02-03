@@ -71,7 +71,9 @@ export class ProductsService {
     relations_?: FindOptionsRelations<Product>,
     select_?: FindOptionsSelect<Product>,
   ): Promise<Product> {
-    return this._selectOne(where_, relations_, select_);
+    const product = await this._selectOne(where_, relations_, select_);
+    console.log(product);
+    return product;
   }
 
   /********************************************************************************
@@ -135,6 +137,7 @@ export class ProductsService {
 
     createProductDto_.metadata = fullMetadataPath;
     createProductDto_.image = fullImagePath;
+    createProductDto_.total_edition = edition_;
     createProductDto_.creator = { id: user.id };
     createProductDto_.collection = { id: collectionId_ };
     createProductDto_.editions = [];

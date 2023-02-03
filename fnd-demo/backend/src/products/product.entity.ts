@@ -30,6 +30,9 @@ export class Product {
   @Column('varchar', { nullable: true })
   public image?: string;
 
+  @Column('numeric', { default: 1 })
+  public total_edition?: number;
+
   @Column('varchar', { nullable: true })
   public token_id?: string;
 

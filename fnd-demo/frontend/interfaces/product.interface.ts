@@ -12,6 +12,7 @@ export interface Product {
   image: string;
   metadata?: string;
   token_id?: string;
+  total_edition: number;
   created_at: string;
   creator: User;
   editions: Edition[];

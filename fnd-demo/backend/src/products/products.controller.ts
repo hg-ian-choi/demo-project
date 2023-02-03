@@ -53,7 +53,12 @@ export class ProductsController {
   ): Promise<Product> {
     return this.productsService.getProduct(
       { id: productId_ },
-      { collection: true, creator: true, editions: { owner: true } },
+      {
+        collection: true,
+        creator: true,
+        editions: { owner: true },
+        histories: true,
+      },
     );
   }
 
