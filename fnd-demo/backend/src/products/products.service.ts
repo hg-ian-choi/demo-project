@@ -71,7 +71,7 @@ export class ProductsService {
     where_: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
     select_?: FindOptionsSelect<Product>,
-  ): Promise<Product> {
+  ): Promise<any> {
     const product = await this._selectOne(where_, relations_, select_);
 
     const editions: { edition: Edition; count: number }[] = [];
@@ -89,7 +89,7 @@ export class ProductsService {
       }
     }
 
-    return product;
+    return { ...product, editions: editions };
   }
 
   /********************************************************************************

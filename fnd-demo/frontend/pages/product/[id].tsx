@@ -1,6 +1,6 @@
 // pages/product/[id].tsx
 
-import { Card, CircularProgress, Typography } from '@mui/material';
+import { Card, CircularProgress, Table, Typography } from '@mui/material';
 import { Box, Container } from '@mui/system';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import Image from 'next/image';
