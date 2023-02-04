@@ -1,10 +1,13 @@
 // pages/product/[id].tsx
 
-import { Card, CircularProgress, Table, Typography } from '@mui/material';
+import { Button, CircularProgress, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { Box, Container } from '@mui/system';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import Image from 'next/image';
 import { useState } from 'react';
+import { ProductHistory } from '../../interfaces/product-history.interface';
+import { ProductHistoryType } from '../../enums/product-history-type.enum';
+import { ProductStatus } from '../../enums/product-status.enum';
 import { Product } from '../../interfaces/product.interface';
 import { ServerSideResponse } from '../../interfaces/serverside-response.interface';
 
@@ -20,7 +23,7 @@ export async function getServerSideProps(context: any) {
       .get(`/products/${context.params.id}`)
       .then((response_: AxiosResponse) => {
         if (response_.status === 200) {
-          console.log(response_.data);
+          console.log('response_.data', response_.data);
           result.data = response_.data;
         }
       })
@@ -80,13 +83,89 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                 </Box>
               </Box>
             </Container>
-            <Container>
-              <Box>Histories: </Box>
-              {data.editions.map((edition_, index_) => {
-                console.log('edition_', edition_);
-                return <Box key={`edition_${index_}`}></Box>;
-              })}
-            </Container>
+            {data && data.histories && (
+              <Container>
+                <Box mt={10}>Histories: </Box>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align="center">Type</TableCell>
+                        <TableCell align="center">From</TableCell>
+                        <TableCell align="center">To</TableCell>
+                        <TableCell align="center">Amount</TableCell>
+                        <TableCell align="center">Price</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.histories.map((history_: ProductHistory, index_: number) => {
+                        if (history_.type.toString() === '0') {
+                          return;
+                        }
+                        return (
+                          <TableRow key={history_.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell component="th" scope="row" align="center">
+                              {ProductHistoryType[history_.type]}
+                            </TableCell>
+                            <TableCell align="center">{history_.type.toString() === '1' ? '-' : history_.buyer.username}</TableCell>
+                            <TableCell align="center">
+                              {history_.type.toString() === '1' ? history_.operator.username : history_.buyer.username}
+                            </TableCell>
+                            <TableCell align="center">{history_.amount}</TableCell>
+                            <TableCell align="center">{history_.price?.toString() === '0' ? '-' : history_.price}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>{' '}
+                  </Table>
+                </TableContainer>
+              </Container>
+            )}
+            {data && data.editions && (
+              <Container>
+                <Box mt={10}>Editions: </Box>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align="center">Name</TableCell>
+                        <TableCell align="center">Creator</TableCell>
+                        <TableCell align="center">Owner</TableCell>
+                        <TableCell align="center">Status</TableCell>
+                        <TableCell align="center">Price</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.editions.map((edition_, index_) => {
+                        return (
+                          <TableRow key={edition_.edition.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell component="th" scope="row" align="center">
+                              {data.name}
+                            </TableCell>
+                            <TableCell align="center">{data.creator.username}</TableCell>
+                            <TableCell align="center">{edition_.edition.owner.username}</TableCell>
+                            <TableCell align="center">{ProductStatus[edition_.edition.status]}</TableCell>
+                            <TableCell align="center">
+                              {edition_.edition.price.toString() === '1' ? (
+                                'Sold out'
+                              ) : (
+                                <Button
+                                  onClick={() => {
+                                    console.log(edition_.edition.id);
+                                  }}
+                                >
+                                  Buy now
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>{' '}
+                  </Table>
+                </TableContainer>
+              </Container>
+            )}
           </Container>
         )
       )}

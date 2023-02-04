@@ -15,7 +15,7 @@ export interface Product {
   total_edition: number;
   created_at: string;
   creator: User;
-  editions: Edition[];
+  editions: { edition: Edition; count: number }[];
   histories?: ProductHistory[];
   collection?: Collection;
 }

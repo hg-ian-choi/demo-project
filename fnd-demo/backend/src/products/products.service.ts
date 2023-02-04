@@ -89,6 +89,8 @@ export class ProductsService {
       }
     }
 
+    console.log('_product', { ...product, editions: editions });
+
     return { ...product, editions: editions };
   }
 

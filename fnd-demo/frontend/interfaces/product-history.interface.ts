@@ -12,5 +12,6 @@ export interface ProductHistory {
   created_at: string;
   seller: User;
   buyer: User;
+  operator: User;
   product: Product;
 }

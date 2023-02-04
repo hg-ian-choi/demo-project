@@ -57,7 +57,7 @@ export class ProductsController {
         collection: true,
         creator: true,
         editions: { owner: true },
-        histories: true,
+        histories: { buyer: true, seller: true, operator: true },
       },
     );
   }
