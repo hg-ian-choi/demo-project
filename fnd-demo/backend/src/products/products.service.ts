@@ -25,6 +25,7 @@ import {
 } from 'typeorm';
 import { Product } from './product.entity';
 import productABI from '../web3/abis/product.abi.json';
+import { Edition } from 'src/editions/edition.entity';
 
 @Injectable()
 export class ProductsService {
@@ -72,7 +73,20 @@ export class ProductsService {
     select_?: FindOptionsSelect<Product>,
   ): Promise<Product> {
     const product = await this._selectOne(where_, relations_, select_);
-    console.log(product);
+
+    const filteredEdition = product.editions.filter(
+      (edition_: Edition, index_: number, self_: Edition[]) =>
+        index_ ===
+        self_.findIndex(
+          (findEdition_: Edition) =>
+            findEdition_.owner.id === edition_.owner.id &&
+            findEdition_.status === edition_.status,
+        ),
+    );
+
+    console.log('filteredEdition', filteredEdition);
+    console.log('product.editions', product.editions);
+
     return product;
   }
 
