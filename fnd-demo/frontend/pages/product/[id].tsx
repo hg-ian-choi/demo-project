@@ -83,6 +83,53 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                 </Box>
               </Box>
             </Container>
+            {data && data.editions && (
+              <Container>
+                <Box mt={10}>Editions: </Box>
+                <TableContainer component={Paper}>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align="center">Name</TableCell>
+                        <TableCell align="center">Creator</TableCell>
+                        <TableCell align="center">Owner</TableCell>
+                        <TableCell align="center">Price</TableCell>
+                        <TableCell align="center">Status</TableCell>
+                        <TableCell align="center"></TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {data.editions.map((edition_) => {
+                        return (
+                          <TableRow key={edition_.edition.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell component="th" scope="row" align="center">
+                              {data.name}
+                            </TableCell>
+                            <TableCell align="center">{data.creator.username}</TableCell>
+                            <TableCell align="center">{edition_.edition.owner.username}</TableCell>
+                            <TableCell align="center">{edition_.edition.price.toString() === '0' ? '-' : edition_.edition.price}</TableCell>
+                            <TableCell align="center">{ProductStatus[edition_.edition.status]}</TableCell>
+                            <TableCell align="center">
+                              {edition_.edition.status.toString() === '1' ? (
+                                '-'
+                              ) : (
+                                <Button
+                                  onClick={() => {
+                                    console.log(edition_.edition.status, edition_.edition.owner.id);
+                                  }}
+                                >
+                                  Buy now
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Container>
+            )}
             {data && data.histories && (
               <Container>
                 <Box mt={10}>Histories: </Box>
@@ -98,7 +145,7 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {data.histories.map((history_: ProductHistory, index_: number) => {
+                      {data.histories.map((history_: ProductHistory) => {
                         if (history_.type.toString() === '0') {
                           return;
                         }
@@ -116,52 +163,7 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                           </TableRow>
                         );
                       })}
-                    </TableBody>{' '}
-                  </Table>
-                </TableContainer>
-              </Container>
-            )}
-            {data && data.editions && (
-              <Container>
-                <Box mt={10}>Editions: </Box>
-                <TableContainer component={Paper}>
-                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell align="center">Name</TableCell>
-                        <TableCell align="center">Creator</TableCell>
-                        <TableCell align="center">Owner</TableCell>
-                        <TableCell align="center">Status</TableCell>
-                        <TableCell align="center">Price</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {data.editions.map((edition_, index_) => {
-                        return (
-                          <TableRow key={edition_.edition.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                            <TableCell component="th" scope="row" align="center">
-                              {data.name}
-                            </TableCell>
-                            <TableCell align="center">{data.creator.username}</TableCell>
-                            <TableCell align="center">{edition_.edition.owner.username}</TableCell>
-                            <TableCell align="center">{ProductStatus[edition_.edition.status]}</TableCell>
-                            <TableCell align="center">
-                              {edition_.edition.price.toString() === '1' ? (
-                                'Sold out'
-                              ) : (
-                                <Button
-                                  onClick={() => {
-                                    console.log(edition_.edition.id);
-                                  }}
-                                >
-                                  Buy now
-                                </Button>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>{' '}
+                    </TableBody>
                   </Table>
                 </TableContainer>
               </Container>
