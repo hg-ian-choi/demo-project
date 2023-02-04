@@ -74,18 +74,20 @@ export class ProductsService {
   ): Promise<Product> {
     const product = await this._selectOne(where_, relations_, select_);
 
-    const filteredEdition = product.editions.filter(
-      (edition_: Edition, index_: number, self_: Edition[]) =>
-        index_ ===
-        self_.findIndex(
-          (findEdition_: Edition) =>
-            findEdition_.owner.id === edition_.owner.id &&
-            findEdition_.status === edition_.status,
-        ),
-    );
+    const editions: { edition: Edition; count: number }[] = [];
 
-    console.log('filteredEdition', filteredEdition);
-    console.log('product.editions', product.editions);
+    for await (const edition_ of product.editions) {
+      const findedEditionIndex = editions.findIndex(
+        (findEdition_: { edition: Edition; count: number }) =>
+          findEdition_?.edition?.owner?.id === edition_.owner.id &&
+          findEdition_?.edition?.status === edition_.status,
+      );
+      if (findedEditionIndex >= 0) {
+        editions[findedEditionIndex].count += 1;
+      } else {
+        editions.push({ edition: edition_, count: 1 });
+      }
+    }
 
     return product;
   }
