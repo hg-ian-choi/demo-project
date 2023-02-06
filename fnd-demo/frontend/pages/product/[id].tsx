@@ -10,6 +10,8 @@ import { ProductHistoryType } from '../../enums/product-history-type.enum';
 import { ProductStatus } from '../../enums/product-status.enum';
 import { Product } from '../../interfaces/product.interface';
 import { ServerSideResponse } from '../../interfaces/serverside-response.interface';
+import { useSelector } from 'react-redux';
+import { loginUserSelector } from '../../store/loginUserSlice';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -37,6 +39,7 @@ export async function getServerSideProps(context: any) {
 
 export default function ProductDetail(props: ServerSideResponse<Product>) {
   const { data, error } = props;
+  const loginUser = useSelector(loginUserSelector);
 
   const [progress, setProgress] = useState(false);
 
@@ -93,6 +96,7 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                         <TableCell align="center">Name</TableCell>
                         <TableCell align="center">Creator</TableCell>
                         <TableCell align="center">Owner</TableCell>
+                        <TableCell align="center">Amount</TableCell>
                         <TableCell align="center">Price</TableCell>
                         <TableCell align="center">Status</TableCell>
                         <TableCell align="center"></TableCell>
@@ -107,10 +111,19 @@ export default function ProductDetail(props: ServerSideResponse<Product>) {
                             </TableCell>
                             <TableCell align="center">{data.creator.username}</TableCell>
                             <TableCell align="center">{edition_.edition.owner.username}</TableCell>
+                            <TableCell align="center">{edition_.count}</TableCell>
                             <TableCell align="center">{edition_.edition.price.toString() === '0' ? '-' : edition_.edition.price}</TableCell>
                             <TableCell align="center">{ProductStatus[edition_.edition.status]}</TableCell>
                             <TableCell align="center">
-                              {edition_.edition.status.toString() === '1' ? (
+                              {edition_.edition.owner.id === loginUser.userId ? (
+                                <Button
+                                  onClick={() => {
+                                    console.log(edition_.edition.owner.id);
+                                  }}
+                                >
+                                  Set Price
+                                </Button>
+                              ) : edition_.edition.status.toString() === '0' ? (
                                 '-'
                               ) : (
                                 <Button

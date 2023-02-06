@@ -9,6 +9,7 @@ import { getAccount, getContractInstance } from '../api/web3';
 import { loginUserSelector } from '../../store/loginUserSlice';
 import factoryABI from '../../abis/factory.abi.json';
 import { Collection } from '../../interfaces/collection.interface';
+
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
@@ -170,7 +171,15 @@ export default function Collections(props: any) {
       ) : (
         <Container style={{ padding: '30px 0' }}>
           {step === 0 ? (
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <Grid container columnGap={3} rowGap={3} justifyContent="center">
                 {collectionsState.length > 0 &&
                   collectionsState.map((value_: Collection, index_: number) => (

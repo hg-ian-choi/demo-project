@@ -297,7 +297,7 @@ export default function CollectionDetail(props: ServerSideResponse<Collection>) 
                   </Box>
                   <Box display="flex" justifyContent="space-between" alignItems="center" mt="30px">
                     <label htmlFor="name">
-                      name<span style={{ color: 'red' }}>*</span>
+                      edition<span style={{ color: 'red' }}>*</span>
                     </label>
                     <Box ml="30px">
                       <TextField
