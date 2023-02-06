@@ -31,37 +31,6 @@ import { ProductsService } from './products.service';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  /******************************************************************************
-   ************************************ READ ************************************
-   ******************************************************************************/
-  @Get('/')
-  private async getProducts(
-    @Body('where') where_?: FindOptionsWhere<Product>,
-    @Body('order') order_?: FindOptionsOrder<Product>,
-    @Body('relations') relations_?: FindOptionsRelations<Product>,
-  ): Promise<Product[]> {
-    return this.getProducts(
-      { ...where_, token_id: Not(IsNull()) },
-      order_,
-      relations_,
-    );
-  }
-
-  @Get('/:product_id')
-  private async getProduct(
-    @Param('product_id') productId_: string,
-  ): Promise<Product> {
-    return this.productsService.getProduct(
-      { id: productId_ },
-      {
-        collection: true,
-        creator: true,
-        editions: { owner: true },
-        histories: { buyer: true, seller: true, operator: true },
-      },
-    );
-  }
-
   /********************************************************************************
    ************************************ CREATE ************************************
    ********************************************************************************/
@@ -86,6 +55,37 @@ export class ProductsController {
       edition_,
       collectionId_,
       createProductDto,
+    );
+  }
+
+  /******************************************************************************
+   ************************************ READ ************************************
+   ******************************************************************************/
+  @Get('/')
+  private async getProducts(
+    @Body('where') where_?: FindOptionsWhere<Product>,
+    @Body('order') order_?: FindOptionsOrder<Product>,
+    @Body('relations') relations_?: FindOptionsRelations<Product>,
+  ): Promise<Product[]> {
+    return this.getProducts(
+      { ...where_, token_id: Not(IsNull()) },
+      order_,
+      relations_,
+    );
+  }
+
+  @Get('/:product_id')
+  private async getProduct(
+    @Param('product_id') productId_: string,
+  ): Promise<Product> {
+    return this.productsService.getPageProduct(
+      { id: productId_ },
+      {
+        collection: true,
+        creator: true,
+        editions: { owner: true },
+        histories: { buyer: true, seller: true, operator: true },
+      },
     );
   }
 

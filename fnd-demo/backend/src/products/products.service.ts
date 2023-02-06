@@ -60,6 +60,14 @@ export class ProductsService {
     return this._selectMany(where_, relations_, order_, select_);
   }
 
+  public async getProduct(
+    where_: FindOptionsWhere<Product>,
+    relations_?: FindOptionsRelations<Product>,
+    select_?: FindOptionsSelect<Product>,
+  ): Promise<Product> {
+    return this._selectOne(where_, relations_, select_);
+  }
+
   /**
    * @description get Product
    * @param where
@@ -67,7 +75,7 @@ export class ProductsService {
    * @param select
    * @returns Product
    */
-  public async getProduct(
+  public async getPageProduct(
     where_: FindOptionsWhere<Product>,
     relations_?: FindOptionsRelations<Product>,
     select_?: FindOptionsSelect<Product>,
@@ -212,6 +220,7 @@ export class ProductsService {
       }
       const productHistory = await this.productHistoriesService.create({
         type: ProductHistoryType.sync,
+        amount: product.total_edition,
         txn_hash: txnHash_,
         product: { id: product.id },
         operator: { id: product.creator.id },
