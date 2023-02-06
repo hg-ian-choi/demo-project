@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "../I1155.sol";
+import "../IProduct1155.sol";
 
 contract Core is ERC1155Holder {
     address owner;
@@ -52,113 +52,114 @@ contract Core is ERC1155Holder {
         return walletToContractToTokenToProduct[seller_][contract_][tokenId_];
     }
 
-    function balanceOf(address contract_, uint256 id_) internal view returns (uint256) {
-        return I1155(contract_).balanceOf(_msgSender(), id_);
+    function balanceOf(address contract_, uint256 tokenId_) internal view returns (uint256) {
+        return IProduct1155(contract_).balanceOf(_msgSender(), tokenId_);
     }
 
     // setProduct, cancelProduct, buyProduct
-    function setProduct(address contract_, uint256 id_, uint256 amount_, uint256 price_) external {
+    function setProduct(address contract_, uint256 tokenId_, uint256 amount_, uint256 price_) external {
         require(amount_ > 0, "Amount is 0");
-        uint256 _balance = I1155(contract_).balanceOf(_msgSender(), id_);
+        uint256 _balance = IProduct1155(contract_).balanceOf(_msgSender(), tokenId_);
         require(_balance >= amount_, "Not sufficient balance");
         require(price_ > 10000000000000000, "Price should > 0.01 ETH");
 
         if (creator[contract_] == address(0)) {
-            creator[contract_] = I1155(contract_).getOwner();
+            creator[contract_] = IProduct1155(contract_).getOwner();
         }
 
-        Product memory _product = walletToContractToTokenToProduct[_msgSender()][contract_][id_];
+        Product memory _product = walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_];
 
         if (_product.seller == address(0)) {
             _product.seller = _msgSender();
             _product.amount = amount_;
             _product.price = price_;
-            walletToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+            walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_] = _product;
 
-            I1155(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_, "0x00");
+            IProduct1155(contract_).safeTransferFrom(_msgSender(), address(this), tokenId_, amount_, "0x00");
         } else {
             if (amount_ < _product.amount) {
-                I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, _product.amount - amount_, "0x00");
+                IProduct1155(contract_).safeTransferFrom(address(this), _msgSender(), tokenId_, _product.amount - amount_, "0x00");
                 _product.amount = amount_;
                 _product.price = price_;
-                walletToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+                walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_] = _product;
             } else if (amount_ > _product.amount) {
-                I1155(contract_).safeTransferFrom(_msgSender(), address(this), id_, amount_ - _product.amount, "0x00");
+                IProduct1155(contract_).safeTransferFrom(_msgSender(), address(this), tokenId_, amount_ - _product.amount, "0x00");
                 _product.amount = amount_;
                 _product.price = price_;
-                walletToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+                walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_] = _product;
             } else {
                 _product.price = price_;
-                walletToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+                walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_] = _product;
             }
         }
-        emit setProductEvent(_msgSender(), contract_, id_, price_, amount_);
+        emit setProductEvent(_msgSender(), contract_, tokenId_, price_, amount_);
     }
 
-    function cancelProduct(address payable contract_, uint256 id_, uint256 amount_) external {
+    function cancelProduct(address payable contract_, uint256 tokenId_, uint256 amount_) external {
         require(amount_ > 0, "Amount should > 0");
 
-        Product memory _product = walletToContractToTokenToProduct[_msgSender()][contract_][id_];
+        Product memory _product = walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_];
 
         require(_product.seller != address(0), "Product is not on sale");
         require(amount_ <= _product.amount, "Amount should less than selling");
 
         if (amount_ == _product.amount) {
-            I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
-            delete walletToContractToTokenToProduct[_msgSender()][contract_][id_];
+            IProduct1155(contract_).safeTransferFrom(address(this), _msgSender(), tokenId_, amount_, "0x00");
+            delete walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_];
         } else {
-            I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
+            IProduct1155(contract_).safeTransferFrom(address(this), _msgSender(), tokenId_, amount_, "0x00");
             _product.amount = _product.amount - amount_;
-            walletToContractToTokenToProduct[_msgSender()][contract_][id_] = _product;
+            walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_] = _product;
         }
-        emit setProductEvent(_msgSender(), contract_, id_, 0, amount_);
+        emit setProductEvent(_msgSender(), contract_, tokenId_, 0, amount_);
     }
 
-    function buyProduct(address payable seller_, address payable contract_, uint256 id_, uint256 amount_) external payable {
-        Product memory sell = walletToContractToTokenToProduct[seller_][contract_][id_];
+    function buyProduct(address payable seller_, address payable contract_, uint256 tokenId_, uint256 amount_) external payable {
+        Product memory sell = walletToContractToTokenToProduct[seller_][contract_][tokenId_];
 
-        require(sell.seller != _msgSender(), "Can not buy own Product");
         require(sell.seller != address(0), "Product not exist");
         require(sell.price > 0, "Can not buy Product whose price is 0");
         require(sell.amount > 0, "Can not buy Product whose amount is 0");
-        // require(msg.value >= sell.price, "Not sufficient funds");
         require(amount_ <= sell.amount, "Not sufficient sell amount");
         require(amount_ > 0, "Can not buy 0 Product");
 
         uint256 totalPrice = sell.price * amount_;
 
-        require(ethBalance[_msgSender()] >= totalPrice, "Not sufficient funds");
+        if (_msgValue() >= totalPrice) {
+            require(_msgValue() >= totalPrice, "Not sufficient funds");
+            uint256 sellerValue = (totalPrice * 92) / 100;
+            uint256 ownerValue = (totalPrice * 3) / 100;
+            uint256 artistvalue = (totalPrice * 5) / 100;
 
-        // uint256 sellerValue = (totalPrice * 92) / 100;
-        // uint256 ownerValue = (totalPrice * 3) / 100;
-        // uint256 artistvalue = (totalPrice * 5) / 100;
+            (bool sentToSeller, ) = sell.seller.call{value: sellerValue}("");
+            (bool sentToOwner, ) = owner.call{value: ownerValue}("");
+            (bool sentToArtist, ) = creator[contract_].call{value: artistvalue}("");
 
-        // (bool sentToSeller, ) = sell.seller.call{value: sellerValue}("");
-        // (bool sentToOwner, ) = _owner.call{value: ownerValue}("");
-        // (bool sentToArtist, ) = creator[contract_].call{value: artistvalue}("");
+            require(sentToSeller, "Failed to send to Seller!");
+            require(sentToOwner, "Failed to send to Owner!");
+            require(sentToArtist, "Failed to send to Artist!");
 
-        // require(sentToSeller, "Failed to send to Seller!");
-        // require(sentToOwner, "Failed to send to Owner!");
-        // require(sentToArtist, "Failed to send to Artist!");
-
-        // if (msg.value > totalPrice) {
-        //     emit receiveExtraEvent(_msgSender(), msg.value - totalPrice);
-        // }
-
-        ethBalance[_msgSender()] -= totalPrice;
-        ethBalance[sell.seller] += (totalPrice * 92) / 100;
-        ethBalance[owner] += (totalPrice * 3) / 100;
-        ethBalance[creator[contract_]] += (totalPrice * 5) / 100;
-
-        if (amount_ == sell.amount) {
-            delete walletToContractToTokenToProduct[seller_][contract_][id_];
+            if (msg.value > totalPrice) {
+                emit receiveExtraEvent(_msgSender(), _msgValue() - totalPrice);
+            }
         } else {
-            sell.amount -= amount_;
-            walletToContractToTokenToProduct[seller_][contract_][id_] = sell;
+            require(sell.seller != _msgSender(), "Can not buy own Product");
+            require(ethBalance[_msgSender()] >= totalPrice, "Not sufficient funds");
+            ethBalance[_msgSender()] -= totalPrice;
+            ethBalance[sell.seller] += (totalPrice * 92) / 100;
+            ethBalance[owner] += (totalPrice * 3) / 100;
+            ethBalance[creator[contract_]] += (totalPrice * 5) / 100;
         }
 
-        I1155(contract_).safeTransferFrom(address(this), _msgSender(), id_, amount_, "0x00");
-        emit buyProductEvent(sell.seller, _msgSender(), contract_, id_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
+        if (amount_ == sell.amount) {
+            delete walletToContractToTokenToProduct[seller_][contract_][tokenId_];
+        } else {
+            sell.amount -= amount_;
+            walletToContractToTokenToProduct[seller_][contract_][tokenId_] = sell;
+        }
+
+        IProduct1155(contract_).safeTransferFrom(address(this), _msgSender(), tokenId_, amount_, "0x00");
+        emit buyProductEvent(sell.seller, _msgSender(), contract_, tokenId_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 
     // balance enquiry, deposit, withdraw
@@ -205,6 +206,10 @@ contract Core is ERC1155Holder {
     // private functions
     function _msgSender() private view returns (address) {
         return msg.sender;
+    }
+
+    function _msgValue() private view returns (uint256) {
+        return msg.value;
     }
 
     // functions must exist
