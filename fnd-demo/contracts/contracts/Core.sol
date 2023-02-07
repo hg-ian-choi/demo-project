@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "../IProduct1155.sol";
+import "./IProduct1155.sol";
 
 contract Core is ERC1155Holder {
     address owner;
@@ -95,7 +95,7 @@ contract Core is ERC1155Holder {
         emit setProductEvent(_msgSender(), contract_, tokenId_, price_, amount_);
     }
 
-    function cancelProduct(address payable contract_, uint256 tokenId_, uint256 amount_) external {
+    function cancelProduct(address contract_, uint256 tokenId_, uint256 amount_) external {
         require(amount_ > 0, "Amount should > 0");
 
         Product memory _product = walletToContractToTokenToProduct[_msgSender()][contract_][tokenId_];
@@ -114,7 +114,7 @@ contract Core is ERC1155Holder {
         emit setProductEvent(_msgSender(), contract_, tokenId_, 0, amount_);
     }
 
-    function buyProduct(address payable seller_, address payable contract_, uint256 tokenId_, uint256 amount_) external payable {
+    function buyProduct(address seller_, address contract_, uint256 tokenId_, uint256 amount_) external payable {
         Product memory sell = walletToContractToTokenToProduct[seller_][contract_][tokenId_];
 
         require(sell.seller != address(0), "Product not exist");
@@ -124,31 +124,41 @@ contract Core is ERC1155Holder {
         require(amount_ > 0, "Can not buy 0 Product");
 
         uint256 totalPrice = sell.price * amount_;
+        uint256 sellerValue = (totalPrice * 92) / 100;
+        uint256 ownerValue = (totalPrice * 3) / 100;
+        uint256 artistvalue = (totalPrice * 5) / 100;
 
         if (_msgValue() >= totalPrice) {
             require(_msgValue() >= totalPrice, "Not sufficient funds");
-            uint256 sellerValue = (totalPrice * 92) / 100;
-            uint256 ownerValue = (totalPrice * 3) / 100;
-            uint256 artistvalue = (totalPrice * 5) / 100;
 
-            (bool sentToSeller, ) = sell.seller.call{value: sellerValue}("");
-            (bool sentToOwner, ) = owner.call{value: ownerValue}("");
-            (bool sentToArtist, ) = creator[contract_].call{value: artistvalue}("");
+            // (bool sentToSeller, ) = sell.seller.call{value: sellerValue}("");
+            // (bool sentToOwner, ) = owner.call{value: ownerValue}("");
+            // (bool sentToArtist, ) = creator[contract_].call{value: artistvalue}("");
 
-            require(sentToSeller, "Failed to send to Seller!");
-            require(sentToOwner, "Failed to send to Owner!");
-            require(sentToArtist, "Failed to send to Artist!");
+            // require(sentToSeller, "Failed to send to Seller!");
+            // require(sentToOwner, "Failed to send to Owner!");
+            // require(sentToArtist, "Failed to send to Artist!");
 
-            if (msg.value > totalPrice) {
+            ethBalance[seller_] += sellerValue;
+            ethBalance[owner] += ownerValue;
+            ethBalance[creator[contract_]] += artistvalue;
+
+            if (_msgValue() > totalPrice) {
+                ethBalance[_msgSender()] += _msgValue() - totalPrice;
                 emit receiveExtraEvent(_msgSender(), _msgValue() - totalPrice);
             }
+
+            emit buyProductEvent(sell.seller, _msgSender(), contract_, tokenId_, amount_, sell.price, totalPrice, _msgValue(), _msgValue() - totalPrice);
         } else {
             require(sell.seller != _msgSender(), "Can not buy own Product");
             require(ethBalance[_msgSender()] >= totalPrice, "Not sufficient funds");
+
             ethBalance[_msgSender()] -= totalPrice;
-            ethBalance[sell.seller] += (totalPrice * 92) / 100;
-            ethBalance[owner] += (totalPrice * 3) / 100;
-            ethBalance[creator[contract_]] += (totalPrice * 5) / 100;
+            ethBalance[seller_] += sellerValue;
+            ethBalance[owner] += ownerValue;
+            ethBalance[creator[contract_]] += artistvalue;
+
+            emit buyProductEvent(sell.seller, _msgSender(), contract_, tokenId_, amount_, sell.price, totalPrice, totalPrice, 0);
         }
 
         if (amount_ == sell.amount) {
@@ -159,7 +169,6 @@ contract Core is ERC1155Holder {
         }
 
         IProduct1155(contract_).safeTransferFrom(address(this), _msgSender(), tokenId_, amount_, "0x00");
-        emit buyProductEvent(sell.seller, _msgSender(), contract_, tokenId_, amount_, sell.price, totalPrice, msg.value, msg.value - totalPrice);
     }
 
     // balance enquiry, deposit, withdraw

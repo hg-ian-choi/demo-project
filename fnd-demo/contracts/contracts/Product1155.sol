@@ -8,18 +8,23 @@ import "@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155Supp
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./Ownable.sol";
 
-contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgradeable, ERC1155BurnableUpgradeable, ERC1155SupplyUpgradeable {
+contract Product1155 is Initializable, PausableUpgradeable, ERC1155Upgradeable, ERC1155BurnableUpgradeable, ERC1155SupplyUpgradeable {
     using Counters for Counters.Counter;
     Counters.Counter tokenId;
 
     string public name;
     string public symbol;
+    address owner;
     address core;
 
     mapping(uint256 => string) tokenURI;
     mapping(address => uint256[]) addressToTokenIdArray;
+
+    modifier onlyOwner() {
+        _checkOwner();
+        _;
+    }
 
     event mintEvent(string indexed id, address indexed creater, uint256 indexed tokenId, uint256 amount);
 
@@ -31,8 +36,8 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         name = name_;
         symbol = symbol_;
         core = core_;
+        owner = sender_;
         __ERC1155_init("");
-        __Ownable_init(sender_);
         __Pausable_init();
         __ERC1155Burnable_init();
         __ERC1155Supply_init();
@@ -42,10 +47,10 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         tokenId.increment();
         uint256 _tokenId = getCurrentTokenId();
         tokenURI[_tokenId] = uri_;
-        _mint(_sender(), _tokenId, amount_, data_);
+        _mint(_msgSender(), _tokenId, amount_, data_);
         setApprovalForAll(core, true);
         addressToTokenIdArray[_msgSender()].push(_tokenId);
-        emit mintEvent(id_, _sender(), _tokenId, amount_);
+        emit mintEvent(id_, _msgSender(), _tokenId, amount_);
         return _tokenId;
     }
 
@@ -69,16 +74,19 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
     }
 
     function safeTransferFrom(address from_, address to_, uint256 tokenId_, uint256 amount_, bytes memory data_) public override {
-        require(from_ == _msgSender() || isApprovedForAll(from_, _msgSender()), "ERC1155: caller is not token owner or approved");
+        require(
+            from_ == _msgSender() || _msgSender() == core || isApprovedForAll(from_, _msgSender()),
+            "ERC1155: caller is not token owner or approved"
+        );
 
         uint256 _tokenBalance = balanceOf(from_, tokenId_);
 
         if (amount_ == _tokenBalance) {
-            int256 _fromIndex = indexOf(addressToTokenIdArray[from_], tokenId_);
-            removeAddressToTokenElement(addressToTokenIdArray[from_], uint256(_fromIndex));
+            int256 _fromIndex = _indexOf(addressToTokenIdArray[from_], tokenId_);
+            _removeAddressToTokenElement(addressToTokenIdArray[from_], uint256(_fromIndex));
         }
 
-        int256 _toIndex = indexOf(addressToTokenIdArray[to_], tokenId_);
+        int256 _toIndex = _indexOf(addressToTokenIdArray[to_], tokenId_);
 
         if (_toIndex < 0) {
             addressToTokenIdArray[to_].push(tokenId_);
@@ -91,9 +99,9 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         require(from_ == _msgSender() || isApprovedForAll(from_, _msgSender()), "ERC1155: caller is not token owner or approved");
 
         if (amount_ == balanceOf(from_, tokenId_)) {
-            int _index = indexOf(addressToTokenIdArray[from_], tokenId_);
+            int256 _index = _indexOf(addressToTokenIdArray[from_], tokenId_);
             if (_index >= 0) {
-                removeAddressToTokenElement(addressToTokenIdArray[from_], uint256(_index));
+                _removeAddressToTokenElement(addressToTokenIdArray[from_], uint256(_index));
             }
         }
 
@@ -108,7 +116,16 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         return tokenId.current();
     }
 
-    function indexOf(uint256[] memory array_, uint256 searchFor_) private pure returns (int256) {
+    function getAddressTokens(address address_) public view returns (uint256[] memory) {
+        return addressToTokenIdArray[address_];
+    }
+
+    function getOwner() public view returns (address) {
+        return owner;
+    }
+
+    // private functions
+    function _indexOf(uint256[] memory array_, uint256 searchFor_) private pure returns (int256) {
         for (uint256 i = 0; i < array_.length; i++) {
             if (array_[i] == searchFor_) {
                 return int256(i);
@@ -117,10 +134,14 @@ contract Product1155 is Initializable, Ownable, PausableUpgradeable, ERC1155Upgr
         return -1;
     }
 
-    function removeAddressToTokenElement(uint256[] storage array_, uint256 removeFor_) private {
+    function _removeAddressToTokenElement(uint256[] storage array_, uint256 removeFor_) private {
         for (uint256 i = removeFor_; i < array_.length - 1; i++) {
             array_[i] = array_[i + 1];
         }
         array_.pop();
+    }
+
+    function _checkOwner() private view {
+        require(owner == _msgSender(), "Ownable: caller is not the owner");
     }
 }
